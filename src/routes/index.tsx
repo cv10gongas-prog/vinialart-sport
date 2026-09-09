@@ -63,9 +63,10 @@ function Home() {
           <span className="skew-tag bg-magenta px-3 py-1 font-display text-[0.6rem] text-primary-foreground">
             VinilArt Sport
           </span>
-          <h1 className="mt-5 max-w-3xl text-[2.6rem] leading-[0.88] sm:text-6xl md:text-7xl">
+          <h1 className="mt-5 max-w-3xl text-[2rem] leading-[0.9] break-words sm:text-5xl md:text-7xl">
             Personalizamos <span className="text-sport-gradient">a tua paixão.</span>
           </h1>
+
           <p className="mt-5 max-w-lg text-base text-muted-foreground sm:text-lg">
             Produtos desportivos e artigos personalizados à tua medida.
           </p>
@@ -73,7 +74,7 @@ function Home() {
             <SportLink to="/personalizar" size="lg">
               Personalizar produto
             </SportLink>
-            <SportLink to="/loja" variant="outline" size="lg">
+            <SportLink to="/loja" variant="outline" shape="square" size="lg">
               Explorar loja
             </SportLink>
           </div>
@@ -158,7 +159,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <SectionHeading eyebrow="Destaques" title="Produtos em destaque" />
-          <SportLink to="/loja" variant="outline" size="sm">
+          <SportLink to="/loja" variant="outline" shape="square" size="sm">
             Ver toda a loja
           </SportLink>
         </div>
@@ -283,7 +284,7 @@ function Home() {
             <SportLink to="/personalizar" size="lg">
               Personalizar
             </SportLink>
-            <SportLink to="/loja" variant="outline" size="lg">
+            <SportLink to="/loja" variant="outline" shape="square" size="lg">
               Ver loja
             </SportLink>
           </div>

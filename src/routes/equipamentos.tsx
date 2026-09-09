@@ -76,7 +76,7 @@ function Equipamentos() {
             <SportLink to="/contactos" size="lg">
               Falar com a VinilArt Sport
             </SportLink>
-            <SportLink to="/personalizar" variant="outline" size="lg">
+            <SportLink to="/personalizar" variant="outline" shape="square" size="lg">
               Personalizar
             </SportLink>
           </div>

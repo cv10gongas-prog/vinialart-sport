@@ -32,9 +32,10 @@ export function PageHero({
         <span className="skew-tag bg-cyan px-3 py-1 font-display text-[0.6rem] text-accent-foreground">
           {eyebrow}
         </span>
-        <h1 className="mt-4 max-w-3xl text-4xl leading-[0.9] sm:text-5xl md:text-6xl">
+        <h1 className="mt-4 max-w-3xl text-[1.9rem] leading-[0.92] break-words sm:text-5xl md:text-6xl">
           {title}
         </h1>
+
         {text && <p className="mt-4 max-w-xl text-muted-foreground">{text}</p>}
       </div>
     </section>

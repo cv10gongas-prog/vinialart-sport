@@ -167,7 +167,7 @@ function Produto() {
             <SportLink to="/personalizar" size="lg">
               Personalizar
             </SportLink>
-            <SportButton variant="outline" size="lg" disabled>
+            <SportButton variant="outline" shape="square" size="lg" disabled>
               Adicionar ao carrinho
             </SportButton>
           </div>

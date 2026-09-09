@@ -75,7 +75,7 @@ function Personalizar() {
           <SportButton size="lg" disabled>
             Finalizar encomenda
           </SportButton>
-          <SportLink to="/contactos" variant="outline" size="lg">
+          <SportLink to="/contactos" variant="outline" shape="square" size="lg">
             Pedir ajuda
           </SportLink>
         </div>
