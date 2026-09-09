@@ -13,8 +13,20 @@
  */
 
 // ---------------------------------------------------------------------------
-// Print Area
+// Print Area & Clip Shapes
 // ---------------------------------------------------------------------------
+
+export type ClipShapeType = "rect" | "rounded" | "contour" | "svg-path";
+
+export interface ClipShape {
+  type: ClipShapeType;
+  /** Corner radius in pixels if type === "rounded" */
+  cornerRadius?: number | number[] | undefined;
+  /** Array of normalized points [x0, y0, x1, y1...] (0..1 relative to printArea) if type === "contour" */
+  points?: number[] | undefined;
+  /** SVG path d string if type === "svg-path" */
+  svgPath?: string | undefined;
+}
 
 /** Bounding box within the mockup image coordinate space. */
 export interface PrintArea {
@@ -26,6 +38,8 @@ export interface PrintArea {
   widthFraction: number;
   /** Height as fraction of canvas height (0–1) */
   heightFraction: number;
+  /** Custom clipping shape (replaces plain rectangle) */
+  shape?: ClipShape | undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -34,11 +48,27 @@ export interface PrintArea {
 
 export type SurfaceId = string; // e.g. "LEFT" | "RIGHT" | "FRONT" | "BACK"
 
+export interface SurfaceMockup {
+  /** Base product image */
+  baseSrc: string;
+  /** Optional surface shading / glossy highlight overlay image */
+  overlaySrc?: string | undefined;
+  /** Sub-rectangle of the source image to focus on (for multi-item assets) */
+  crop?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | undefined;
+}
+
 export interface Surface {
   id: SurfaceId;
   label: string;
   /** Path/URL to the product mockup image for this surface */
   mockupSrc: string;
+  /** Extended mockup configuration for layered realism */
+  mockup?: SurfaceMockup | undefined;
   /** Area within the mockup where design elements can be placed */
   printArea: PrintArea;
 }

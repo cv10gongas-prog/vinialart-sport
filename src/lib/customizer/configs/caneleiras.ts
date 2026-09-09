@@ -22,6 +22,31 @@
 import type { ProductCustomizerConfig } from "@/lib/customizer/types";
 import caneleirasMockup from "@/assets/prod-caneleiras.jpg";
 
+/**
+ * Normalized 2D contour polygon of a shin guard shell (relative to print area bounding box: 0..1).
+ * Smooth curved top, ergonomic side bulges, tapering smoothly towards the ankle.
+ */
+const SHIN_GUARD_CONTOUR_POINTS: number[] = [
+  0.50, 0.00, // Top apex center
+  0.72, 0.02, // Top right curve
+  0.88, 0.08, // Upper right shoulder
+  0.96, 0.18, // High right edge
+  0.98, 0.32, // Right belly maximum width
+  0.94, 0.48, // Mid right transition
+  0.88, 0.65, // Lower right taper
+  0.80, 0.82, // Ankle right curve
+  0.68, 0.94, // Bottom right corner
+  0.50, 1.00, // Bottom center apex
+  0.32, 0.94, // Bottom left corner
+  0.20, 0.82, // Ankle left curve
+  0.12, 0.65, // Lower left taper
+  0.06, 0.48, // Mid left transition
+  0.02, 0.32, // Left belly maximum width
+  0.04, 0.18, // High left edge
+  0.12, 0.08, // Upper left shoulder
+  0.28, 0.02, // Top left curve
+];
+
 export const caneleirasConfig: ProductCustomizerConfig = {
   id: "caneleiras-personalizadas",
   name: "Caneleiras Personalizadas",
@@ -31,24 +56,50 @@ export const caneleirasConfig: ProductCustomizerConfig = {
       id: "LEFT",
       label: "Caneleira Esquerda",
       mockupSrc: caneleirasMockup,
+      mockup: {
+        baseSrc: caneleirasMockup,
+        // Focus frame on Left Caneleira (taller, on the left side of the photo)
+        crop: {
+          x: 0.08,
+          y: 0.02,
+          width: 0.48,
+          height: 0.88,
+        },
+      },
       printArea: {
-        // Approximate printable zone: centred horizontally, upper 2/3 of image
-        // These values should be revised when official mockups are available
-        xFraction: 0.2,
-        yFraction: 0.15,
-        widthFraction: 0.6,
-        heightFraction: 0.65,
+        xFraction: 0.14,
+        yFraction: 0.06,
+        widthFraction: 0.36,
+        heightFraction: 0.76,
+        shape: {
+          type: "contour",
+          points: SHIN_GUARD_CONTOUR_POINTS,
+        },
       },
     },
     {
       id: "RIGHT",
       label: "Caneleira Direita",
-      mockupSrc: caneleirasMockup, // same photo; future: dedicated right-side mockup
+      mockupSrc: caneleirasMockup,
+      mockup: {
+        baseSrc: caneleirasMockup,
+        // Focus frame on Right Caneleira (slightly recessed, on the right side of the photo)
+        crop: {
+          x: 0.48,
+          y: 0.08,
+          width: 0.46,
+          height: 0.86,
+        },
+      },
       printArea: {
-        xFraction: 0.2,
-        yFraction: 0.15,
-        widthFraction: 0.6,
-        heightFraction: 0.65,
+        xFraction: 0.52,
+        yFraction: 0.12,
+        widthFraction: 0.34,
+        heightFraction: 0.72,
+        shape: {
+          type: "contour",
+          points: SHIN_GUARD_CONTOUR_POINTS,
+        },
       },
     },
   ],

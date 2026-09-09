@@ -327,14 +327,26 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
         Limpar {activeSurface.label}
       </button>
 
-      {/* === Export Preview === */}
-      <button
-        onClick={downloadPreview}
-        className="flex items-center gap-2 border border-border bg-surface px-3 py-2.5 text-xs uppercase tracking-widest text-foreground transition-colors hover:border-cyan hover:text-cyan"
-      >
-        <Download className="h-4 w-4" />
-        Exportar preview PNG
-      </button>
+      {/* === Export Options === */}
+      <div className="grid gap-2">
+        <button
+          onClick={customizer.downloadPreview}
+          className="flex items-center gap-2 border border-border bg-surface px-3 py-2 text-xs uppercase tracking-widest text-foreground transition-colors hover:border-cyan hover:text-cyan"
+          title="Exporta o produto completo com o design e reflexos para apresentação ao cliente"
+        >
+          <Download className="h-4 w-4 text-cyan" />
+          Exportar Preview do Produto
+        </button>
+
+        <button
+          onClick={customizer.downloadProductionArt}
+          className="flex items-center gap-2 border border-border bg-surface px-3 py-2 text-xs uppercase tracking-widest text-foreground transition-colors hover:border-magenta hover:text-magenta"
+          title="Exporta a arte personalizada isolada (estrutura técnica preliminar para integração de produção futura)"
+        >
+          <Download className="h-4 w-4 text-magenta" />
+          Exportar Arte (Técnica)
+        </button>
+      </div>
 
       {/* === FUTURE features === */}
       <div className="grid gap-2 border-t border-border pt-4">

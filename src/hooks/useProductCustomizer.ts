@@ -64,6 +64,24 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   const [saveStatus, setSaveStatus] = useState<DraftSaveStatus>("idle");
   const hasInitializedDraftRef = useRef(false);
 
+  // View Mode: "edit" (shows guides, transformer, bounds) vs "preview" (clean realistic product display)
+  const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
+
+  // Viewport Zoom: scales the display stage without altering layer transformations (scaleX, scaleY, x, y)
+  const [zoom, setZoom] = useState<number>(1);
+
+  const zoomIn = useCallback(() => {
+    setZoom((z) => Math.min(2.0, Math.round((z + 0.15) * 100) / 100));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoom((z) => Math.max(0.6, Math.round((z - 0.15) * 100) / 100));
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    setZoom(1);
+  }, []);
+
   // ------------------------------------------------------------------
   // Rehydrate draft from storage on mount
   // ------------------------------------------------------------------
@@ -450,18 +468,23 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   // Clean Export Preview PNG (Without UI guides, masks or transformers)
   // ------------------------------------------------------------------
 
-  const exportPreview = useCallback((): string | null => {
+  // ------------------------------------------------------------------
+  // Dual Export Functions:
+  // 1) Customer Preview: Full product mockup + clipped design + specular shine (high-res PNG)
+  // 2) Production Art: Isolated customer design within the print area, transparent PNG, zero UI
+  // ------------------------------------------------------------------
+
+  const exportCustomerPreview = useCallback((): string | null => {
     const stage = stageRef.current;
     if (!stage) return null;
 
-    // Find guide layer and transformer nodes
     const guideLayer = stage.findOne(".guide-layer") as Konva.Layer | undefined;
     const transformer = stage.findOne("Transformer") as Konva.Transformer | undefined;
 
     const guideWasVisible = guideLayer ? guideLayer.visible() : true;
     const trWasVisible = transformer ? transformer.visible() : true;
 
-    // Hide UI elements before taking snapshot
+    // Hide editing guides & selection transformer
     if (guideLayer) guideLayer.visible(false);
     if (transformer) transformer.visible(false);
     stage.draw();
@@ -471,7 +494,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
       pixelRatio: 2,
     });
 
-    // Restore UI elements
+    // Restore visibility
     if (guideLayer) guideLayer.visible(guideWasVisible);
     if (transformer) transformer.visible(trWasVisible);
     stage.draw();
@@ -479,14 +502,70 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     return dataUrl;
   }, []);
 
+  const exportProductionArt = useCallback((): string | null => {
+    const stage = stageRef.current;
+    if (!stage) return null;
+
+    const mockupLayer = stage.findOne(".mockup-layer") as Konva.Layer | undefined;
+    const overlayLayer = stage.findOne(".overlay-layer") as Konva.Layer | undefined;
+    const guideLayer = stage.findOne(".guide-layer") as Konva.Layer | undefined;
+    const transformer = stage.findOne("Transformer") as Konva.Transformer | undefined;
+
+    const mockupWasVisible = mockupLayer ? mockupLayer.visible() : true;
+    const overlayWasVisible = overlayLayer ? overlayLayer.visible() : true;
+    const guideWasVisible = guideLayer ? guideLayer.visible() : true;
+    const trWasVisible = transformer ? transformer.visible() : true;
+
+    // Hide mockup, overlays, guides and transformer to leave ONLY customer artwork
+    if (mockupLayer) mockupLayer.visible(false);
+    if (overlayLayer) overlayLayer.visible(false);
+    if (guideLayer) guideLayer.visible(false);
+    if (transformer) transformer.visible(false);
+    stage.draw();
+
+    // Export bounding box of the print area
+    const pa = activeSurface.printArea;
+    const cropX = Math.round(pa.xFraction * config.canvasWidth);
+    const cropY = Math.round(pa.yFraction * config.canvasHeight);
+    const cropW = Math.round(pa.widthFraction * config.canvasWidth);
+    const cropH = Math.round(pa.heightFraction * config.canvasHeight);
+
+    const dataUrl = stage.toDataURL({
+      x: cropX,
+      y: cropY,
+      width: cropW,
+      height: cropH,
+      mimeType: "image/png",
+      pixelRatio: 3, // High-res print resolution
+    });
+
+    // Restore previous state
+    if (mockupLayer) mockupLayer.visible(mockupWasVisible);
+    if (overlayLayer) overlayLayer.visible(overlayWasVisible);
+    if (guideLayer) guideLayer.visible(guideWasVisible);
+    if (transformer) transformer.visible(trWasVisible);
+    stage.draw();
+
+    return dataUrl;
+  }, [activeSurface.printArea, config.canvasWidth, config.canvasHeight]);
+
   const downloadPreview = useCallback(() => {
-    const dataUrl = exportPreview();
+    const dataUrl = exportCustomerPreview();
     if (!dataUrl) return;
     const link = document.createElement("a");
-    link.download = `vinilart-sport-preview-${state.activeSurfaceId.toLowerCase()}.png`;
+    link.download = `vinilart-preview-${state.activeSurfaceId.toLowerCase()}.png`;
     link.href = dataUrl;
     link.click();
-  }, [exportPreview, state.activeSurfaceId]);
+  }, [exportCustomerPreview, state.activeSurfaceId]);
+
+  const downloadProductionArt = useCallback(() => {
+    const dataUrl = exportProductionArt();
+    if (!dataUrl) return;
+    const link = document.createElement("a");
+    link.download = `vinilart-arte-producao-${state.activeSurfaceId.toLowerCase()}.png`;
+    link.href = dataUrl;
+    link.click();
+  }, [exportProductionArt, state.activeSurfaceId]);
 
   return {
     // Config
@@ -500,9 +579,15 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     canUndo,
     canRedo,
     saveStatus,
+    viewMode,
+    zoom,
     // Refs
     stageRef,
     // Actions
+    setViewMode,
+    zoomIn,
+    zoomOut,
+    resetZoom,
     setSurface,
     addImageFromFile,
     addText,
@@ -519,8 +604,11 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     clearDraft,
     undo,
     redo,
-    exportPreview,
+    exportPreview: exportCustomerPreview,
+    exportCustomerPreview,
+    exportProductionArt,
     downloadPreview,
+    downloadProductionArt,
     dispatch,
   };
 }

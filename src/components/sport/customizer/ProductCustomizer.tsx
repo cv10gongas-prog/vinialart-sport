@@ -33,12 +33,41 @@ export function ProductCustomizer({ config, className }: ProductCustomizerProps)
         <div className="min-w-0">
           <p className="font-display text-sm">{config.name}</p>
           <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
-            Personalizador — V1.5
+            Personalizador — V2.0
           </p>
         </div>
-        <span className="skew-tag border border-cyan px-2 py-1 font-display text-[0.55rem] text-cyan">
-          Autosave + Camadas
-        </span>
+        <div className="flex items-center gap-2">
+          {/* View Mode Toggle: Editar vs Pré-visualizar */}
+          <div className="flex items-center rounded border border-border bg-surface p-0.5">
+            <button
+              type="button"
+              onClick={() => customizer.setViewMode("edit")}
+              className={cn(
+                "px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider transition-colors",
+                customizer.viewMode === "edit"
+                  ? "bg-cyan text-black"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => customizer.setViewMode("preview")}
+              className={cn(
+                "px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider transition-colors",
+                customizer.viewMode === "preview"
+                  ? "bg-magenta text-white"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Pré-visualizar
+            </button>
+          </div>
+          <span className="skew-tag border border-cyan px-2 py-1 font-display text-[0.55rem] text-cyan">
+            Mockup Realista
+          </span>
+        </div>
       </div>
 
       {/* Surface Tabs */}
@@ -59,13 +88,47 @@ export function ProductCustomizer({ config, className }: ProductCustomizerProps)
         ))}
       </div>
 
-      {/* Status bar */}
-      <div className="mt-2 flex gap-3 text-[0.6rem] uppercase tracking-widest text-muted-foreground/50">
-        <span>{state.undoStack.length} acções no histórico</span>
-        {state.redoStack.length > 0 && (
-          <span>{state.redoStack.length} para refazer</span>
-        )}
-        <span>{layerCount} {layerCount === 1 ? "elemento" : "elementos"}</span>
+      {/* Status bar & Viewport Zoom Controls */}
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground/60">
+        <div className="flex items-center gap-3">
+          <span>{state.undoStack.length} acções</span>
+          {state.redoStack.length > 0 && (
+            <span>{state.redoStack.length} refazer</span>
+          )}
+          <span>{layerCount} {layerCount === 1 ? "elemento" : "elementos"}</span>
+        </div>
+
+        {/* Viewport Zoom Controls */}
+        <div className="flex items-center gap-1">
+          <span className="text-[0.6rem] text-muted-foreground/60 mr-1">Zoom:</span>
+          <button
+            type="button"
+            onClick={customizer.zoomOut}
+            title="Diminuir zoom"
+            aria-label="Diminuir zoom"
+            className="flex h-5 w-5 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan"
+          >
+            -
+          </button>
+          <button
+            type="button"
+            onClick={customizer.resetZoom}
+            title="Repor zoom a 100%"
+            aria-label="Repor zoom"
+            className="px-1.5 py-0.5 border border-border bg-surface text-[0.6rem] font-mono hover:border-cyan hover:text-cyan"
+          >
+            {Math.round(customizer.zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            onClick={customizer.zoomIn}
+            title="Aumentar zoom"
+            aria-label="Aumentar zoom"
+            className="flex h-5 w-5 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       {/* Main layout: canvas + toolbar */}
@@ -77,13 +140,15 @@ export function ProductCustomizer({ config, className }: ProductCustomizerProps)
           </div>
 
           {/* Overlay labels */}
-          <div className="absolute bottom-2 left-2 flex flex-wrap gap-2">
+          <div className="absolute bottom-2 left-2 flex flex-wrap gap-2 pointer-events-none">
             <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground">
               {activeSurface.label}
             </span>
-            <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-cyan/70">
-              Zona azul = área de impressão
-            </span>
+            {customizer.viewMode === "edit" && (
+              <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-cyan/70">
+                Contorno anatómico = área de impressão
+              </span>
+            )}
           </div>
         </div>
 

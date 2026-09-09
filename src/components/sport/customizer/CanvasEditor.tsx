@@ -69,7 +69,9 @@ export function CanvasEditor({ config, customizer }: CanvasEditorProps) {
     };
   }, []);
 
-  const scale = Math.min(containerWidth / config.canvasWidth, 1);
+  const baseScale = Math.min(containerWidth / config.canvasWidth, 1);
+  const effectiveZoom = customizer.zoom ?? 1;
+  const totalScale = baseScale * effectiveZoom;
 
   if (!mounted || !KonvaLib) {
     return (
@@ -88,22 +90,20 @@ export function CanvasEditor({ config, customizer }: CanvasEditorProps) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-full overflow-hidden"
+      className="relative w-full max-w-full overflow-hidden flex items-center justify-center"
       style={{
-        height: Math.round(config.canvasHeight * scale),
+        height: Math.round(config.canvasHeight * baseScale),
         touchAction: "none",
       }}
     >
-      {/* Scale wrapper: positioned absolutely to avoid expanding parent on mobile */}
+      {/* Zoom / Scale wrapper */}
       <div
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          transformOrigin: "top left",
-          transform: `scale(${scale})`,
+          transformOrigin: "center center",
+          transform: `scale(${totalScale})`,
           width: config.canvasWidth,
           height: config.canvasHeight,
+          transition: "transform 0.15s ease-out",
         }}
       >
         <KonvaStageInner
@@ -250,9 +250,34 @@ function KonvaStageInner({
     [dispatch, state.activeSurfaceId],
   );
 
+  const isEditMode = (customizer.viewMode ?? "edit") === "edit";
+
   const sortedLayers = [...activeLayers]
     .filter((l) => l.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
+
+  // Clipping function: if shape is contour, build a smooth polygon path; otherwise clip rectangle
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const clipFunc = useCallback((ctx: any) => {
+    const shape = printArea.shape;
+    if (shape?.type === "contour" && shape.points && shape.points.length >= 6) {
+      const pts = shape.points;
+      const x0 = pts[0] ?? 0;
+      const y0 = pts[1] ?? 0;
+      ctx.beginPath();
+      ctx.moveTo(paX + x0 * paW, paY + y0 * paH);
+      for (let i = 2; i < pts.length; i += 2) {
+        const xi = pts[i] ?? 0;
+        const yi = pts[i + 1] ?? 0;
+        ctx.lineTo(paX + xi * paW, paY + yi * paH);
+      }
+      ctx.closePath();
+    } else {
+      ctx.beginPath();
+      ctx.rect(paX, paY, paW, paH);
+      ctx.closePath();
+    }
+  }, [printArea.shape, paX, paY, paW, paH]);
 
   return (
     <Stage
@@ -263,7 +288,7 @@ function KonvaStageInner({
       onTap={handleStageClick}
     >
       {/* Layer 0: Mockup background (non-interactive) */}
-      <Layer listening={false}>
+      <Layer name="mockup-layer" listening={false}>
         {mockupImg && (
           <KonvaImage
             image={mockupImg}
@@ -273,8 +298,8 @@ function KonvaStageInner({
         )}
       </Layer>
 
-      {/* Layer 1 (guide-layer): Print-area masks & border (hidden on export) */}
-      <Layer name="guide-layer" listening={false}>
+      {/* Layer 1 (guide-layer): Print-area masks & border (visible ONLY in edit mode, hidden in preview & export) */}
+      <Layer name="guide-layer" listening={false} visible={isEditMode}>
         <Rect
           x={0}
           y={0}
@@ -297,7 +322,7 @@ function KonvaStageInner({
           height={paH}
           fill="rgba(0,0,0,0.5)"
         />
-        {/* Print-area border */}
+        {/* Print-area border / contour guide */}
         <Rect
           x={paX}
           y={paY}
@@ -310,9 +335,9 @@ function KonvaStageInner({
         />
       </Layer>
 
-      {/* Layer 2: Design elements clipped to print area */}
-      <Layer>
-        <Group clipX={paX} clipY={paY} clipWidth={paW} clipHeight={paH}>
+      {/* Layer 2: Design elements clipped to anatomical shape */}
+      <Layer name="design-layer">
+        <Group clipFunc={clipFunc}>
           {sortedLayers.map((layer) => {
             if (layer.type === "image") {
               const img = layerImgs[layer.id];
@@ -331,7 +356,7 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  draggable={!layer.locked}
+                  draggable={!layer.locked && isEditMode}
                   onClick={handleLayerClick(layer.id)}
                   onTap={handleLayerClick(layer.id)}
                   onDragEnd={handleDragEnd(layer)}
@@ -356,7 +381,7 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  draggable={!layer.locked}
+                  draggable={!layer.locked && isEditMode}
                   onClick={handleLayerClick(layer.id)}
                   onTap={handleLayerClick(layer.id)}
                   onDragEnd={handleDragEnd(layer)}
@@ -369,35 +394,67 @@ function KonvaStageInner({
           })}
         </Group>
 
-        {/* Transformer — outside Group so handles render above clip boundary */}
-        <Transformer
-          name="selection-transformer"
-          ref={transformerRef}
-          borderStroke="#00c8ff"
-          borderStrokeWidth={1.5}
-          anchorFill="#ffffff"
-          anchorStroke="#00c8ff"
-          anchorSize={10}
-          rotateAnchorOffset={20}
-          enabledAnchors={[
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
-            "middle-left",
-            "middle-right",
-          ]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          boundBoxFunc={(oldBox: any, newBox: any) => {
-            if (
-              Math.abs(newBox.width) < 10 ||
-              Math.abs(newBox.height) < 10
-            ) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-        />
+        {/* Transformer — rendered ONLY in edit mode */}
+        {isEditMode && (
+          <Transformer
+            name="selection-transformer"
+            ref={transformerRef}
+            borderStroke="#00c8ff"
+            borderStrokeWidth={1.5}
+            anchorFill="#ffffff"
+            anchorStroke="#00c8ff"
+            anchorSize={10}
+            rotateAnchorOffset={20}
+            enabledAnchors={[
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right",
+              "middle-left",
+              "middle-right",
+            ]}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            boundBoxFunc={(oldBox: any, newBox: any) => {
+              if (
+                Math.abs(newBox.width) < 10 ||
+                Math.abs(newBox.height) < 10
+              ) {
+                return oldBox;
+              }
+              return newBox;
+            }}
+          />
+        )}
+      </Layer>
+
+      {/* Layer 3: Realistic Specular Shine & Curvature Highlight Overlay (non-interactive, passes clicks) */}
+      <Layer name="overlay-layer" listening={false}>
+        <Group clipFunc={clipFunc}>
+          {/* Subtle glossy curvature highlight gradient across upper shell */}
+          <Rect
+            x={paX}
+            y={paY}
+            width={paW}
+            height={paH * 0.45}
+            fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+            fillLinearGradientEndPoint={{ x: paW * 0.8, y: paH * 0.45 }}
+            fillLinearGradientColorStops={[
+              0, "rgba(255, 255, 255, 0.22)",
+              0.4, "rgba(255, 255, 255, 0.08)",
+              1, "rgba(255, 255, 255, 0)",
+            ]}
+          />
+          {/* Subtle perimeter bevel / shadow inside contour */}
+          <Rect
+            x={paX}
+            y={paY}
+            width={paW}
+            height={paH}
+            stroke="rgba(0, 0, 0, 0.35)"
+            strokeWidth={3}
+            fill="transparent"
+          />
+        </Group>
       </Layer>
     </Stage>
   );
