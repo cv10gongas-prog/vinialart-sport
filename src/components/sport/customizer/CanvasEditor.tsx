@@ -173,10 +173,10 @@ function KonvaStageInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeLayers]);
 
-  // Attach Transformer to selected node; safely detach on null or surface switch
+  // Attach / detach transformer when selectedLayer changes
   useEffect(() => {
     if (!transformerRef.current || !stageRef.current) return;
-    if (!selectedLayer) {
+    if (!selectedLayer || selectedLayer.locked || !selectedLayer.visible) {
       transformerRef.current.nodes([]);
       transformerRef.current.getLayer()?.batchDraw();
       return;
@@ -189,7 +189,7 @@ function KonvaStageInner({
       transformerRef.current.nodes([]);
       transformerRef.current.getLayer()?.batchDraw();
     }
-  }, [selectedLayer?.id, state.activeSurfaceId, activeLayers.length, stageRef]);
+  }, [selectedLayer?.id, selectedLayer?.locked, selectedLayer?.visible, state.activeSurfaceId, activeLayers.length, stageRef]);
 
   // Print area in canvas-space pixels
   const { printArea } = activeSurface;
@@ -218,6 +218,7 @@ function KonvaStageInner({
   const handleDragEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (layer: DesignLayer) => (e: any) => {
+      if (layer.locked) return;
       dispatch({
         type: "UPDATE_LAYER",
         surfaceId: state.activeSurfaceId,
@@ -231,6 +232,7 @@ function KonvaStageInner({
   const handleTransformEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (layer: DesignLayer) => (e: any) => {
+      if (layer.locked) return;
       const node = e.target;
       dispatch({
         type: "UPDATE_LAYER",
@@ -329,7 +331,7 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  draggable
+                  draggable={!layer.locked}
                   onClick={handleLayerClick(layer.id)}
                   onTap={handleLayerClick(layer.id)}
                   onDragEnd={handleDragEnd(layer)}
@@ -354,7 +356,7 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  draggable
+                  draggable={!layer.locked}
                   onClick={handleLayerClick(layer.id)}
                   onTap={handleLayerClick(layer.id)}
                   onDragEnd={handleDragEnd(layer)}

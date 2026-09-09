@@ -53,6 +53,8 @@ export interface BaseLayer {
   id: LayerId;
   /** Which surface this layer belongs to */
   surfaceId: SurfaceId;
+  /** Optional user-facing label or automatic title */
+  name?: string | undefined;
   /** X position in canvas pixels */
   x: number;
   /** Y position in canvas pixels */
@@ -64,13 +66,18 @@ export interface BaseLayer {
   rotation: number;
   /** Stack order (higher = on top) */
   zIndex: number;
+  /** Visibility toggle (false = hidden on canvas and export) */
   visible: boolean;
+  /** Lock toggle (true = cannot be dragged, resized or rotated) */
+  locked: boolean;
 }
 
 export interface ImageLayer extends BaseLayer {
   type: "image";
   /** Object URL (blob:) created from local file upload */
   srcUrl: string;
+  /** Key used to store/retrieve the image blob in IndexedDB */
+  fileKey?: string | undefined;
   /** Original filename for display */
   filename: string;
   /** Natural dimensions of the source image */
@@ -118,6 +125,9 @@ export type AllowedTool =
   | "resize"
   | "rotate"
   | "delete"
+  | "duplicate"
+  | "lock"
+  | "reorder"
   | "undo"
   | "redo"
   | "reset"
@@ -165,6 +175,8 @@ export interface CustomizerState {
 // Action types for the reducer
 // ---------------------------------------------------------------------------
 
+export type LayerReorderDirection = "up" | "down" | "top" | "bottom";
+
 export type CustomizerAction =
   | { type: "SET_ACTIVE_SURFACE"; surfaceId: SurfaceId }
   | { type: "ADD_IMAGE_LAYER"; surfaceId: SurfaceId; layer: ImageLayer }
@@ -177,7 +189,23 @@ export type CustomizerAction =
       skipHistory?: boolean | undefined;
     }
   | { type: "DELETE_LAYER"; surfaceId: SurfaceId; layerId: LayerId }
+  | { type: "DUPLICATE_LAYER"; surfaceId: SurfaceId; layerId: LayerId }
+  | { type: "TOGGLE_LOCK_LAYER"; surfaceId: SurfaceId; layerId: LayerId }
+  | { type: "TOGGLE_VISIBILITY_LAYER"; surfaceId: SurfaceId; layerId: LayerId }
+  | {
+      type: "REORDER_LAYER";
+      surfaceId: SurfaceId;
+      layerId: LayerId;
+      direction: LayerReorderDirection;
+    }
+  | {
+      type: "COPY_DESIGN_TO_SURFACE";
+      sourceSurfaceId: SurfaceId;
+      targetSurfaceId: SurfaceId;
+    }
   | { type: "SELECT_LAYER"; surfaceId: SurfaceId; layerId: LayerId | null }
   | { type: "RESET_SURFACE"; surfaceId: SurfaceId }
+  | { type: "RESTORE_DRAFT"; state: CustomizerState }
+  | { type: "CLEAR_ALL_SURFACES" }
   | { type: "UNDO" }
   | { type: "REDO" };

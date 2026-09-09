@@ -9,13 +9,14 @@
  *  - Clean PNG export (stripping UI guides, masks and transformers)
  */
 
-import { useReducer, useRef, useCallback, useEffect } from "react";
+import { useReducer, useRef, useCallback, useEffect, useState } from "react";
 import type Konva from "konva";
 import type {
   ProductCustomizerConfig,
   SurfaceId,
   DesignLayer,
   ImageLayer,
+  LayerReorderDirection,
 } from "@/lib/customizer/types";
 import {
   customizerReducer,
@@ -27,6 +28,14 @@ import {
   smartFitLayer,
   nextZIndex,
 } from "@/lib/customizer/utils";
+import {
+  saveCustomizerDraft,
+  loadCustomizerDraft,
+  clearCustomizerDraft,
+} from "@/lib/customizer/storage/draft";
+import { nanoid } from "@/lib/customizer/nanoid";
+
+export type DraftSaveStatus = "idle" | "saving" | "saved";
 
 export function useProductCustomizer(config: ProductCustomizerConfig) {
   const defaultSurfaceId = config.surfaces[0]?.id ?? "";
@@ -48,6 +57,65 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   // Track all local blob URLs created in this session for cleanup on unmount
   const blobUrlsRef = useRef<Set<string>>(new Set());
 
+  // Map of fileKey -> { blob, filename } for pending IndexedDB persists
+  const pendingBlobsRef = useRef<Map<string, { blob: Blob; filename: string }>>(new Map());
+
+  // Draft persistence status: "saved" | "saving" | "idle"
+  const [saveStatus, setSaveStatus] = useState<DraftSaveStatus>("idle");
+  const hasInitializedDraftRef = useRef(false);
+
+  // ------------------------------------------------------------------
+  // Rehydrate draft from storage on mount
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    let active = true;
+    async function initDraft() {
+      try {
+        const result = await loadCustomizerDraft(
+          config.id,
+          config.surfaces.map((s) => s.id),
+        );
+        if (active && result) {
+          result.restoredObjectUrls.forEach((url) => blobUrlsRef.current.add(url));
+          dispatch({ type: "RESTORE_DRAFT", state: result.state });
+          setSaveStatus("saved");
+        }
+      } catch (err) {
+        console.warn("Failed to load customizer draft:", err);
+      } finally {
+        if (active) {
+          hasInitializedDraftRef.current = true;
+        }
+      }
+    }
+    initDraft();
+    return () => {
+      active = false;
+    };
+  }, [config.id, config.surfaces]);
+
+  // ------------------------------------------------------------------
+  // Auto-save debounce effect
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    if (!hasInitializedDraftRef.current) return;
+
+    setSaveStatus("saving");
+    const timer = setTimeout(async () => {
+      try {
+        await saveCustomizerDraft(config.id, state, pendingBlobsRef.current);
+        pendingBlobsRef.current.clear();
+        setSaveStatus("saved");
+      } catch (err) {
+        console.error("Auto-save failed:", err);
+        setSaveStatus("idle");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [state, config.id]);
+
+  // Cleanup blob URLs on unmount
   useEffect(() => {
     const urls = blobUrlsRef.current;
     return () => {
@@ -96,8 +164,12 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
   const addImageFromFile = useCallback(
     (file: File) => {
+      const fileKey = `img_${nanoid()}`;
       const srcUrl = URL.createObjectURL(file);
       blobUrlsRef.current.add(srcUrl);
+
+      // Queue for IndexedDB persistence
+      pendingBlobsRef.current.set(fileKey, { blob: file, filename: file.name });
 
       const img = new window.Image();
       img.onload = () => {
@@ -112,6 +184,8 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
           activeSurface.printArea,
           nextZIndex(activeLayers),
         );
+        layer.fileKey = fileKey;
+
         dispatch({
           type: "ADD_IMAGE_LAYER",
           surfaceId: state.activeSurfaceId,
@@ -127,7 +201,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   const addText = useCallback(
     (
       text: string,
-      options?: { fill?: string; fontSize?: number; fontFamily?: string },
+      options?: { fill?: string; fontSize?: number; fontFamily?: string; name?: string },
     ) => {
       const layer = createTextLayer(
         state.activeSurfaceId,
@@ -139,6 +213,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
         options?.fontSize ?? 36,
         options?.fontFamily ?? config.fontOptions[0],
         nextZIndex(activeLayers),
+        options?.name,
       );
       dispatch({
         type: "ADD_TEXT_LAYER",
@@ -179,6 +254,75 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     [state.activeSurfaceId],
   );
 
+  const duplicateLayer = useCallback(
+    (layerId: string) => {
+      dispatch({
+        type: "DUPLICATE_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId,
+      });
+    },
+    [state.activeSurfaceId],
+  );
+
+  const toggleLock = useCallback(
+    (layerId: string) => {
+      // If currently selected, detach transformer so handles disappear when locked
+      if (selectedLayer?.id === layerId && stageRef.current) {
+        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
+        tr?.nodes([]);
+      }
+      dispatch({
+        type: "TOGGLE_LOCK_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId,
+      });
+    },
+    [selectedLayer, state.activeSurfaceId],
+  );
+
+  const toggleVisibility = useCallback(
+    (layerId: string) => {
+      if (selectedLayer?.id === layerId && stageRef.current) {
+        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
+        tr?.nodes([]);
+      }
+      dispatch({
+        type: "TOGGLE_VISIBILITY_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId,
+      });
+    },
+    [selectedLayer, state.activeSurfaceId],
+  );
+
+  const reorderLayer = useCallback(
+    (layerId: string, direction: LayerReorderDirection) => {
+      dispatch({
+        type: "REORDER_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId,
+        direction,
+      });
+    },
+    [state.activeSurfaceId],
+  );
+
+  const copyDesignToOtherSurface = useCallback(
+    (targetSurfaceId: SurfaceId) => {
+      if (stageRef.current) {
+        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
+        tr?.nodes([]);
+      }
+      dispatch({
+        type: "COPY_DESIGN_TO_SURFACE",
+        sourceSurfaceId: state.activeSurfaceId,
+        targetSurfaceId,
+      });
+    },
+    [state.activeSurfaceId],
+  );
+
   const selectLayer = useCallback(
     (layerId: string | null) => {
       dispatch({
@@ -214,6 +358,16 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     dispatch({ type: "RESET_SURFACE", surfaceId: state.activeSurfaceId });
   }, [state.activeSurfaceId]);
 
+  const clearDraft = useCallback(async () => {
+    if (stageRef.current) {
+      const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
+      tr?.nodes([]);
+    }
+    await clearCustomizerDraft(config.id);
+    dispatch({ type: "CLEAR_ALL_SURFACES" });
+    setSaveStatus("idle");
+  }, [config.id]);
+
   const undo = useCallback(() => {
     if (stageRef.current) {
       const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
@@ -229,6 +383,68 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     }
     dispatch({ type: "REDO" });
   }, []);
+
+  // ------------------------------------------------------------------
+  // Keyboard Shortcuts (Safe: Ignored when in input/textarea/editable)
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Delete / Backspace: delete selected layer
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedLayer) {
+        e.preventDefault();
+        deleteLayer(selectedLayer.id);
+        return;
+      }
+
+      // Escape: deselect
+      if (e.key === "Escape" && selectedLayer) {
+        e.preventDefault();
+        selectLayer(null);
+        return;
+      }
+
+      // Ctrl/Cmd + D: duplicate selected layer
+      if (cmdOrCtrl && (e.key === "d" || e.key === "D") && selectedLayer) {
+        e.preventDefault();
+        duplicateLayer(selectedLayer.id);
+        return;
+      }
+
+      // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y: redo
+      if (
+        (cmdOrCtrl && e.shiftKey && (e.key === "z" || e.key === "Z")) ||
+        (cmdOrCtrl && (e.key === "y" || e.key === "Y"))
+      ) {
+        e.preventDefault();
+        if (canRedo) redo();
+        return;
+      }
+
+      // Ctrl/Cmd + Z: undo
+      if (cmdOrCtrl && !e.shiftKey && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        if (canUndo) undo();
+        return;
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedLayer, canUndo, canRedo, deleteLayer, duplicateLayer, selectLayer, undo, redo]);
 
   // ------------------------------------------------------------------
   // Clean Export Preview PNG (Without UI guides, masks or transformers)
@@ -283,6 +499,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     selectedLayer,
     canUndo,
     canRedo,
+    saveStatus,
     // Refs
     stageRef,
     // Actions
@@ -291,9 +508,15 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     addText,
     updateLayer,
     deleteLayer,
+    duplicateLayer,
+    toggleLock,
+    toggleVisibility,
+    reorderLayer,
+    copyDesignToOtherSurface,
     selectLayer,
     smartFit,
     resetSurface,
+    clearDraft,
     undo,
     redo,
     exportPreview,

@@ -52,6 +52,7 @@ export function createImageLayer(
     id: nanoid(),
     type: "image",
     surfaceId,
+    name: filename || "Imagem",
     x,
     y,
     scaleX: 1,
@@ -59,6 +60,7 @@ export function createImageLayer(
     rotation: 0,
     zIndex,
     visible: true,
+    locked: false,
     srcUrl,
     filename,
     naturalWidth,
@@ -78,6 +80,7 @@ export function createTextLayer(
   fontSize: number = 36,
   fontFamily: string = "Archivo Black",
   zIndex: number = 10,
+  customName?: string,
 ): TextLayer {
   const areaX = printArea.xFraction * canvasWidth;
   const areaY = printArea.yFraction * canvasHeight;
@@ -93,6 +96,7 @@ export function createTextLayer(
     id: nanoid(),
     type: "text",
     surfaceId,
+    name: customName || text || "Texto",
     x,
     y,
     scaleX: 1,
@@ -100,6 +104,7 @@ export function createTextLayer(
     rotation: 0,
     zIndex,
     visible: true,
+    locked: false,
     text,
     fontSize,
     fontFamily,

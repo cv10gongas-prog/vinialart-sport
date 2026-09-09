@@ -33,11 +33,11 @@ export function ProductCustomizer({ config, className }: ProductCustomizerProps)
         <div className="min-w-0">
           <p className="font-display text-sm">{config.name}</p>
           <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
-            Personalizador — V1
+            Personalizador — V1.5
           </p>
         </div>
         <span className="skew-tag border border-cyan px-2 py-1 font-display text-[0.55rem] text-cyan">
-          Editor real
+          Autosave + Camadas
         </span>
       </div>
 

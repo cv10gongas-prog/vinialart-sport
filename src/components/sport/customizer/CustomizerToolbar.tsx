@@ -9,13 +9,15 @@
 
 import { useRef, useState, useEffect } from "react";
 import {
+  Check,
+  Copy,
   Download,
   Eraser,
+  Loader2,
   RotateCcw,
   RotateCw,
   Sparkles,
   Target,
-  Trash,
   Type,
   Undo2,
   Upload,
@@ -25,7 +27,7 @@ import { SportButton } from "@/components/sport/SportButton";
 import { AddTextPanel } from "./AddTextPanel";
 import { LayerPanel } from "./LayerPanel";
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
-import type { DesignLayer } from "@/lib/customizer/types";
+import type { DesignLayer, LayerId, LayerReorderDirection } from "@/lib/customizer/types";
 
 interface CustomizerToolbarProps {
   customizer: ProductCustomizerHandle;
@@ -39,12 +41,21 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
     canUndo,
     canRedo,
     activeSurface,
+    activeLayers,
+    saveStatus,
     addImageFromFile,
     addText,
     updateLayer,
     deleteLayer,
+    duplicateLayer,
+    toggleLock,
+    toggleVisibility,
+    reorderLayer,
+    copyDesignToOtherSurface,
+    selectLayer,
     smartFit,
     resetSurface,
+    clearDraft,
     undo,
     redo,
     downloadPreview,
@@ -52,6 +63,8 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showTextPanel, setShowTextPanel] = useState(false);
+  const [showConfirmCopy, setShowConfirmCopy] = useState(false);
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
 
   // Close text panel when switching surfaces
   useEffect(() => {
@@ -74,18 +87,90 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
     setShowTextPanel(false);
   }
 
-  function handleDeleteSelected() {
-    if (selectedLayer) deleteLayer(selectedLayer.id);
-  }
-
-  function handleUpdateSelected(changes: Partial<DesignLayer>, skipHistory?: boolean) {
+  function handleUpdateLayer(changes: Partial<DesignLayer>, skipHistory?: boolean) {
     if (selectedLayer) updateLayer(selectedLayer.id, changes, skipHistory);
   }
 
-  const canSmartFit = selectedLayer?.type === "image";
+  // Find the other surface (for 2-surface products like caneleiras)
+  const otherSurface = config.surfaces.find((s) => s.id !== state.activeSurfaceId);
+  const otherSurfaceDesign = otherSurface ? state.surfaces[otherSurface.id] : undefined;
+  const otherHasContent = (otherSurfaceDesign?.layers.length ?? 0) > 0;
+
+  function handleTriggerCopy() {
+    if (otherHasContent) {
+      setShowConfirmCopy(true);
+    } else if (otherSurface) {
+      copyDesignToOtherSurface(otherSurface.id);
+    }
+  }
+
+  function handleConfirmCopy() {
+    if (otherSurface) {
+      copyDesignToOtherSurface(otherSurface.id);
+    }
+    setShowConfirmCopy(false);
+  }
+
+  const canSmartFit = selectedLayer?.type === "image" && !selectedLayer.locked;
 
   return (
     <div className="flex flex-col gap-4">
+      {/* === Draft Save Status Banner === */}
+      <div className="flex items-center justify-between border-b border-border/80 pb-2 text-[0.65rem]">
+        <div className="flex items-center gap-1.5 text-muted-foreground">
+          {saveStatus === "saving" && (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin text-cyan" />
+              <span>A guardar...</span>
+            </>
+          )}
+          {saveStatus === "saved" && (
+            <>
+              <Check className="h-3 w-3 text-neon-green" />
+              <span>Rascunho guardado</span>
+            </>
+          )}
+          {saveStatus === "idle" && <span>Rascunho local</span>}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowConfirmClear(true)}
+          className="text-muted-foreground/60 hover:text-destructive transition-colors uppercase tracking-wider text-[0.6rem]"
+        >
+          Limpar rascunho
+        </button>
+      </div>
+
+      {/* Confirmation Modal: Clear Draft */}
+      {showConfirmClear && (
+        <div className="rounded border border-destructive/40 bg-destructive/10 p-3 text-xs">
+          <p className="font-semibold text-destructive">Limpar todo o rascunho?</p>
+          <p className="mt-1 text-[0.7rem] text-muted-foreground">
+            Isto irá apagar todas as camadas e imagens guardadas localmente em ambos os lados.
+          </p>
+          <div className="mt-2.5 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowConfirmClear(false)}
+              className="border border-border px-2.5 py-1 text-[0.65rem] uppercase tracking-wider hover:bg-surface"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                await clearDraft();
+                setShowConfirmClear(false);
+              }}
+              className="bg-destructive px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-destructive-foreground hover:opacity-90"
+            >
+              Sim, limpar tudo
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* === Upload Image === */}
       <div>
         <input
@@ -136,17 +221,21 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
         />
       )}
 
-      {/* === Selected Layer Properties === */}
-      {selectedLayer && (
-        <div className="border border-border bg-surface-2 p-3">
-          <LayerPanel
-            layer={selectedLayer}
-            colorSwatches={config.colorSwatches}
-            onUpdate={handleUpdateSelected}
-            onDelete={handleDeleteSelected}
-          />
-        </div>
-      )}
+      {/* === Real Layer Management Stack === */}
+      <div className="border border-border bg-surface-2 p-3">
+        <LayerPanel
+          layers={activeLayers}
+          selectedLayerId={selectedLayer?.id ?? null}
+          colorSwatches={config.colorSwatches}
+          onSelectLayer={(id: LayerId | null) => selectLayer(id)}
+          onUpdateLayer={handleUpdateLayer}
+          onDeleteLayer={(id: LayerId) => deleteLayer(id)}
+          onDuplicateLayer={(id: LayerId) => duplicateLayer(id)}
+          onToggleLock={(id: LayerId) => toggleLock(id)}
+          onToggleVisibility={(id: LayerId) => toggleVisibility(id)}
+          onReorderLayer={(id: LayerId, dir: LayerReorderDirection) => reorderLayer(id, dir)}
+        />
+      </div>
 
       {/* === Smart Fit (real, no AI) === */}
       <button
@@ -161,12 +250,53 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
         title={
           canSmartFit
             ? "Ajusta automaticamente à área de impressão"
-            : "Seleciona uma imagem primeiro"
+            : "Seleciona uma imagem desbloqueada primeiro"
         }
       >
         <Target className="h-4 w-4" />
         Ajustar à área
       </button>
+
+      {/* === "Aplicar este design aos dois lados" === */}
+      {otherSurface && (
+        <div>
+          <button
+            type="button"
+            onClick={handleTriggerCopy}
+            disabled={activeLayers.length === 0}
+            className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-3 py-2 text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <Copy className="h-3.5 w-3.5" />
+            Aplicar aos dois lados
+          </button>
+
+          {/* Confirm overwrite modal */}
+          {showConfirmCopy && (
+            <div className="mt-2 rounded border border-yellow/50 bg-yellow/10 p-3 text-xs">
+              <p className="font-semibold text-yellow">Substituir design existente?</p>
+              <p className="mt-1 text-[0.7rem] text-muted-foreground">
+                O lado <strong>{otherSurface.label}</strong> já tem elementos. Queres substituí-los pelo design atual?
+              </p>
+              <div className="mt-2.5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmCopy(false)}
+                  className="border border-border px-2.5 py-1 text-[0.65rem] uppercase tracking-wider hover:bg-surface"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmCopy}
+                  className="bg-yellow px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-yellow-foreground hover:opacity-90"
+                >
+                  Substituir
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* === Undo / Redo === */}
       <div className="grid grid-cols-2 gap-2">
@@ -187,17 +317,6 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
           Refazer
         </button>
       </div>
-
-      {/* === Delete selected === */}
-      {selectedLayer && (
-        <button
-          onClick={handleDeleteSelected}
-          className="flex items-center gap-2 border border-border px-3 py-2 text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
-        >
-          <Trash className="h-3.5 w-3.5" />
-          Eliminar elemento
-        </button>
-      )}
 
       {/* === Reset surface === */}
       <button
