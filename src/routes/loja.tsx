@@ -6,13 +6,14 @@ import { ProductCard } from "@/components/sport/ProductCard";
 import { categories, products } from "@/lib/sport-data";
 import { cn } from "@/lib/utils";
 
-type LojaSearch = { categoria?: string };
+type LojaSearch = { categoria?: string | undefined };
 
 export const Route = createFileRoute("/loja")({
   component: Loja,
   validateSearch: (search: Record<string, unknown>): LojaSearch => ({
     categoria: typeof search["categoria"] === "string" ? search["categoria"] : undefined,
   }),
+
   head: () => ({
     meta: [
       { title: "Loja — VinilArt Sport" },
