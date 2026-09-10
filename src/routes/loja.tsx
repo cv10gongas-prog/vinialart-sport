@@ -61,7 +61,7 @@ function Loja() {
       <PageHero
         eyebrow="Loja"
         title="Artigos personalizáveis"
-        text="Catálogo demonstrativo. Preços e variantes finais a confirmar."
+        text="Explora os nossos artigos e soluções desportivas. Orçamentos sob consulta."
       />
 
       <div className="mx-auto max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">

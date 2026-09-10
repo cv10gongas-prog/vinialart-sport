@@ -5,8 +5,18 @@ import { SportLink } from "@/components/sport/SportButton";
 import { ProductCustomizer } from "@/components/sport/customizer/ProductCustomizer";
 import { caneleirasConfig } from "@/lib/customizer/configs/caneleiras";
 import { steps } from "@/lib/sport-data";
+import { useCart } from "@/lib/cart/store";
+
+export interface PersonalizarSearch {
+  cartItem?: string | undefined;
+}
 
 export const Route = createFileRoute("/personalizar")({
+  validateSearch: (search: Record<string, unknown>): PersonalizarSearch => {
+    return {
+      cartItem: typeof search["cartItem"] === "string" ? search["cartItem"] : undefined,
+    };
+  },
   component: Personalizar,
   head: () => ({
     meta: [
@@ -31,11 +41,17 @@ export const Route = createFileRoute("/personalizar")({
 });
 
 function Personalizar() {
+  const { cartItem: cartItemId } = Route.useSearch();
+  const { items } = useCart();
+
+  const editingCartItem = cartItemId ? items.find((i) => i.id === cartItemId) : undefined;
+  const initialDesign = editingCartItem?.customizerDesign;
+
   return (
     <PageShell>
       <PageHero
         eyebrow="Personalizar"
-        title="Tu imaginas. Nós personalizamos."
+        title={editingCartItem ? `A editar: ${editingCartItem.productName}` : "Tu imaginas. Nós personalizamos."}
         text="Personaliza a tua caneleira: carrega a tua imagem, adiciona nome e número, ajusta à área e exporta o preview."
       />
 
@@ -66,20 +82,24 @@ function Personalizar() {
         </p>
 
         <div className="mt-8">
-          <ProductCustomizer config={caneleirasConfig} />
+          <ProductCustomizer
+            config={caneleirasConfig}
+            initialDesignJson={initialDesign}
+            cartItemId={cartItemId}
+          />
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <SportLink to="/contactos" size="lg">
-            Finalizar pedido por contacto
+          <SportLink to="/carrinho" size="lg">
+            Ver carrinho
           </SportLink>
           <SportLink
-            to="/loja"
+            to="/contactos"
             variant="outline"
             shape="square"
             size="lg"
           >
-            Ver outros produtos
+            Finalizar pedido por contacto
           </SportLink>
         </div>
       </section>

@@ -32,6 +32,8 @@ import {
   saveCustomizerDraft,
   loadCustomizerDraft,
   clearCustomizerDraft,
+  rehydrateStoredDesign,
+  serializeCustomizerDesign,
 } from "@/lib/customizer/storage/draft";
 import { getImageBlob, saveImageBlob } from "@/lib/customizer/storage/db";
 import { getImageProcessingProvider } from "@/lib/customizer/ai";
@@ -39,7 +41,14 @@ import { nanoid } from "@/lib/customizer/nanoid";
 
 export type DraftSaveStatus = "idle" | "saving" | "saved";
 
-export function useProductCustomizer(config: ProductCustomizerConfig) {
+export interface UseProductCustomizerOptions {
+  initialDesignJson?: string | undefined;
+}
+
+export function useProductCustomizer(
+  config: ProductCustomizerConfig,
+  options?: UseProductCustomizerOptions,
+) {
   const defaultSurfaceId = config.surfaces[0]?.id ?? "";
 
   const [state, dispatch] = useReducer(
@@ -85,12 +94,26 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   }, []);
 
   // ------------------------------------------------------------------
-  // Rehydrate draft from storage on mount
+  // Rehydrate draft from storage on mount (or from cart item if provided)
   // ------------------------------------------------------------------
   useEffect(() => {
     let active = true;
     async function initDraft() {
       try {
+        if (options?.initialDesignJson) {
+          const parsed = JSON.parse(options.initialDesignJson);
+          const result = await rehydrateStoredDesign(
+            parsed,
+            config.surfaces.map((s) => s.id),
+          );
+          if (active && result) {
+            result.restoredObjectUrls.forEach((url) => blobUrlsRef.current.add(url));
+            dispatch({ type: "RESTORE_DRAFT", state: result.state });
+            setSaveStatus("saved");
+            return;
+          }
+        }
+
         const result = await loadCustomizerDraft(
           config.id,
           config.surfaces.map((s) => s.id),
@@ -112,7 +135,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     return () => {
       active = false;
     };
-  }, [config.id, config.surfaces]);
+  }, [config.id, config.surfaces, options?.initialDesignJson]);
 
   // ------------------------------------------------------------------
   // Auto-save debounce effect
@@ -151,20 +174,23 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   }, []);
 
   // ------------------------------------------------------------------
-  // Derived helpers
+  // Computed helpers
   // ------------------------------------------------------------------
 
-  const activeSurface = config.surfaces.find(
-    (s) => s.id === state.activeSurfaceId,
-  )!;
+  const activeSurface =
+    config.surfaces.find((s) => s.id === state.activeSurfaceId) ?? config.surfaces[0]!;
 
-  const activeSurfaceDesign = state.surfaces[state.activeSurfaceId];
-  const activeLayers = activeSurfaceDesign?.layers ?? [];
+  const activeSurfaceDesign =
+    state.surfaces[state.activeSurfaceId] ?? {
+      surfaceId: state.activeSurfaceId,
+      layers: [],
+      selectedLayerId: null,
+    };
 
-  const selectedLayer =
-    activeLayers.find(
-      (l) => l.id === activeSurfaceDesign?.selectedLayerId,
-    ) ?? null;
+  const activeLayers = activeSurfaceDesign.layers;
+
+  const selectedLayer: DesignLayer | null =
+    activeLayers.find((l) => l.id === activeSurfaceDesign.selectedLayerId) ?? null;
 
   const canUndo = state.undoStack.length > 0;
   const canRedo = state.redoStack.length > 0;
@@ -172,6 +198,16 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   // ------------------------------------------------------------------
   // Actions
   // ------------------------------------------------------------------
+
+  /** Allowed MIME types for image uploads */
+  const ALLOWED_IMAGE_TYPES = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+  ]);
+  /** Maximum upload size: 20 MB */
+  const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
   const setSurface = useCallback((surfaceId: SurfaceId) => {
     // Detach transformer on surface switch
@@ -184,6 +220,17 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
   const addImageFromFile = useCallback(
     (file: File) => {
+      // Validate MIME type
+      if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+        console.warn(`[Customizer] Tipo de ficheiro não suportado: ${file.type}`);
+        return;
+      }
+      // Validate file size
+      if (file.size > MAX_UPLOAD_BYTES) {
+        console.warn(`[Customizer] Ficheiro demasiado grande: ${(file.size / 1024 / 1024).toFixed(1)} MB (máx. 20 MB)`);
+        return;
+      }
+
       const fileKey = `img_${nanoid()}`;
       const srcUrl = URL.createObjectURL(file);
       blobUrlsRef.current.add(srcUrl);
@@ -248,7 +295,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   );
 
   const updateLayer = useCallback(
-    (layerId: string, changes: Partial<DesignLayer>, skipHistory?: boolean) => {
+    (layerId: string, changes: Partial<DesignLayer>, skipHistory = false) => {
       dispatch({
         type: "UPDATE_LAYER",
         surfaceId: state.activeSurfaceId,
@@ -262,7 +309,6 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
   const deleteLayer = useCallback(
     (layerId: string) => {
-      // Detach transformer immediately before removing node to prevent phantom boxes
       if (stageRef.current) {
         const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
         tr?.nodes([]);
@@ -289,33 +335,24 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
   const toggleLock = useCallback(
     (layerId: string) => {
-      // If currently selected, detach transformer so handles disappear when locked
-      if (selectedLayer?.id === layerId && stageRef.current) {
-        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
-        tr?.nodes([]);
-      }
       dispatch({
         type: "TOGGLE_LOCK_LAYER",
         surfaceId: state.activeSurfaceId,
         layerId,
       });
     },
-    [selectedLayer, state.activeSurfaceId],
+    [state.activeSurfaceId],
   );
 
   const toggleVisibility = useCallback(
     (layerId: string) => {
-      if (selectedLayer?.id === layerId && stageRef.current) {
-        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
-        tr?.nodes([]);
-      }
       dispatch({
         type: "TOGGLE_VISIBILITY_LAYER",
         surfaceId: state.activeSurfaceId,
         layerId,
       });
     },
-    [selectedLayer, state.activeSurfaceId],
+    [state.activeSurfaceId],
   );
 
   const reorderLayer = useCallback(
@@ -332,10 +369,6 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
   const copyDesignToOtherSurface = useCallback(
     (targetSurfaceId: SurfaceId) => {
-      if (stageRef.current) {
-        const tr = stageRef.current.findOne("Transformer") as Konva.Transformer | undefined;
-        tr?.nodes([]);
-      }
       dispatch({
         type: "COPY_DESIGN_TO_SURFACE",
         sourceSurfaceId: state.activeSurfaceId,
@@ -379,13 +412,16 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     const provider = getImageProcessingProvider();
 
     try {
-      // If we don't have subject bounds cached, analyze the active blob
       let subjectBox = imgLayer.subjectBoundingBox;
-      if (!subjectBox && imgLayer.fileKey) {
-        const record = await getImageBlob(imgLayer.fileKey);
-        if (record && record.blob) {
-          const analysis = await provider.analyzeSubject(record.blob);
-          subjectBox = analysis.boundingBox;
+
+      if (!subjectBox) {
+        const fileKeyToAnalyze = imgLayer.processedFileKey || imgLayer.fileKey;
+        if (fileKeyToAnalyze) {
+          const record = await getImageBlob(fileKeyToAnalyze);
+          if (record?.blob) {
+            const analysis = await provider.analyzeSubject(record.blob);
+            subjectBox = analysis.boundingBox;
+          }
         }
       }
 
@@ -406,134 +442,97 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
           subjectBoundingBox: subjectBox,
         },
       });
-    } catch (err) {
-      console.warn("Intelligent fit fallback to standard fit:", err);
+    } catch (e) {
+      console.warn("Intelligent fit analysis fallback to standard:", e);
       smartFit();
     }
   }, [selectedLayer, activeSurface, config, state.activeSurfaceId, smartFit]);
 
-  // AI Background Removal (Non-destructive, transparent PNG, IndexedDB persisted)
+  // Background Removal State & Actions
   const [bgRemovalProgress, setBgRemovalProgress] = useState<{
+    layerId: string;
     percent: number;
     statusText: string;
   } | null>(null);
 
   const removeBackground = useCallback(
-    async (layerId?: string) => {
-      const targetId = layerId ?? selectedLayer?.id;
-      if (!targetId) return;
-
-      const layer = activeLayers.find((l) => l.id === targetId);
+    async (layerId: string) => {
+      const layer = activeLayers.find((l) => l.id === layerId) as ImageLayer | undefined;
       if (!layer || layer.type !== "image") return;
-      const imgLayer = layer as ImageLayer;
 
-      // Ensure we get the raw source blob (prefer originalFileKey)
-      const sourceKey = imgLayer.originalFileKey || imgLayer.fileKey;
-      if (!sourceKey) return;
+      const provider = getImageProcessingProvider();
 
-      let sourceBlob: Blob | null = null;
+      updateLayer(layerId, { isProcessingBg: true }, true);
+      setBgRemovalProgress({ layerId, percent: 5, statusText: "A preparar imagem..." });
+
       try {
-        const record = await getImageBlob(sourceKey);
-        sourceBlob = record?.blob ?? null;
-      } catch (e) {
-        console.warn("Failed to fetch image blob for background removal:", e);
-      }
-
-      // Fallback: fetch from current Object URL if IndexedDB fetch missed
-      if (!sourceBlob && imgLayer.srcUrl) {
-        try {
-          const res = await fetch(imgLayer.srcUrl);
-          sourceBlob = await res.blob();
-        } catch {
-          // ignore
+        let sourceBlob: Blob | null = null;
+        const sourceKey = layer.originalFileKey || layer.fileKey;
+        if (sourceKey) {
+          const record = await getImageBlob(sourceKey);
+          if (record?.blob) sourceBlob = record.blob;
         }
-      }
 
-      if (!sourceBlob) {
-        console.error("Could not obtain image blob for background removal");
-        return;
-      }
+        if (!sourceBlob) {
+          const resp = await fetch(layer.originalSrcUrl || layer.srcUrl);
+          sourceBlob = await resp.blob();
+        }
 
-      // Mark layer as processing
-      dispatch({
-        type: "UPDATE_LAYER",
-        surfaceId: state.activeSurfaceId,
-        layerId: imgLayer.id,
-        changes: { isProcessingBg: true },
-        skipHistory: true,
-      });
-      setBgRemovalProgress({ percent: 10, statusText: "A iniciar..." });
-
-      try {
-        const provider = getImageProcessingProvider();
         const processedBlob = await provider.removeBackground(sourceBlob, {
-          onProgress: (percent, text) => {
-            setBgRemovalProgress({ percent, statusText: text || "A processar..." });
+          onProgress: (percent, statusText) => {
+            setBgRemovalProgress({ layerId, percent, statusText: statusText || "A processar..." });
           },
         });
 
-        // Store processed blob in IndexedDB
         const processedKey = `proc_${nanoid()}`;
-        await saveImageBlob(processedKey, processedBlob, `nobg_${imgLayer.filename}.png`);
+        await saveImageBlob(processedKey, processedBlob, `nobg_${layer.filename || "image"}.png`);
 
-        // Create Object URL for canvas display
         const processedUrl = URL.createObjectURL(processedBlob);
         blobUrlsRef.current.add(processedUrl);
 
-        // Analyze subject bounds on the newly transparent result
-        const analysis = await provider.analyzeSubject(processedBlob);
+        let subjectBox = layer.subjectBoundingBox;
+        try {
+          const analysis = await provider.analyzeSubject(processedBlob);
+          subjectBox = analysis.boundingBox;
+        } catch (e) {
+          console.warn("Subject analysis after bg removal skipped:", e);
+        }
 
-        // Non-destructive update: preserves originalFileKey, updates srcUrl and fileKey
-        dispatch({
-          type: "UPDATE_LAYER",
-          surfaceId: state.activeSurfaceId,
-          layerId: imgLayer.id,
-          changes: {
+        updateLayer(
+          layerId,
+          {
             srcUrl: processedUrl,
             fileKey: processedKey,
             processedFileKey: processedKey,
             processedSrcUrl: processedUrl,
-            originalFileKey: sourceKey,
-            originalSrcUrl: imgLayer.originalSrcUrl || imgLayer.srcUrl,
+            originalFileKey: sourceKey || layer.fileKey,
+            originalSrcUrl: layer.originalSrcUrl || layer.srcUrl,
             isBackgroundRemoved: true,
             isViewingOriginal: false,
             isProcessingBg: false,
-            subjectBoundingBox: analysis.boundingBox,
+            subjectBoundingBox: subjectBox,
           },
-        });
-      } catch (error) {
-        console.error("Error during background removal:", error);
-        dispatch({
-          type: "UPDATE_LAYER",
-          surfaceId: state.activeSurfaceId,
-          layerId: imgLayer.id,
-          changes: { isProcessingBg: false },
-          skipHistory: true,
-        });
-        throw error;
+          false,
+        );
+      } catch (err) {
+        console.error("Background removal failed:", err);
+        updateLayer(layerId, { isProcessingBg: false }, true);
       } finally {
         setBgRemovalProgress(null);
       }
     },
-    [activeLayers, selectedLayer, state.activeSurfaceId],
+    [activeLayers, updateLayer],
   );
 
-  // Restore Original Image
   const restoreOriginal = useCallback(
-    async (layerId?: string) => {
-      const targetId = layerId ?? selectedLayer?.id;
-      if (!targetId) return;
+    async (layerId: string) => {
+      const layer = activeLayers.find((l) => l.id === layerId) as ImageLayer | undefined;
+      if (!layer || layer.type !== "image" || !layer.isBackgroundRemoved) return;
 
-      const layer = activeLayers.find((l) => l.id === targetId);
-      if (!layer || layer.type !== "image") return;
-      const imgLayer = layer as ImageLayer;
-
-      if (!imgLayer.originalFileKey) return;
-
-      let origUrl = imgLayer.originalSrcUrl;
-      if (!origUrl) {
-        const record = await getImageBlob(imgLayer.originalFileKey);
-        if (record && record.blob) {
+      let origUrl = layer.originalSrcUrl;
+      if (!origUrl && layer.originalFileKey) {
+        const record = await getImageBlob(layer.originalFileKey);
+        if (record?.blob) {
           origUrl = URL.createObjectURL(record.blob);
           blobUrlsRef.current.add(origUrl);
         }
@@ -541,62 +540,54 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
 
       if (!origUrl) return;
 
-      dispatch({
-        type: "UPDATE_LAYER",
-        surfaceId: state.activeSurfaceId,
-        layerId: imgLayer.id,
-        changes: {
+      updateLayer(
+        layerId,
+        {
           srcUrl: origUrl,
-          fileKey: imgLayer.originalFileKey,
+          fileKey: layer.originalFileKey || layer.fileKey,
           isBackgroundRemoved: false,
           isViewingOriginal: false,
-          isProcessingBg: false,
         },
-      });
+        false,
+      );
     },
-    [activeLayers, selectedLayer, state.activeSurfaceId],
+    [activeLayers, updateLayer],
   );
 
-  // Toggle "Ver Original" preview comparison
   const toggleCompareOriginal = useCallback(
-    async (layerId?: string) => {
-      const targetId = layerId ?? selectedLayer?.id;
-      if (!targetId) return;
+    async (layerId: string) => {
+      const layer = activeLayers.find((l) => l.id === layerId) as ImageLayer | undefined;
+      if (!layer || layer.type !== "image" || !layer.isBackgroundRemoved) return;
 
-      const layer = activeLayers.find((l) => l.id === targetId);
-      if (!layer || layer.type !== "image") return;
-      const imgLayer = layer as ImageLayer;
+      const nextViewingOriginal = !layer.isViewingOriginal;
 
-      if (!imgLayer.isBackgroundRemoved) return;
+      let targetUrl = nextViewingOriginal ? layer.originalSrcUrl : layer.processedSrcUrl;
+      const targetKey = nextViewingOriginal ? layer.originalFileKey : layer.processedFileKey;
 
-      const willViewOriginal = !imgLayer.isViewingOriginal;
-      let targetUrl = willViewOriginal ? imgLayer.originalSrcUrl : imgLayer.processedSrcUrl;
-
-      if (!targetUrl) {
-        const key = willViewOriginal ? imgLayer.originalFileKey : imgLayer.processedFileKey;
-        if (key) {
-          const record = await getImageBlob(key);
-          if (record && record.blob) {
+      if (!targetUrl && targetKey) {
+        try {
+          const record = await getImageBlob(targetKey);
+          if (record?.blob) {
             targetUrl = URL.createObjectURL(record.blob);
             blobUrlsRef.current.add(targetUrl);
           }
+        } catch (e) {
+          console.warn("Failed to load blob for compare toggle:", e);
         }
       }
 
       if (!targetUrl) return;
 
-      dispatch({
-        type: "UPDATE_LAYER",
-        surfaceId: state.activeSurfaceId,
-        layerId: imgLayer.id,
-        changes: {
+      updateLayer(
+        layerId,
+        {
           srcUrl: targetUrl,
-          isViewingOriginal: willViewOriginal,
+          isViewingOriginal: nextViewingOriginal,
         },
-        skipHistory: true, // Non-destructive view toggle doesn't dirty undo
-      });
+        true,
+      );
     },
-    [activeLayers, selectedLayer, state.activeSurfaceId],
+    [activeLayers, updateLayer],
   );
 
   const resetSurface = useCallback(() => {
@@ -634,7 +625,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   }, []);
 
   // ------------------------------------------------------------------
-  // Keyboard Shortcuts (Safe: Ignored when in input/textarea/editable)
+  // Keyboard Shortcuts
   // ------------------------------------------------------------------
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -652,28 +643,24 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
 
-      // Delete / Backspace: delete selected layer
       if ((e.key === "Delete" || e.key === "Backspace") && selectedLayer) {
         e.preventDefault();
         deleteLayer(selectedLayer.id);
         return;
       }
 
-      // Escape: deselect
       if (e.key === "Escape" && selectedLayer) {
         e.preventDefault();
         selectLayer(null);
         return;
       }
 
-      // Ctrl/Cmd + D: duplicate selected layer
       if (cmdOrCtrl && (e.key === "d" || e.key === "D") && selectedLayer) {
         e.preventDefault();
         duplicateLayer(selectedLayer.id);
         return;
       }
 
-      // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y: redo
       if (
         (cmdOrCtrl && e.shiftKey && (e.key === "z" || e.key === "Z")) ||
         (cmdOrCtrl && (e.key === "y" || e.key === "Y"))
@@ -683,7 +670,6 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
         return;
       }
 
-      // Ctrl/Cmd + Z: undo
       if (cmdOrCtrl && !e.shiftKey && (e.key === "z" || e.key === "Z")) {
         e.preventDefault();
         if (canUndo) undo();
@@ -699,12 +685,6 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
   // Clean Export Preview PNG (Without UI guides, masks or transformers)
   // ------------------------------------------------------------------
 
-  // ------------------------------------------------------------------
-  // Dual Export Functions:
-  // 1) Customer Preview: Full product mockup + clipped design + specular shine (high-res PNG)
-  // 2) Production Art: Isolated customer design within the print area, transparent PNG, zero UI
-  // ------------------------------------------------------------------
-
   const exportCustomerPreview = useCallback((): string | null => {
     const stage = stageRef.current;
     if (!stage) return null;
@@ -715,19 +695,17 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     const guideWasVisible = guideLayer ? guideLayer.visible() : true;
     const trWasVisible = transformer ? transformer.visible() : true;
 
-    // Hide editing guides & selection transformer
-    if (guideLayer) guideLayer.visible(false);
-    if (transformer) transformer.visible(false);
+    guideLayer?.hide();
+    transformer?.hide();
     stage.draw();
 
     const dataUrl = stage.toDataURL({
-      mimeType: "image/png",
       pixelRatio: 2,
+      mimeType: "image/png",
     });
 
-    // Restore visibility
-    if (guideLayer) guideLayer.visible(guideWasVisible);
-    if (transformer) transformer.visible(trWasVisible);
+    if (guideWasVisible) guideLayer?.show();
+    if (trWasVisible) transformer?.show();
     stage.draw();
 
     return dataUrl;
@@ -747,14 +725,12 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     const guideWasVisible = guideLayer ? guideLayer.visible() : true;
     const trWasVisible = transformer ? transformer.visible() : true;
 
-    // Hide mockup, overlays, guides and transformer to leave ONLY customer artwork
     if (mockupLayer) mockupLayer.visible(false);
     if (overlayLayer) overlayLayer.visible(false);
     if (guideLayer) guideLayer.visible(false);
     if (transformer) transformer.visible(false);
     stage.draw();
 
-    // Export bounding box of the print area
     const pa = activeSurface.printArea;
     const cropX = Math.round(pa.xFraction * config.canvasWidth);
     const cropY = Math.round(pa.yFraction * config.canvasHeight);
@@ -766,15 +742,14 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
       y: cropY,
       width: cropW,
       height: cropH,
+      pixelRatio: 2,
       mimeType: "image/png",
-      pixelRatio: 3, // High-res print resolution
     });
 
-    // Restore previous state
-    if (mockupLayer) mockupLayer.visible(mockupWasVisible);
-    if (overlayLayer) overlayLayer.visible(overlayWasVisible);
-    if (guideLayer) guideLayer.visible(guideWasVisible);
-    if (transformer) transformer.visible(trWasVisible);
+    if (mockupLayer && mockupWasVisible) mockupLayer.visible(true);
+    if (overlayLayer && overlayWasVisible) overlayLayer.visible(true);
+    if (guideLayer && guideWasVisible) guideLayer.visible(true);
+    if (transformer && trWasVisible) transformer.visible(true);
     stage.draw();
 
     return dataUrl;
@@ -798,10 +773,12 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     link.click();
   }, [exportProductionArt, state.activeSurfaceId]);
 
+  const serializeDesign = useCallback((): string => {
+    return serializeCustomizerDesign(state);
+  }, [state]);
+
   return {
-    // Config
     config,
-    // State
     state,
     activeSurface,
     activeSurfaceDesign,
@@ -812,9 +789,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     saveStatus,
     viewMode,
     zoom,
-    // Refs
     stageRef,
-    // Actions
     setViewMode,
     zoomIn,
     zoomOut,
@@ -845,6 +820,7 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     exportProductionArt,
     downloadPreview,
     downloadProductionArt,
+    serializeDesign,
     dispatch,
   };
 }

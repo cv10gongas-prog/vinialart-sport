@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { VINILART_MAIN_URL } from "@/lib/config";
 
 export function Footer() {
   return (
@@ -11,12 +12,15 @@ export function Footer() {
           <p className="mt-3 text-sm text-muted-foreground">
             Personalização desportiva. Uma vertente da VinilArt.
           </p>
-          <a
-            href="/"
-            className="mt-4 inline-block text-xs uppercase tracking-[0.14em] text-cyan hover:underline"
-          >
-            Voltar à VinilArt
-          </a>
+          {VINILART_MAIN_URL !== "#" && (
+            <a
+              href={VINILART_MAIN_URL || undefined}
+              className="mt-4 inline-block text-xs uppercase tracking-[0.14em] text-cyan hover:underline"
+              rel="noopener noreferrer"
+            >
+              Voltar à VinilArt
+            </a>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
@@ -71,9 +75,9 @@ export function Footer() {
       </div>
       <div className="brush-rule" />
       <div className="mx-auto max-w-7xl px-4 py-5 text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} VinilArt Sport — versão de demonstração. Preços e
-        produtos são placeholders.
+        © {new Date().getFullYear()} VinilArt Sport
       </div>
     </footer>
   );
 }
+

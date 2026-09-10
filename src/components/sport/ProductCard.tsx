@@ -44,7 +44,9 @@ export function ProductCard({ product }: { product: Product }) {
         </p>
         <h3 className="text-sm leading-tight">{product.name}</h3>
         <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="font-display text-sm text-yellow">{product.priceLabel}</span>
+          <span className="font-display text-xs text-muted-foreground">
+            {product.priceLabel}
+          </span>
           <span className="text-[0.65rem] uppercase tracking-[0.14em] text-cyan opacity-0 transition-opacity group-hover:opacity-100">
             Ver produto
           </span>

@@ -141,6 +141,10 @@ export const caneleirasConfig: ProductCustomizerConfig = {
     "Georgia",
   ],
 
-  mockupNote:
-    "TEMPORARY: Using Lovable demo photo. Swap for transparent PNG mockup when available.",
+  /*
+   * INTERNAL NOTE: Current mockup image (prod-caneleiras.jpg) is a demonstration photo.
+   * When production-ready mockups are available (ideally PNG with transparency or SVG overlays),
+   * swap `mockupSrc` for each surface and adjust the `printArea` fractions accordingly.
+   * Until then, mockupNote is intentionally omitted from the config to keep the UI clean.
+   */
 };
