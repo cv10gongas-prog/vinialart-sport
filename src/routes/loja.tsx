@@ -59,61 +59,66 @@ function Loja() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="Loja"
-        title="Artigos personalizáveis"
-        text="Explora os nossos artigos e soluções desportivas. Orçamentos sob consulta."
+        eyebrow="Catálogo Desportivo"
+        title="Artigos & Equipamentos Personalizáveis"
+        text="Caneleiras, equipamentos, bandeiras, artigos para adeptos, estampagem e impressão gráfica à tua medida."
       />
 
       <div className="mx-auto max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
         {/* Filtros */}
         <aside className="mb-8 lg:mb-0">
-          <div className="card-sport hover:!translate-y-0 p-5">
-            <p className="flex items-center gap-2 font-display text-sm">
-              <SlidersHorizontal className="h-4 w-4 text-cyan" /> Filtros
+          <div className="card-sport hover:!translate-y-0 p-5 border border-border/80 bg-surface">
+            <p className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-foreground">
+              <SlidersHorizontal className="h-4 w-4 text-cyan" /> Categorias & Filtros
             </p>
 
-            <p className="mt-5 text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mt-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
               Categorias
             </p>
-            <div className="mt-2 flex flex-wrap gap-2 lg:flex-col lg:items-start">
+            <div className="mt-2 flex flex-wrap gap-1.5 lg:flex-col lg:items-stretch">
               <button
                 onClick={() => setCat(undefined)}
                 className={cn(
-                  "px-3 py-1.5 text-xs uppercase tracking-[0.1em] transition-colors",
-                  !cat ? "bg-magenta text-primary-foreground" : "text-muted-foreground hover:text-cyan",
+                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
+                  !cat ? "bg-magenta text-white shadow-glow-magenta" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
                 )}
               >
-                Todas
+                <span>Todas</span>
+                <span className="font-mono text-[0.65rem] opacity-70">({products.length})</span>
               </button>
-              {categories.map((c) => (
-                <button
-                  key={c.slug}
-                  onClick={() => setCat(c.name)}
-                  className={cn(
-                    "px-3 py-1.5 text-left text-xs uppercase tracking-[0.1em] transition-colors",
-                    cat === c.name
-                      ? "bg-magenta text-primary-foreground"
-                      : "text-muted-foreground hover:text-cyan",
-                  )}
-                >
-                  {c.name}
-                </button>
-              ))}
+              {categories.map((c) => {
+                const count = products.filter((p) => p.category === c.name).length;
+                return (
+                  <button
+                    key={c.slug}
+                    onClick={() => setCat(c.name)}
+                    className={cn(
+                      "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
+                      cat === c.name
+                        ? "bg-magenta text-white shadow-glow-magenta"
+                        : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                    )}
+                  >
+                    <span>{c.name}</span>
+                    <span className="font-mono text-[0.65rem] opacity-70">({count})</span>
+                  </button>
+                );
+              })}
             </div>
 
-            <p className="mt-6 text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mt-6 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
               Etiquetas
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {badgeFilters.map((b) => (
                 <button
                   key={b}
                   onClick={() => setBadge(badge === b ? undefined : b)}
                   className={cn(
-                    "border px-3 py-1.5 text-[0.65rem] uppercase tracking-[0.1em] transition-colors",
+                    "skew-tag border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider transition-all",
                     badge === b
-                      ? "border-cyan text-cyan"
-                      : "border-border text-muted-foreground hover:border-cyan",
+                      ? "border-cyan bg-cyan text-black"
+                      : "border-border text-muted-foreground hover:border-cyan hover:text-cyan",
                   )}
                 >
                   {b}
@@ -121,12 +126,14 @@ function Loja() {
               ))}
             </div>
 
-            <p className="mt-6 text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Preço
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Filtro de preço disponível quando os preços forem definidos.
-            </p>
+            <div className="mt-6 border-t border-border/60 pt-4">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+                Tabela de Preços
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground/80 leading-relaxed">
+                Preços sob consulta. Fornecemos orçamento imediato para unidades avulsas ou encomendas de equipa completa.
+              </p>
+            </div>
           </div>
         </aside>
 

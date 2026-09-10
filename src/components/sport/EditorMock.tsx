@@ -1,183 +1,225 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
+  ArrowRight,
+  CheckCircle2,
   Eraser,
-  Image as ImageIcon,
+  Layers,
   Move,
   RotateCw,
   Sparkles,
   Type,
   Upload,
-  ZoomIn,
 } from "lucide-react";
 import caneleiras from "@/assets/prod-caneleiras.jpg";
-import { SportButton } from "./SportButton";
+import { SportLink } from "./SportButton";
 import { cn } from "@/lib/utils";
 
-const swatches = ["magenta", "cyan", "yellow", "foreground", "background"] as const;
-
-const swatchClass: Record<string, string> = {
-  magenta: "bg-magenta",
-  cyan: "bg-cyan",
-  yellow: "bg-yellow",
-  foreground: "bg-foreground",
-  background: "bg-background",
-};
-
-function ToolChip({
-  icon: Icon,
-  label,
-}: {
-  icon: typeof Move;
-  label: string;
-}) {
-  return (
-    <span className="flex items-center gap-2 border border-border bg-surface-2 px-3 py-2 text-xs text-muted-foreground">
-      <Icon className="h-3.5 w-3.5 shrink-0 text-cyan" />
-      <span className="truncate">{label}</span>
-    </span>
-  );
-}
-
 export function EditorMock({ className }: { className?: string }) {
-  const [side, setSide] = useState<"Esquerdo" | "Direito">("Esquerdo");
-  const [color, setColor] = useState<string>("magenta");
+  const [activeSide, setActiveSide] = useState<"left" | "right">("left");
+
+  const highlights = [
+    {
+      icon: Eraser,
+      title: "Remoção de Fundo Local",
+      desc: "Remove fundos de fotos e logos diretamente no teu browser sem esperas.",
+      color: "text-magenta",
+      borderColor: "border-magenta/40",
+    },
+    {
+      icon: Sparkles,
+      title: "Ajuste Inteligente da Imagem",
+      desc: "Enquadra fotos, rostos e grafismos no centro útil da área imprimível.",
+      color: "text-cyan",
+      borderColor: "border-cyan/40",
+    },
+    {
+      icon: Layers,
+      title: "Lados Independentes (L / R)",
+      desc: "Podes desenhar uma caneleira para a esquerda e outra diferente para a direita.",
+      color: "text-yellow",
+      borderColor: "border-yellow/40",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Pré-visualização & Arte Técnica",
+      desc: "Visualiza com acabamento realista e exporta o ficheiro pronto para encomenda.",
+      color: "text-green-400",
+      borderColor: "border-green-400/40",
+    },
+  ];
 
   return (
-    <div className={cn("card-sport hover:!translate-y-0 p-4 sm:p-6", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="min-w-0">
-          <p className="font-display text-sm">Personalizador</p>
-          <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
-            Pré-visualização — em desenvolvimento
-          </p>
+    <div
+      className={cn(
+        "card-sport group relative overflow-hidden border border-border/80 bg-surface p-5 sm:p-8 hover:!translate-y-0 shadow-card",
+        className,
+      )}
+    >
+      {/* Background athletic pattern */}
+      <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 bg-sport-gradient opacity-10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-tech-grid opacity-30" />
+
+      {/* Top Header Bar */}
+      <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-3 w-3 items-center justify-center">
+            <span className="h-2 w-2 rounded-full bg-cyan animate-ping" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-display text-base tracking-tight sm:text-lg">
+                ESTÚDIO DE PERSONALIZAÇÃO 2D
+              </p>
+              <span className="skew-tag bg-cyan px-2 py-0.5 text-[0.55rem] font-black text-black">
+                MOTOR REAL ATIVO
+              </span>
+            </div>
+            <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
+              Caneleiras // Lados L / R // Konva Engine
+            </p>
+          </div>
         </div>
-        <span className="skew-tag border border-yellow px-2 py-1 font-display text-[0.55rem] text-yellow">
-          Demo visual
-        </span>
+
+        {/* Side switcher */}
+        <div className="flex items-center rounded border border-border/80 bg-background/80 p-1">
+          <button
+            type="button"
+            onClick={() => setActiveSide("left")}
+            className={cn(
+              "px-3 py-1 font-display text-[0.65rem] uppercase tracking-wider transition-all",
+              activeSide === "left"
+                ? "bg-magenta text-white shadow-glow-magenta"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Lado Esquerdo
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSide("right")}
+            className={cn(
+              "px-3 py-1 font-display text-[0.65rem] uppercase tracking-wider transition-all",
+              activeSide === "right"
+                ? "bg-cyan text-black shadow-glow-cyan"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Lado Direito
+          </button>
+        </div>
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_minmax(0,15rem)]">
-        {/* Preview canvas */}
-        <div className="relative aspect-square overflow-hidden border border-border bg-background">
+      {/* Main Studio Showcase grid */}
+      <div className="relative mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        {/* Left: Realistic Visual Canvas Display */}
+        <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-border bg-background sm:aspect-square">
           <img
             src={caneleiras}
-            alt="Pré-visualização do produto personalizado"
-            loading="lazy"
+            alt="Simulação do personalizador VinilArt Sport"
             width={1024}
             height={1024}
-            className="h-full w-full object-cover opacity-90"
+            className="h-full w-full object-cover"
           />
-          {/* fake selection frame */}
-          <div className="absolute left-1/2 top-1/2 h-2/5 w-2/5 -translate-x-1/2 -translate-y-1/2 border-2 border-dashed border-cyan">
-            <span className="absolute -left-1.5 -top-1.5 h-3 w-3 bg-cyan" />
-            <span className="absolute -right-1.5 -top-1.5 h-3 w-3 bg-cyan" />
-            <span className="absolute -bottom-1.5 -left-1.5 h-3 w-3 bg-cyan" />
-            <span className="absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-cyan" />
-            <span className="absolute -top-7 left-0 bg-cyan px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.12em] text-accent-foreground">
-              A tua imagem
+
+          {/* Athletic framing & technical crosshairs */}
+          <div className="pointer-events-none absolute inset-0 border border-white/5">
+            <span className="absolute left-4 top-4 font-mono text-[0.6rem] text-muted-foreground/60">
+              SYS::VIEW // 100% SCALE
+            </span>
+            <span className="absolute right-4 top-4 font-mono text-[0.6rem] text-cyan">
+              {activeSide === "left" ? "CANVAS: LEFT_SURFACE" : "CANVAS: RIGHT_SURFACE"}
+            </span>
+            <span className="absolute bottom-4 left-4 font-mono text-[0.6rem] text-muted-foreground/60">
+              ÁREA ÚTIL // PERSONALIZAÇÃO
             </span>
           </div>
-          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
-            <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground">
-              Lado {side}
-            </span>
-            <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground">
-              Cor: {color}
+
+          {/* Interactive focal bounding box */}
+          <div
+            className={cn(
+              "absolute top-1/2 h-[74%] w-[38%] -translate-y-1/2 border-2 border-dashed transition-all duration-300",
+              activeSide === "left"
+                ? "left-[29%] -translate-x-1/2 border-magenta shadow-glow-magenta"
+                : "left-[71%] -translate-x-1/2 border-cyan shadow-glow-cyan",
+            )}
+          >
+            {/* Corner handles */}
+            <span className={cn("absolute -left-1.5 -top-1.5 h-3 w-3", activeSide === "left" ? "bg-magenta" : "bg-cyan")} />
+            <span className={cn("absolute -right-1.5 -top-1.5 h-3 w-3", activeSide === "left" ? "bg-magenta" : "bg-cyan")} />
+            <span className={cn("absolute -bottom-1.5 -left-1.5 h-3 w-3", activeSide === "left" ? "bg-magenta" : "bg-cyan")} />
+            <span className={cn("absolute -bottom-1.5 -right-1.5 h-3 w-3", activeSide === "left" ? "bg-magenta" : "bg-cyan")} />
+
+            <div
+              className={cn(
+                "absolute -top-7 left-0 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider",
+                activeSide === "left" ? "bg-magenta text-white" : "bg-cyan text-black",
+              )}
+            >
+              {activeSide === "left" ? "ÁREA DE DESIGN // ESQUERDA" : "ÁREA DE DESIGN // DIREITA"}
+            </div>
+          </div>
+
+          {/* Floating feature pills on mockup */}
+          <div className="absolute bottom-4 right-4 flex flex-col gap-1.5">
+            <span className="skew-tag bg-black/80 px-2 py-1 font-mono text-[0.6rem] text-white border border-border backdrop-blur-sm">
+              ✨ PRÉ-VISUALIZAÇÃO EM TEMPO REAL
             </span>
           </div>
         </div>
 
-        {/* Tool panel */}
-        <div className="flex flex-col gap-4">
-          <div className="border border-dashed border-border bg-surface-2 p-4 text-center">
-            <Upload className="mx-auto h-5 w-5 text-magenta" />
-            <p className="mt-2 text-xs text-muted-foreground">
-              Arrasta a tua imagem ou logo
-            </p>
-            <p className="text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground/70">
-              Upload em breve
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <ToolChip icon={Move} label="Mover" />
-            <ToolChip icon={ZoomIn} label="Redimensionar" />
-            <ToolChip icon={RotateCw} label="Rodar" />
-            <ToolChip icon={ImageIcon} label="Logos" />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Nome
-            </label>
-            <input
-              placeholder="Ex.: Silva"
-              className="h-10 border border-input bg-surface-2 px-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-cyan"
-            />
-            <label className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Número
-            </label>
-            <input
-              placeholder="10"
-              className="h-10 border border-input bg-surface-2 px-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-cyan"
-            />
-          </div>
-
-          <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Lado
-            </p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {(["Esquerdo", "Direito"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSide(s)}
+        {/* Right: Studio Capabilities & Action */}
+        <div className="flex flex-col justify-between gap-6">
+          <div className="grid gap-3">
+            {highlights.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={idx}
                   className={cn(
-                    "h-9 border text-[0.65rem] uppercase tracking-[0.12em] transition-colors",
-                    side === s
-                      ? "border-magenta bg-magenta text-primary-foreground"
-                      : "border-border text-muted-foreground hover:border-cyan",
+                    "flex items-start gap-3.5 border bg-background/60 p-3.5 transition-all hover:bg-background/90",
+                    item.borderColor,
                   )}
                 >
-                  {s}
-                </button>
-              ))}
+                  <div className={cn("mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded bg-surface", item.color)}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-xs uppercase tracking-wider text-foreground">
+                      {item.title}
+                    </h4>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                      {item.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Action box */}
+          <div className="border-t border-border/80 pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-display text-sm">Pronto para criar o teu par?</p>
+                <p className="text-xs text-muted-foreground">
+                  Sem necessidade de registo imediato. Começa a editar agora.
+                </p>
+              </div>
+              <SportLink
+                to="/personalizar"
+                variant="primary"
+                size="lg"
+                shape="slant"
+                className="w-full sm:w-auto shadow-glow-magenta"
+              >
+                Abrir Personalizador <ArrowRight className="h-4 w-4" />
+              </SportLink>
             </div>
           </div>
-
-          <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Cores
-            </p>
-            <div className="mt-2 flex gap-2">
-              {swatches.map((s) => (
-                <button
-                  key={s}
-                  aria-label={`Cor ${s}`}
-                  onClick={() => setColor(s)}
-                  className={cn(
-                    "h-8 w-8 border",
-                    swatchClass[s],
-                    color === s ? "border-foreground" : "border-border",
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <ToolChip icon={Type} label="Adicionar texto" />
-            <ToolChip icon={Eraser} label="Remover fundo" />
-          </div>
-
-          <SportButton variant="gradient" className="w-full" disabled>
-            <Sparkles className="h-4 w-4" /> Ajustar automaticamente com IA
-          </SportButton>
-          <p className="text-center text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground/70">
-            Funcionalidade futura
-          </p>
         </div>
       </div>
     </div>
   );
 }
+

@@ -58,19 +58,19 @@ export const caneleirasConfig: ProductCustomizerConfig = {
       mockupSrc: caneleirasMockup,
       mockup: {
         baseSrc: caneleirasMockup,
-        // Focus frame on Left Caneleira (taller, on the left side of the photo)
+        // Focus frame on Left Caneleira
         crop: {
-          x: 0.08,
-          y: 0.02,
-          width: 0.48,
+          x: 0.06,
+          y: 0.04,
+          width: 0.46,
           height: 0.88,
         },
       },
       printArea: {
-        xFraction: 0.14,
-        yFraction: 0.06,
-        widthFraction: 0.36,
-        heightFraction: 0.76,
+        xFraction: 0.13,
+        yFraction: 0.07,
+        widthFraction: 0.34,
+        heightFraction: 0.79,
         shape: {
           type: "contour",
           points: SHIN_GUARD_CONTOUR_POINTS,
@@ -83,19 +83,19 @@ export const caneleirasConfig: ProductCustomizerConfig = {
       mockupSrc: caneleirasMockup,
       mockup: {
         baseSrc: caneleirasMockup,
-        // Focus frame on Right Caneleira (slightly recessed, on the right side of the photo)
+        // Focus frame on Right Caneleira (symmetrical pairing)
         crop: {
           x: 0.48,
-          y: 0.08,
+          y: 0.04,
           width: 0.46,
-          height: 0.86,
+          height: 0.88,
         },
       },
       printArea: {
-        xFraction: 0.52,
-        yFraction: 0.12,
+        xFraction: 0.53,
+        yFraction: 0.07,
         widthFraction: 0.34,
-        heightFraction: 0.72,
+        heightFraction: 0.79,
         shape: {
           type: "contour",
           points: SHIN_GUARD_CONTOUR_POINTS,

@@ -1,4 +1,7 @@
 import caneleiras from "@/assets/prod-caneleiras.jpg";
+import caneleirasAngle from "@/assets/prod-caneleira-angle.jpg";
+import caneleirasDetail from "@/assets/prod-caneleira-detail.jpg";
+import caneleirasBack from "@/assets/prod-caneleira-back.jpg";
 import equipamento from "@/assets/prod-equipamento.jpg";
 import bandeira from "@/assets/prod-bandeira.jpg";
 
@@ -9,6 +12,8 @@ export type Product = {
   name: string;
   category: string;
   image: string;
+  /** Additional product gallery images for detailed showcase */
+  gallery?: string[];
   /** Always "Preço sob consulta" — never invent prices. */
   priceLabel: string;
   badges: Badge[];
@@ -35,10 +40,11 @@ export const products: Product[] = [
     name: "Caneleiras Personalizadas",
     category: "Caneleiras",
     image: caneleiras,
+    gallery: [caneleiras, caneleirasAngle, caneleirasDetail, caneleirasBack],
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável", "Mais popular"],
     description:
-      "Caneleiras produzidas com impressão de alta durabilidade. Envia o teu logo, foto ou grafismo e define nome, número e cores. Cada par é preparado individualmente para o teu design.",
+      "Caneleiras com personalização gráfica à tua medida. Adiciona as tuas imagens, fotos ou logótipos, define nome e número, e personaliza cada lado de forma independente no nosso estúdio online.",
     isCustomizable: true,
     variants: ["XS", "S", "M", "L", "XL"],
   },
@@ -50,9 +56,8 @@ export const products: Product[] = [
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Equipamentos desportivos personalizados com as cores, logo e identidade da tua equipa. Produção individual ou por equipa completa.",
+      "Personalização de equipamentos desportivos para atletas, clubes e equipas. Configuração com cores, emblemas e numerações da tua equipa.",
     isCustomizable: false,
-    variants: ["XS", "S", "M", "L", "XL", "XXL"],
   },
   {
     slug: "bandeira-personalizada",
@@ -60,66 +65,42 @@ export const products: Product[] = [
     category: "Bandeiras",
     image: bandeira,
     priceLabel: "Preço sob consulta",
-    badges: ["Personalizável", "Novo"],
-    description:
-      "Bandeiras de alta qualidade com o design, cores e identidade do teu clube ou equipa. Impressão a toda a largura.",
-    isCustomizable: false,
-  },
-  {
-    slug: "camisola-personalizada",
-    name: "Camisola Personalizada",
-    category: "Equipamentos",
-    image: equipamento,
-    priceLabel: "Preço sob consulta",
-    badges: ["Personalizável", "Novo"],
-    description:
-      "Camisolas desportivas personalizadas com nome, número e identidade visual da equipa. Tecido de alta performance.",
-    isCustomizable: false,
-    variants: ["XS", "S", "M", "L", "XL", "XXL"],
-  },
-  {
-    slug: "caneleiras-clube",
-    name: "Caneleiras — Pack Equipa",
-    category: "Caneleiras",
-    image: caneleiras,
-    priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Pack de caneleiras personalizadas para toda a equipa. Encomenda com nomes e números individuais por jogador.",
-    isCustomizable: true,
-    variants: ["XS", "S", "M", "L", "XL"],
+      "Bandeiras personalizadas com o design, cores e identidade do teu clube, claque ou evento desportivo.",
+    isCustomizable: false,
   },
   {
-    slug: "bandeira-adeptos",
-    name: "Bandeira de Adeptos",
+    slug: "artigos-adeptos",
+    name: "Artigos para Adeptos",
     category: "Artigos para Adeptos",
     image: bandeira,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Bandeiras para adeptos com o design e cores do teu clube. Leve, resistente e de grande impacto visual nas bancadas.",
+      "Artigos de apoio e bancada personalizados para adeptos, claques e grupos desportivos.",
     isCustomizable: false,
   },
   {
-    slug: "estampagem-nome-numero",
-    name: "Estampagem Nome & Número",
+    slug: "estampagem",
+    name: "Estampagem",
     category: "Estampagem",
     image: equipamento,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Serviço de estampagem de nome e número em equipamentos existentes. Compatível com a maioria dos tecidos desportivos.",
+      "Serviço de estampagem de nomes, números e logótipos em peças desportivas para individuais ou equipas.",
     isCustomizable: false,
   },
   {
-    slug: "impressao-grande-formato",
-    name: "Impressão Grande Formato",
+    slug: "impressao",
+    name: "Impressão",
     category: "Impressão",
     image: bandeira,
     priceLabel: "Preço sob consulta",
-    badges: ["Novo"],
+    badges: ["Personalizável"],
     description:
-      "Impressão de grande formato para banners, faixas e decoração de espaços desportivos. Consulta-nos para medidas e suportes disponíveis.",
+      "Produção e impressão gráfica para materiais de apoio desportivo, faixas e comunicação de clubes.",
     isCustomizable: false,
   },
 ];

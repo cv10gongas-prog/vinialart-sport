@@ -30,10 +30,10 @@ export const Route = createFileRoute("/equipamentos")({
 });
 
 const blocks = [
-  { icon: Shirt, title: "Equipamentos completos", text: "Camisolas, calções e meias personalizadas." },
-  { icon: Hash, title: "Nomes e números", text: "Estampagem individual para cada atleta." },
-  { icon: Users, title: "Encomendas de equipa", text: "Listas de tamanhos e produção por grupo." },
-  { icon: Palette, title: "Identidade do clube", text: "Cores, logos e grafismos próprios." },
+  { icon: Shirt, title: "Personalização de Equipamentos", text: "Adaptação de cores, emblemas e identidade da tua equipa." },
+  { icon: Hash, title: "Nomes e números", text: "Estampagem e numeração individual para cada atleta." },
+  { icon: Users, title: "Encomendas de equipa", text: "Produção individual ou para equipas completas." },
+  { icon: Palette, title: "Identidade visual", text: "Logótipos, patrocinadores e grafismos personalizados." },
 ];
 
 function Equipamentos() {
@@ -41,8 +41,8 @@ function Equipamentos() {
     <PageShell>
       <PageHero
         eyebrow="Equipamentos"
-        title="Soluções para equipas e clubes."
-        text="Do equipamento de jogo aos artigos de treino, com a identidade da tua equipa."
+        title="Personalização para equipas e clubes."
+        text="Desenvolvemos a personalização do teu equipamento desportivo com as cores e símbolos da tua equipa."
       />
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
@@ -70,7 +70,7 @@ function Equipamentos() {
         <div className="mt-14 border border-border bg-surface p-8 text-center">
           <h2 className="text-2xl sm:text-3xl">Encomenda para a tua equipa</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-            Envia-nos a lista de nomes, números e tamanhos e preparamos a proposta.
+            Envia-nos a tua lista de nomes, números e detalhes pretendidos e preparamos a proposta.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <SportLink to="/contactos" size="lg">

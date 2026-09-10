@@ -92,27 +92,34 @@ export function ProductCustomizer({
       </div>
 
       {/* Surface Tabs */}
-      <div className="mt-4 flex gap-1 border-b border-border" role="tablist" aria-label="Lados do produto">
-        {config.surfaces.map((surface) => (
-          <button
-            key={surface.id}
-            role="tab"
-            aria-selected={state.activeSurfaceId === surface.id}
-            onClick={() => setSurface(surface.id)}
-            className={cn(
-              "-mb-px border-b-2 px-4 pb-2.5 pt-1.5 font-display text-[0.65rem] uppercase tracking-[0.14em] transition-colors",
-              state.activeSurfaceId === surface.id
-                ? "border-magenta text-foreground"
-                : "border-transparent text-muted-foreground hover:text-cyan",
-            )}
-          >
-            {surface.label}
-          </button>
-        ))}
+      <div className="mt-4 flex gap-2 border-b border-border/80 pb-1" role="tablist" aria-label="Lados do produto">
+        {config.surfaces.map((surface) => {
+          const isActive = state.activeSurfaceId === surface.id;
+          const isLeft = surface.id === "left";
+          return (
+            <button
+              key={surface.id}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setSurface(surface.id)}
+              className={cn(
+                "flex items-center gap-2 rounded-t px-4 py-2 font-display text-xs uppercase tracking-wider transition-all",
+                isActive
+                  ? isLeft
+                    ? "bg-magenta text-white shadow-glow-magenta"
+                    : "bg-cyan text-black shadow-glow-cyan"
+                  : "border border-border/60 bg-surface text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <span className={cn("h-2 w-2 rounded-full", isActive ? (isLeft ? "bg-white" : "bg-black") : "bg-muted-foreground/50")} />
+              {surface.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Status bar & Viewport Zoom Controls */}
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground/60">
+      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[0.6rem] font-mono uppercase tracking-widest text-muted-foreground/70">
         <div className="flex items-center gap-3">
           {state.undoStack.length > 0 && (
             <span aria-live="polite">
@@ -128,7 +135,7 @@ export function ProductCustomizer({
             type="button"
             onClick={customizer.zoomOut}
             aria-label="Diminuir zoom"
-            className="flex h-5 w-5 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            className="flex h-6 w-6 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
           >
             <span aria-hidden="true">−</span>
           </button>
@@ -136,7 +143,7 @@ export function ProductCustomizer({
             type="button"
             onClick={customizer.resetZoom}
             aria-label={`Zoom atual: ${Math.round(customizer.zoom * 100)}%. Clica para repor.`}
-            className="px-1.5 py-0.5 border border-border bg-surface text-[0.6rem] font-mono hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            className="px-2 py-0.5 border border-border bg-surface text-[0.6rem] font-mono hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
           >
             {Math.round(customizer.zoom * 100)}%
           </button>
@@ -144,7 +151,7 @@ export function ProductCustomizer({
             type="button"
             onClick={customizer.zoomIn}
             aria-label="Aumentar zoom"
-            className="flex h-5 w-5 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            className="flex h-6 w-6 items-center justify-center border border-border bg-surface text-xs hover:border-cyan hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
           >
             <span aria-hidden="true">+</span>
           </button>
@@ -152,17 +159,23 @@ export function ProductCustomizer({
       </div>
 
       {/* Main layout: canvas + toolbar */}
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,15rem)]">
+      <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,16rem)]">
         {/* Canvas wrapper */}
         <div className="relative mx-auto w-full max-w-[480px] min-w-0 lg:mx-0">
-          <div className="w-full min-w-0 overflow-hidden border border-border bg-surface">
+          <div className="relative w-full min-w-0 overflow-hidden rounded-sm border border-border/80 bg-black/90 p-1 shadow-card">
             <CanvasEditor config={config} customizer={customizer} />
+
+            {/* Corner technical crosshairs */}
+            <div className="pointer-events-none absolute inset-2 border border-white/5" />
+            <span className="pointer-events-none absolute right-3 top-3 font-mono text-[0.55rem] text-muted-foreground/50">
+              HUD // 100% SCALE
+            </span>
           </div>
 
           {/* Overlay label */}
-          <div className="absolute bottom-2 left-2 flex flex-wrap gap-2 pointer-events-none" aria-hidden="true">
-            <span className="bg-background/80 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground">
-              {activeSurface.label}
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 pointer-events-none" aria-hidden="true">
+            <span className="skew-tag border border-cyan/40 bg-black/90 px-2.5 py-1 font-mono text-[0.6rem] text-cyan backdrop-blur-sm">
+              LADO ATIVO: {activeSurface.label.toUpperCase()}
             </span>
           </div>
         </div>

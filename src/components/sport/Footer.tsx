@@ -3,79 +3,101 @@ import { VINILART_MAIN_URL } from "@/lib/config";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-surface">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
+    <footer className="border-t border-border bg-surface bg-tech-grid">
+      <div className="brush-rule" />
+      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div className="max-w-sm">
-          <p className="font-display text-lg">
-            VinilArt <span className="text-magenta">Sport</span>
+          <div className="flex items-center gap-3">
+            <span className="grid h-8 w-8 place-items-center bg-sport-gradient slant-pill">
+              <span className="font-display text-sm font-black text-black">V</span>
+            </span>
+            <span className="font-display text-base tracking-tight text-foreground">
+              VINILART <span className="text-magenta font-black">SPORT</span>
+            </span>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+            Divisão desportiva da VinilArt. Personalização técnica de caneleiras, equipamentos de jogo, bandeiras e merchandising desportivo.
           </p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Personalização desportiva. Uma vertente da VinilArt.
-          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="skew-tag border border-border bg-background px-2 py-0.5 font-mono text-[0.6rem] text-cyan">
+              PERSONALIZAÇÃO À TUA MEDIDA
+            </span>
+            <span className="skew-tag border border-border bg-background px-2 py-0.5 font-mono text-[0.6rem] text-muted-foreground">
+              ENCOMENDAS SOB CONSULTA
+            </span>
+          </div>
           {VINILART_MAIN_URL !== "#" && (
             <a
               href={VINILART_MAIN_URL || undefined}
-              className="mt-4 inline-block text-xs uppercase tracking-[0.14em] text-cyan hover:underline"
+              className="mt-4 inline-block font-display text-[0.65rem] uppercase tracking-[0.14em] text-cyan hover:underline"
               rel="noopener noreferrer"
             >
-              Voltar à VinilArt
+              ← Voltar ao portal principal VinilArt
             </a>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8 text-xs sm:grid-cols-3">
           <div>
-            <p className="font-display text-xs tracking-[0.16em] text-muted-foreground">
+            <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
               Navegar
             </p>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-3 space-y-2.5">
               <li>
-                <Link to="/loja" className="hover:text-cyan">
-                  Loja
+                <Link to="/loja" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Loja de Artigos
                 </Link>
               </li>
               <li>
-                <Link to="/personalizar" className="hover:text-cyan">
-                  Personalizar
+                <Link to="/personalizar" className="text-magenta font-semibold hover:text-cyan transition-colors">
+                  ⚡ Estúdio 2D Caneleiras
                 </Link>
               </li>
               <li>
-                <Link to="/equipamentos" className="hover:text-cyan">
-                  Equipamentos
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="font-display text-xs tracking-[0.16em] text-muted-foreground">
-              Mais
-            </p>
-            <ul className="mt-3 space-y-2">
-              <li>
-                <Link to="/adeptos" className="hover:text-cyan">
-                  Adeptos
-                </Link>
-              </li>
-              <li>
-                <Link to="/contactos" className="hover:text-cyan">
-                  Contactos
+                <Link to="/equipamentos" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Equipamentos de Jogo
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="font-display text-xs tracking-[0.16em] text-muted-foreground">
-              Contacto
+            <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
+              Modalidades
             </p>
-            <p className="mt-3 text-muted-foreground">
-              Dados de contacto a confirmar.
+            <ul className="mt-3 space-y-2.5">
+              <li>
+                <Link to="/adeptos" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Artigos para Adeptos
+                </Link>
+              </li>
+              <li>
+                <Link to="/carrinho" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Carrinho de Compras
+                </Link>
+              </li>
+              <li>
+                <Link to="/contactos" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Contactos & Suporte
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
+              Produção & Apoio
+            </p>
+            <p className="mt-3 text-muted-foreground leading-relaxed">
+              Atendimento especializado para pedidos individuais e clubes desportivos.
             </p>
           </div>
         </div>
       </div>
-      <div className="brush-rule" />
-      <div className="mx-auto max-w-7xl px-4 py-5 text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} VinilArt Sport
+
+      <div className="border-t border-border/60 py-4">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 text-[0.65rem] font-mono text-muted-foreground sm:px-6">
+          <span>© {new Date().getFullYear()} VinilArt Sport. Todos os direitos reservados.</span>
+          <span className="text-muted-foreground/60">PERSONALIZAÇÃO GRÁFICA DESPORTIVA</span>
+        </div>
       </div>
     </footer>
   );

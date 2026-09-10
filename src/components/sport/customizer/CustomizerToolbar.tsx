@@ -290,7 +290,7 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
                 ? "border-cyan/50 bg-cyan/5 text-cyan hover:bg-cyan/15 hover:border-cyan"
                 : "border-border text-muted-foreground/40 cursor-not-allowed",
             )}
-            title="Analisa o sujeito principal e enquadra de forma inteligente no formato anatómico da caneleira"
+            title="Analisa o sujeito principal e enquadra de forma inteligente na área útil da caneleira"
           >
             <Sparkles className="h-4 w-4 text-cyan" />
             ✨ Ajuste inteligente
@@ -455,20 +455,6 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
           <Download className="h-4 w-4 text-magenta" />
           Exportar Arte (Técnica)
         </button>
-      </div>
-
-      {/* === FUTURE features === */}
-      <div className="grid gap-2 border-t border-border pt-4">
-        <p className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/50">
-          Funcionalidades futuras
-        </p>
-        <SportButton variant="gradient" className="w-full opacity-40" disabled>
-          <Sparkles className="h-4 w-4" />
-          Ajustar automaticamente com IA
-        </SportButton>
-        <p className="text-center text-[0.6rem] uppercase tracking-widest text-muted-foreground/40">
-          Em desenvolvimento
-        </p>
       </div>
     </div>
   );

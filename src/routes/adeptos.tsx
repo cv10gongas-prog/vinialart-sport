@@ -10,16 +10,16 @@ export const Route = createFileRoute("/adeptos")({
   component: Adeptos,
   head: () => ({
     meta: [
-      { title: "Adeptos — VinilArt Sport" },
+      { title: "Bandeiras & Artigos para Adeptos — VinilArt Sport" },
       {
         name: "description",
         content:
-          "Artigos personalizados para adeptos e claques: bandeiras, faixas, autocolantes e merchandising.",
+          "Bandeiras e artigos personalizados para adeptos, claques e apoio desportivo.",
       },
-      { property: "og:title", content: "Adeptos — VinilArt Sport" },
+      { property: "og:title", content: "Bandeiras & Artigos para Adeptos — VinilArt Sport" },
       {
         property: "og:description",
-        content: "Bandeiras, faixas e artigos personalizados para adeptos e grupos.",
+        content: "Bandeiras e artigos personalizados para adeptos, claques e grupos desportivos.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/adeptos" },
@@ -30,19 +30,19 @@ export const Route = createFileRoute("/adeptos")({
 });
 
 const items = [
-  { icon: Flag, title: "Bandeiras", text: "Vários formatos, impressão a cores." },
-  { icon: Megaphone, title: "Faixas e tarjas", text: "Mensagens e grafismos à medida." },
-  { icon: Sticker, title: "Autocolantes", text: "Logos e símbolos do grupo." },
-  { icon: Heart, title: "Artigos de apoio", text: "Peças personalizadas para o dia de jogo." },
+  { icon: Flag, title: "Bandeiras", text: "Vários formatos com impressão gráfica personalizada." },
+  { icon: Megaphone, title: "Faixas e tarjas", text: "Mensagens, nomes e símbolos do teu clube." },
+  { icon: Sticker, title: "Autocolantes", text: "Emblemas e grafismos da claque ou clube." },
+  { icon: Heart, title: "Artigos de apoio", text: "Peças de apoio à equipa no dia de jogo." },
 ];
 
 function Adeptos() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="Adeptos"
-        title="Leva as tuas cores para a bancada."
-        text="Artigos personalizados para adeptos, grupos e claques."
+        eyebrow="Bandeiras & Artigos para Adeptos"
+        title="Leva as cores do teu clube para a bancada."
+        text="Soluções de personalização gráfica em bandeiras, faixas e artigos de apoio para claques, adeptos e eventos desportivos."
       />
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
@@ -57,7 +57,7 @@ function Adeptos() {
         </div>
 
         <div className="mt-14">
-          <SectionHeading eyebrow="Artigos" title="Para adeptos" />
+          <SectionHeading eyebrow="Artigos" title="Bandeiras e artigos de apoio" />
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {products
               .filter(
@@ -73,10 +73,10 @@ function Adeptos() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="grain flex aspect-square items-center justify-center border border-dashed border-border bg-surface"
+              className="grain flex aspect-square items-center justify-center border border-dashed border-border bg-surface text-center p-3"
             >
               <span className="text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground">
-                Trabalho {i + 1}
+                Possibilidade {i + 1}
               </span>
             </div>
           ))}
