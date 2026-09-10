@@ -54,6 +54,11 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
     copyDesignToOtherSurface,
     selectLayer,
     smartFit,
+    smartFitIntelligent,
+    removeBackground,
+    restoreOriginal,
+    toggleCompareOriginal,
+    bgRemovalProgress,
     resetSurface,
     clearDraft,
     undo,
@@ -65,6 +70,7 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
   const [showTextPanel, setShowTextPanel] = useState(false);
   const [showConfirmCopy, setShowConfirmCopy] = useState(false);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
+  const [bgError, setBgError] = useState<string | null>(null);
 
   // Close text panel when switching surfaces
   useEffect(() => {
@@ -237,25 +243,128 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
         />
       </div>
 
-      {/* === Smart Fit (real, no AI) === */}
-      <button
-        onClick={smartFit}
-        disabled={!canSmartFit}
-        className={cn(
-          "flex items-center gap-2 border px-3 py-2.5 text-xs uppercase tracking-widest transition-colors",
-          canSmartFit
-            ? "border-cyan text-cyan hover:bg-cyan/10"
-            : "border-border text-muted-foreground/40 cursor-not-allowed",
-        )}
-        title={
-          canSmartFit
-            ? "Ajusta automaticamente à área de impressão"
-            : "Seleciona uma imagem desbloqueada primeiro"
-        }
-      >
-        <Target className="h-4 w-4" />
-        Ajustar à área
-      </button>
+      {/* === Image AI & Fitting Actions (Visible when image is selected) === */}
+      {selectedLayer?.type === "image" && (
+        <div className="grid gap-2 border border-border/80 bg-surface p-2.5">
+          <div className="flex items-center justify-between border-b border-border/60 pb-1.5">
+            <span className="text-[0.65rem] font-bold uppercase tracking-widest text-muted-foreground">
+              Ajustes de Imagem
+            </span>
+            {selectedLayer.isBackgroundRemoved && (
+              <span className="text-[0.6rem] font-semibold text-magenta uppercase tracking-wider">
+                Fundo Removido
+              </span>
+            )}
+          </div>
+
+          {/* Error notice if any */}
+          {bgError && (
+            <div className="rounded bg-destructive/10 border border-destructive/30 p-2 text-[0.65rem] text-destructive">
+              {bgError}
+            </div>
+          )}
+
+          {/* Button: Regular Smart Fit */}
+          <button
+            onClick={smartFit}
+            disabled={!canSmartFit}
+            className={cn(
+              "flex items-center gap-2 border px-3 py-2 text-xs uppercase tracking-widest transition-colors",
+              canSmartFit
+                ? "border-border text-foreground hover:border-cyan hover:text-cyan"
+                : "border-border text-muted-foreground/40 cursor-not-allowed",
+            )}
+            title="Ajusta matematicamente ao centro da área de impressão"
+          >
+            <Target className="h-4 w-4 text-cyan" />
+            Ajustar à área
+          </button>
+
+          {/* Button: AI Smart Fit (Intelligent subject framing) */}
+          <button
+            onClick={smartFitIntelligent}
+            disabled={!canSmartFit}
+            className={cn(
+              "flex items-center gap-2 border px-3 py-2 text-xs uppercase tracking-widest transition-colors font-medium",
+              canSmartFit
+                ? "border-cyan/50 bg-cyan/5 text-cyan hover:bg-cyan/15 hover:border-cyan"
+                : "border-border text-muted-foreground/40 cursor-not-allowed",
+            )}
+            title="Analisa o sujeito principal e enquadra de forma inteligente no formato anatómico da caneleira"
+          >
+            <Sparkles className="h-4 w-4 text-cyan" />
+            ✨ Ajuste inteligente
+          </button>
+
+          {/* Background Removal / Restore / Compare Toggle */}
+          {!selectedLayer.isBackgroundRemoved ? (
+            <button
+              onClick={async () => {
+                setBgError(null);
+                try {
+                  await removeBackground(selectedLayer.id);
+                } catch (err: any) {
+                  setBgError(err?.message || "Erro ao remover fundo. Tenta novamente.");
+                }
+              }}
+              disabled={selectedLayer.locked || selectedLayer.isProcessingBg}
+              className={cn(
+                "flex items-center justify-center gap-2 border border-magenta/60 bg-magenta/10 px-3 py-2 text-xs uppercase tracking-widest text-magenta transition-colors hover:bg-magenta hover:text-white disabled:opacity-50 disabled:cursor-not-allowed",
+              )}
+            >
+              {selectedLayer.isProcessingBg ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>{bgRemovalProgress?.statusText || "Removendo fundo…"}</span>
+                </>
+              ) : (
+                <>
+                  <Eraser className="h-4 w-4" />
+                  <span>Remover fundo</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="grid grid-cols-2 gap-1.5 pt-1">
+              {/* Compare toggle: Ver Original / Ver Sem Fundo */}
+              <button
+                onClick={() => toggleCompareOriginal(selectedLayer.id)}
+                className={cn(
+                  "flex items-center justify-center gap-1 border px-2 py-1.5 text-[0.65rem] uppercase tracking-wider transition-colors",
+                  selectedLayer.isViewingOriginal
+                    ? "border-yellow bg-yellow/10 text-yellow"
+                    : "border-border text-muted-foreground hover:border-cyan hover:text-cyan",
+                )}
+                title="Alternar entre a imagem original e o recorte sem fundo"
+              >
+                {selectedLayer.isViewingOriginal ? "Ver s/ fundo" : "Ver original"}
+              </button>
+
+              {/* Restore original image button */}
+              <button
+                onClick={() => restoreOriginal(selectedLayer.id)}
+                className="flex items-center justify-center gap-1 border border-border px-2 py-1.5 text-[0.65rem] uppercase tracking-wider text-muted-foreground hover:border-destructive hover:text-destructive transition-colors"
+                title="Restaurar a imagem original e descartar o recorte"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Restaurar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fallback button when no image is selected so users still discover the tool */}
+      {!selectedLayer && (
+        <button
+          disabled
+          className="flex items-center gap-2 border border-border text-muted-foreground/40 px-3 py-2.5 text-xs uppercase tracking-widest cursor-not-allowed"
+          title="Seleciona uma imagem para ajustar ou remover fundo"
+        >
+          <Target className="h-4 w-4" />
+          Ajustar à área
+        </button>
+      )}
 
       {/* === "Aplicar este design aos dois lados" === */}
       {otherSurface && (
@@ -353,16 +462,9 @@ export function CustomizerToolbar({ customizer }: CustomizerToolbarProps) {
         <p className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/50">
           Funcionalidades futuras
         </p>
-        <button
-          disabled
-          className="flex cursor-not-allowed items-center gap-2 border border-dashed border-border px-3 py-2 text-xs uppercase tracking-widest text-muted-foreground/40"
-        >
-          <Eraser className="h-3.5 w-3.5" />
-          Remover fundo
-        </button>
         <SportButton variant="gradient" className="w-full opacity-40" disabled>
           <Sparkles className="h-4 w-4" />
-          Ajustar com IA
+          Ajustar automaticamente com IA
         </SportButton>
         <p className="text-center text-[0.6rem] uppercase tracking-widest text-muted-foreground/40">
           Em desenvolvimento

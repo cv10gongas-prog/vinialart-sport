@@ -160,11 +160,13 @@ function KonvaStageInner({
     img.src = activeSurface.mockupSrc;
   }, [activeSurface.mockupSrc]);
 
-  // Load images for image-type layers (only new ones)
+  // Load images for image-type layers (reload if layer.srcUrl changed e.g. bg removal or restore)
   useEffect(() => {
     activeLayers.forEach((layer) => {
       if (layer.type !== "image") return;
-      if (layerImgs[layer.id]) return;
+      const current = layerImgs[layer.id];
+      if (current && current.src === layer.srcUrl) return;
+
       const img = new window.Image();
       img.onload = () =>
         setLayerImgs((prev) => ({ ...prev, [layer.id]: img }));

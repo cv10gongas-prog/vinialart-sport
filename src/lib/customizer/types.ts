@@ -102,12 +102,38 @@ export interface BaseLayer {
   locked: boolean;
 }
 
+export interface SubjectBoundingBox {
+  /** Normalized coordinates (0..1) relative to image dimensions */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** Primary focus point (e.g. head/face/centroid) (0..1) */
+  focusPoint?: { x: number; y: number } | undefined;
+}
+
 export interface ImageLayer extends BaseLayer {
   type: "image";
-  /** Object URL (blob:) created from local file upload */
+  /** Currently active Object URL (blob:) displayed on canvas */
   srcUrl: string;
-  /** Key used to store/retrieve the image blob in IndexedDB */
+  /** Currently active file key in IndexedDB */
   fileKey?: string | undefined;
+  /** Original file key in IndexedDB (preserved across non-destructive operations) */
+  originalFileKey?: string | undefined;
+  /** Original object URL if loaded */
+  originalSrcUrl?: string | undefined;
+  /** Processed file key in IndexedDB (transparent background result) */
+  processedFileKey?: string | undefined;
+  /** Processed object URL if loaded */
+  processedSrcUrl?: string | undefined;
+  /** Flag indicating whether background removal is currently applied */
+  isBackgroundRemoved?: boolean | undefined;
+  /** Flag indicating whether the user is temporarily previewing the original image */
+  isViewingOriginal?: boolean | undefined;
+  /** Transient loading/processing state */
+  isProcessingBg?: boolean | undefined;
+  /** Detected subject bounds for intelligent auto-framing */
+  subjectBoundingBox?: SubjectBoundingBox | undefined;
   /** Original filename for display */
   filename: string;
   /** Natural dimensions of the source image */

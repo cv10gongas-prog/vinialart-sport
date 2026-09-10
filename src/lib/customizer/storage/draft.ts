@@ -153,7 +153,41 @@ export async function loadCustomizerDraft(
             srcUrl: blobUrl,
             visible: imgLayer.visible !== false,
             locked: Boolean(imgLayer.locked),
+            isBackgroundRemoved: Boolean(imgLayer.isBackgroundRemoved),
+            isViewingOriginal: false,
+            isProcessingBg: false,
           };
+
+          // Also rehydrate originalSrcUrl if originalFileKey exists
+          if (imgLayer.originalFileKey && imgLayer.originalFileKey !== imgLayer.fileKey) {
+            try {
+              const origRecord = await getImageBlob(imgLayer.originalFileKey);
+              if (origRecord && origRecord.blob) {
+                const origUrl = URL.createObjectURL(origRecord.blob);
+                createdUrls.push(origUrl);
+                restoredImg.originalSrcUrl = origUrl;
+              }
+            } catch (e) {
+              console.warn("Failed to load original image blob:", e);
+            }
+          } else if (imgLayer.originalFileKey === imgLayer.fileKey) {
+            restoredImg.originalSrcUrl = blobUrl;
+          }
+
+          // Also rehydrate processedSrcUrl if processedFileKey exists
+          if (imgLayer.processedFileKey) {
+            try {
+              const procRecord = await getImageBlob(imgLayer.processedFileKey);
+              if (procRecord && procRecord.blob) {
+                const procUrl = URL.createObjectURL(procRecord.blob);
+                createdUrls.push(procUrl);
+                restoredImg.processedSrcUrl = procUrl;
+              }
+            } catch (e) {
+              console.warn("Failed to load processed image blob:", e);
+            }
+          }
+
           rehydratedLayers.push(restoredImg);
         } else {
           const textLayer = rawLayer as TextLayer;

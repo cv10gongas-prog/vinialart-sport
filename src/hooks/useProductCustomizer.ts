@@ -33,6 +33,8 @@ import {
   loadCustomizerDraft,
   clearCustomizerDraft,
 } from "@/lib/customizer/storage/draft";
+import { getImageBlob, saveImageBlob } from "@/lib/customizer/storage/db";
+import { getImageProcessingProvider } from "@/lib/customizer/ai";
 import { nanoid } from "@/lib/customizer/nanoid";
 
 export type DraftSaveStatus = "idle" | "saving" | "saved";
@@ -203,6 +205,8 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
           nextZIndex(activeLayers),
         );
         layer.fileKey = fileKey;
+        layer.originalFileKey = fileKey;
+        layer.originalSrcUrl = srcUrl;
 
         dispatch({
           type: "ADD_IMAGE_LAYER",
@@ -367,6 +371,233 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
       changes,
     });
   }, [selectedLayer, activeSurface, config, state.activeSurfaceId]);
+
+  // AI-Assisted Smart Fit (Subject Detection & Anatomical Shin Guard Fitting)
+  const smartFitIntelligent = useCallback(async () => {
+    if (!selectedLayer || selectedLayer.type !== "image" || selectedLayer.locked) return;
+    const imgLayer = selectedLayer as ImageLayer;
+    const provider = getImageProcessingProvider();
+
+    try {
+      // If we don't have subject bounds cached, analyze the active blob
+      let subjectBox = imgLayer.subjectBoundingBox;
+      if (!subjectBox && imgLayer.fileKey) {
+        const record = await getImageBlob(imgLayer.fileKey);
+        if (record && record.blob) {
+          const analysis = await provider.analyzeSubject(record.blob);
+          subjectBox = analysis.boundingBox;
+        }
+      }
+
+      const changes = provider.smartFit(
+        imgLayer,
+        activeSurface.printArea,
+        config.canvasWidth,
+        config.canvasHeight,
+        subjectBox,
+      );
+
+      dispatch({
+        type: "UPDATE_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId: imgLayer.id,
+        changes: {
+          ...changes,
+          subjectBoundingBox: subjectBox,
+        },
+      });
+    } catch (err) {
+      console.warn("Intelligent fit fallback to standard fit:", err);
+      smartFit();
+    }
+  }, [selectedLayer, activeSurface, config, state.activeSurfaceId, smartFit]);
+
+  // AI Background Removal (Non-destructive, transparent PNG, IndexedDB persisted)
+  const [bgRemovalProgress, setBgRemovalProgress] = useState<{
+    percent: number;
+    statusText: string;
+  } | null>(null);
+
+  const removeBackground = useCallback(
+    async (layerId?: string) => {
+      const targetId = layerId ?? selectedLayer?.id;
+      if (!targetId) return;
+
+      const layer = activeLayers.find((l) => l.id === targetId);
+      if (!layer || layer.type !== "image") return;
+      const imgLayer = layer as ImageLayer;
+
+      // Ensure we get the raw source blob (prefer originalFileKey)
+      const sourceKey = imgLayer.originalFileKey || imgLayer.fileKey;
+      if (!sourceKey) return;
+
+      let sourceBlob: Blob | null = null;
+      try {
+        const record = await getImageBlob(sourceKey);
+        sourceBlob = record?.blob ?? null;
+      } catch (e) {
+        console.warn("Failed to fetch image blob for background removal:", e);
+      }
+
+      // Fallback: fetch from current Object URL if IndexedDB fetch missed
+      if (!sourceBlob && imgLayer.srcUrl) {
+        try {
+          const res = await fetch(imgLayer.srcUrl);
+          sourceBlob = await res.blob();
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!sourceBlob) {
+        console.error("Could not obtain image blob for background removal");
+        return;
+      }
+
+      // Mark layer as processing
+      dispatch({
+        type: "UPDATE_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId: imgLayer.id,
+        changes: { isProcessingBg: true },
+        skipHistory: true,
+      });
+      setBgRemovalProgress({ percent: 10, statusText: "A iniciar..." });
+
+      try {
+        const provider = getImageProcessingProvider();
+        const processedBlob = await provider.removeBackground(sourceBlob, {
+          onProgress: (percent, text) => {
+            setBgRemovalProgress({ percent, statusText: text || "A processar..." });
+          },
+        });
+
+        // Store processed blob in IndexedDB
+        const processedKey = `proc_${nanoid()}`;
+        await saveImageBlob(processedKey, processedBlob, `nobg_${imgLayer.filename}.png`);
+
+        // Create Object URL for canvas display
+        const processedUrl = URL.createObjectURL(processedBlob);
+        blobUrlsRef.current.add(processedUrl);
+
+        // Analyze subject bounds on the newly transparent result
+        const analysis = await provider.analyzeSubject(processedBlob);
+
+        // Non-destructive update: preserves originalFileKey, updates srcUrl and fileKey
+        dispatch({
+          type: "UPDATE_LAYER",
+          surfaceId: state.activeSurfaceId,
+          layerId: imgLayer.id,
+          changes: {
+            srcUrl: processedUrl,
+            fileKey: processedKey,
+            processedFileKey: processedKey,
+            processedSrcUrl: processedUrl,
+            originalFileKey: sourceKey,
+            originalSrcUrl: imgLayer.originalSrcUrl || imgLayer.srcUrl,
+            isBackgroundRemoved: true,
+            isViewingOriginal: false,
+            isProcessingBg: false,
+            subjectBoundingBox: analysis.boundingBox,
+          },
+        });
+      } catch (error) {
+        console.error("Error during background removal:", error);
+        dispatch({
+          type: "UPDATE_LAYER",
+          surfaceId: state.activeSurfaceId,
+          layerId: imgLayer.id,
+          changes: { isProcessingBg: false },
+          skipHistory: true,
+        });
+        throw error;
+      } finally {
+        setBgRemovalProgress(null);
+      }
+    },
+    [activeLayers, selectedLayer, state.activeSurfaceId],
+  );
+
+  // Restore Original Image
+  const restoreOriginal = useCallback(
+    async (layerId?: string) => {
+      const targetId = layerId ?? selectedLayer?.id;
+      if (!targetId) return;
+
+      const layer = activeLayers.find((l) => l.id === targetId);
+      if (!layer || layer.type !== "image") return;
+      const imgLayer = layer as ImageLayer;
+
+      if (!imgLayer.originalFileKey) return;
+
+      let origUrl = imgLayer.originalSrcUrl;
+      if (!origUrl) {
+        const record = await getImageBlob(imgLayer.originalFileKey);
+        if (record && record.blob) {
+          origUrl = URL.createObjectURL(record.blob);
+          blobUrlsRef.current.add(origUrl);
+        }
+      }
+
+      if (!origUrl) return;
+
+      dispatch({
+        type: "UPDATE_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId: imgLayer.id,
+        changes: {
+          srcUrl: origUrl,
+          fileKey: imgLayer.originalFileKey,
+          isBackgroundRemoved: false,
+          isViewingOriginal: false,
+          isProcessingBg: false,
+        },
+      });
+    },
+    [activeLayers, selectedLayer, state.activeSurfaceId],
+  );
+
+  // Toggle "Ver Original" preview comparison
+  const toggleCompareOriginal = useCallback(
+    async (layerId?: string) => {
+      const targetId = layerId ?? selectedLayer?.id;
+      if (!targetId) return;
+
+      const layer = activeLayers.find((l) => l.id === targetId);
+      if (!layer || layer.type !== "image") return;
+      const imgLayer = layer as ImageLayer;
+
+      if (!imgLayer.isBackgroundRemoved) return;
+
+      const willViewOriginal = !imgLayer.isViewingOriginal;
+      let targetUrl = willViewOriginal ? imgLayer.originalSrcUrl : imgLayer.processedSrcUrl;
+
+      if (!targetUrl) {
+        const key = willViewOriginal ? imgLayer.originalFileKey : imgLayer.processedFileKey;
+        if (key) {
+          const record = await getImageBlob(key);
+          if (record && record.blob) {
+            targetUrl = URL.createObjectURL(record.blob);
+            blobUrlsRef.current.add(targetUrl);
+          }
+        }
+      }
+
+      if (!targetUrl) return;
+
+      dispatch({
+        type: "UPDATE_LAYER",
+        surfaceId: state.activeSurfaceId,
+        layerId: imgLayer.id,
+        changes: {
+          srcUrl: targetUrl,
+          isViewingOriginal: willViewOriginal,
+        },
+        skipHistory: true, // Non-destructive view toggle doesn't dirty undo
+      });
+    },
+    [activeLayers, selectedLayer, state.activeSurfaceId],
+  );
 
   const resetSurface = useCallback(() => {
     if (stageRef.current) {
@@ -600,6 +831,11 @@ export function useProductCustomizer(config: ProductCustomizerConfig) {
     copyDesignToOtherSurface,
     selectLayer,
     smartFit,
+    smartFitIntelligent,
+    removeBackground,
+    restoreOriginal,
+    toggleCompareOriginal,
+    bgRemovalProgress,
     resetSurface,
     clearDraft,
     undo,

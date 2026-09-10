@@ -115,6 +115,11 @@ export function LayerPanel({
                   <span className="truncate text-xs font-medium">
                     {layer.name || (layer.type === "image" ? layer.filename : layer.text)}
                   </span>
+                  {layer.type === "image" && layer.isBackgroundRemoved && (
+                    <span className="shrink-0 rounded bg-magenta/20 px-1 py-0.5 text-[0.55rem] font-semibold text-magenta uppercase tracking-wider">
+                      Sem fundo
+                    </span>
+                  )}
                 </div>
 
                 {/* Right: Quick actions (Lock, Visibility, Duplicate, Reorder, Delete) */}
