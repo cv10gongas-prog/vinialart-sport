@@ -28,9 +28,10 @@ export function CanvasEditor({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [containerWidth, setContainerWidth] = useState(
-    config.canvasWidth,
-  );
+  const [size, setSize] = useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
 
   useEffect(() => {
     setMounted(true);
@@ -45,79 +46,89 @@ export function CanvasEditor({
 
     if (!element) return;
 
-    const updateWidth = () => {
+    const measure = () => {
       const rect = element.getBoundingClientRect();
 
-      if (rect.width > 0) {
-        setContainerWidth(rect.width);
+      if (rect.width > 0 && rect.height > 0) {
+        setSize({
+          width: rect.width,
+          height: rect.height,
+        });
       }
     };
 
-    updateWidth();
+    measure();
 
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry && entry.contentRect.width > 0) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-
+    const observer = new ResizeObserver(measure);
     observer.observe(element);
 
-    window.addEventListener("resize", updateWidth);
+    window.addEventListener("resize", measure);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updateWidth);
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
-  const baseScale = Math.min(
-    containerWidth / config.canvasWidth,
-    1,
-  );
+  const baseScale =
+    size.width > 0 && size.height > 0
+      ? Math.min(
+          size.width / config.canvasWidth,
+          size.height / config.canvasHeight,
+        )
+      : 0;
 
   const zoom = customizer.zoom ?? 1;
   const totalScale = baseScale * zoom;
 
-  if (!mounted || !KonvaLib) {
-    return (
-      <div
-        ref={containerRef}
-        className="flex aspect-square w-full items-center justify-center border border-border bg-black"
-      >
-        <span className="text-[0.7rem] uppercase tracking-widest text-muted-foreground">
-          A carregar editor…
-        </span>
-      </div>
-    );
-  }
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+
+      event.preventDefault();
+
+      if (event.deltaY < 0) {
+        customizer.zoomIn();
+      } else {
+        customizer.zoomOut();
+      }
+    },
+    [customizer],
+  );
 
   return (
     <div
       ref={containerRef}
-      className="relative flex w-full max-w-full items-center justify-center overflow-hidden"
-      style={{
-        height: Math.round(
-          config.canvasHeight * baseScale,
-        ),
-        touchAction: "none",
-      }}
+      onWheel={handleWheel}
+      className="relative h-full min-h-[300px] w-full min-w-0 overflow-hidden"
+      style={{ touchAction: "none" }}
     >
-      <div
-        style={{
-          width: config.canvasWidth,
-          height: config.canvasHeight,
-          transformOrigin: "center center",
-          transform: `scale(${totalScale})`,
-          transition: "transform 150ms ease-out",
-        }}
-      >
-        <KonvaStageInner
-          config={config}
-          customizer={customizer}
-          KonvaLib={KonvaLib}
-        />
-      </div>
+      {!mounted || !KonvaLib || baseScale === 0 ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-mono text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+            A carregar editor…
+          </span>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            style={{
+              width: config.canvasWidth,
+              height: config.canvasHeight,
+              flex: "0 0 auto",
+              transformOrigin: "center center",
+              transform: `scale(${totalScale})`,
+              transition: "transform 150ms ease-out",
+            }}
+          >
+            <KonvaStageInner
+              config={config}
+              customizer={customizer}
+              KonvaLib={KonvaLib}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -161,6 +172,11 @@ function KonvaStageInner({
     Record<string, HTMLImageElement>
   >({});
 
+  const [snap, setSnap] = useState<{
+    v: boolean;
+    h: boolean;
+  }>({ v: false, h: false });
+
   useEffect(() => {
     const img = new window.Image();
 
@@ -177,10 +193,7 @@ function KonvaStageInner({
 
       const current = layerImgs[layer.id];
 
-      if (
-        current &&
-        current.src === layer.srcUrl
-      ) {
+      if (current && current.src === layer.srcUrl) {
         return;
       }
 
@@ -200,10 +213,7 @@ function KonvaStageInner({
   }, [activeLayers]);
 
   useEffect(() => {
-    if (
-      !transformerRef.current ||
-      !stageRef.current
-    ) {
+    if (!transformerRef.current || !stageRef.current) {
       return;
     }
 
@@ -213,9 +223,7 @@ function KonvaStageInner({
       !selectedLayer.visible
     ) {
       transformerRef.current.nodes([]);
-      transformerRef.current
-        .getLayer()
-        ?.batchDraw();
+      transformerRef.current.getLayer()?.batchDraw();
 
       return;
     }
@@ -230,9 +238,7 @@ function KonvaStageInner({
       transformerRef.current.nodes([]);
     }
 
-    transformerRef.current
-      .getLayer()
-      ?.batchDraw();
+    transformerRef.current.getLayer()?.batchDraw();
   }, [
     selectedLayer?.id,
     selectedLayer?.locked,
@@ -244,26 +250,20 @@ function KonvaStageInner({
 
   const { printArea } = activeSurface;
 
-  const paX =
-    printArea.xFraction * config.canvasWidth;
-
-  const paY =
-    printArea.yFraction * config.canvasHeight;
-
-  const paW =
-    printArea.widthFraction * config.canvasWidth;
-
+  const paX = printArea.xFraction * config.canvasWidth;
+  const paY = printArea.yFraction * config.canvasHeight;
+  const paW = printArea.widthFraction * config.canvasWidth;
   const paH =
     printArea.heightFraction * config.canvasHeight;
 
-  const isEditMode =
-    customizer.viewMode === "edit";
+  const centerX = paX + paW / 2;
+  const centerY = paY + paH / 2;
+
+  const isEditMode = customizer.viewMode === "edit";
 
   const sortedLayers = [...activeLayers]
     .filter((layer) => layer.visible)
-    .sort(
-      (a, b) => a.zIndex - b.zIndex,
-    );
+    .sort((a, b) => a.zIndex - b.zIndex);
 
   const contourPoints =
     printArea.shape?.type === "contour" &&
@@ -271,13 +271,9 @@ function KonvaStageInner({
       ? printArea.shape.points.reduce<number[]>(
           (result, value, index) => {
             if (index % 2 === 0) {
-              result.push(
-                paX + value * paW,
-              );
+              result.push(paX + value * paW);
             } else {
-              result.push(
-                paY + value * paH,
-              );
+              result.push(paY + value * paH);
             }
 
             return result;
@@ -311,12 +307,8 @@ function KonvaStageInner({
           index += 2
         ) {
           ctx.lineTo(
-            paX +
-              (points[index] ?? 0) *
-                paW,
-            paY +
-              (points[index + 1] ?? 0) *
-                paH,
+            paX + (points[index] ?? 0) * paW,
+            paY + (points[index + 1] ?? 0) * paH,
           );
         }
 
@@ -325,57 +317,30 @@ function KonvaStageInner({
         return;
       }
 
-      if (
-        shape?.type === "rounded"
-      ) {
+      if (shape?.type === "rounded") {
         const radius =
-          typeof shape.cornerRadius ===
-          "number"
+          typeof shape.cornerRadius === "number"
             ? shape.cornerRadius
             : 12;
 
         ctx.beginPath();
-
-        ctx.roundRect(
-          paX,
-          paY,
-          paW,
-          paH,
-          radius,
-        );
-
+        ctx.roundRect(paX, paY, paW, paH, radius);
         ctx.closePath();
 
         return;
       }
 
       ctx.beginPath();
-
-      ctx.rect(
-        paX,
-        paY,
-        paW,
-        paH,
-      );
-
+      ctx.rect(paX, paY, paW, paH);
       ctx.closePath();
     },
-    [
-      printArea.shape,
-      paX,
-      paY,
-      paW,
-      paH,
-    ],
+    [printArea.shape, paX, paY, paW, paH],
   );
 
   const handleStageClick = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
-      if (
-        event.target ===
-        event.target.getStage()
-      ) {
+      if (event.target === event.target.getStage()) {
         selectLayer(null);
       }
     },
@@ -392,16 +357,60 @@ function KonvaStageInner({
     [selectLayer],
   );
 
+  /** Live magnetic snapping to the print area centre while dragging. */
+  const handleDragMove = useCallback(
+    (layer: DesignLayer) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (event: any) => {
+        const node = event.target;
+        const tolerance = 10;
+
+        const nodeW = node.width() * node.scaleX();
+        const nodeH = node.height() * node.scaleY();
+
+        const cx =
+          layer.type === "image"
+            ? node.x()
+            : node.x() + nodeW / 2;
+
+        const cy =
+          layer.type === "image"
+            ? node.y()
+            : node.y() + nodeH / 2;
+
+        let snapV = false;
+        let snapH = false;
+
+        if (Math.abs(cx - centerX) < tolerance) {
+          node.x(node.x() + (centerX - cx));
+          snapV = true;
+        }
+
+        if (Math.abs(cy - centerY) < tolerance) {
+          node.y(node.y() + (centerY - cy));
+          snapH = true;
+        }
+
+        setSnap((previous) =>
+          previous.v === snapV && previous.h === snapH
+            ? previous
+            : { v: snapV, h: snapH },
+        );
+      },
+    [centerX, centerY],
+  );
+
   const handleDragEnd = useCallback(
     (layer: DesignLayer) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (event: any) => {
+        setSnap({ v: false, h: false });
+
         if (layer.locked) return;
 
         dispatch({
           type: "UPDATE_LAYER",
-          surfaceId:
-            state.activeSurfaceId,
+          surfaceId: state.activeSurfaceId,
           layerId: layer.id,
           changes: {
             x: event.target.x(),
@@ -409,41 +418,32 @@ function KonvaStageInner({
           },
         });
       },
-    [
-      dispatch,
-      state.activeSurfaceId,
-    ],
+    [dispatch, state.activeSurfaceId],
   );
 
-  const handleTransformEnd =
-    useCallback(
-      (layer: DesignLayer) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (event: any) => {
-          if (layer.locked) return;
+  const handleTransformEnd = useCallback(
+    (layer: DesignLayer) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (event: any) => {
+        if (layer.locked) return;
 
-          const node = event.target;
+        const node = event.target;
 
-          dispatch({
-            type: "UPDATE_LAYER",
-            surfaceId:
-              state.activeSurfaceId,
-            layerId: layer.id,
-            changes: {
-              x: node.x(),
-              y: node.y(),
-              scaleX: node.scaleX(),
-              scaleY: node.scaleY(),
-              rotation:
-                node.rotation(),
-            },
-          });
-        },
-      [
-        dispatch,
-        state.activeSurfaceId,
-      ],
-    );
+        dispatch({
+          type: "UPDATE_LAYER",
+          surfaceId: state.activeSurfaceId,
+          layerId: layer.id,
+          changes: {
+            x: node.x(),
+            y: node.y(),
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+            rotation: node.rotation(),
+          },
+        });
+      },
+    [dispatch, state.activeSurfaceId],
+  );
 
   return (
     <Stage
@@ -453,10 +453,7 @@ function KonvaStageInner({
       onClick={handleStageClick}
       onTap={handleStageClick}
     >
-      <Layer
-        name="mockup-layer"
-        listening={false}
-      >
+      <Layer name="mockup-layer" listening={false}>
         {mockupImg && (
           <KonvaImage
             image={mockupImg}
@@ -488,11 +485,9 @@ function KonvaStageInner({
             width={paW}
             height={paH}
             cornerRadius={
-              typeof printArea.shape
-                ?.cornerRadius ===
+              typeof printArea.shape?.cornerRadius ===
               "number"
-                ? printArea.shape
-                    .cornerRadius
+                ? printArea.shape.cornerRadius
                 : 0
             }
             stroke="#00c8ff"
@@ -505,107 +500,96 @@ function KonvaStageInner({
 
       <Layer name="design-layer">
         <Group clipFunc={clipFunc}>
-          {sortedLayers.map(
-            (layer) => {
-              if (
-                layer.type === "image"
-              ) {
-                const image =
-                  layerImgs[layer.id];
+          {sortedLayers.map((layer) => {
+            if (layer.type === "image") {
+              const image = layerImgs[layer.id];
 
-                if (!image) return null;
+              if (!image) return null;
 
-                return (
-                  <KonvaImage
-                    key={layer.id}
-                    id={layer.id}
-                    image={image}
-                    x={layer.x}
-                    y={layer.y}
-                    width={layer.width}
-                    height={layer.height}
-                    offsetX={
-                      layer.width / 2
-                    }
-                    offsetY={
-                      layer.height / 2
-                    }
-                    scaleX={layer.scaleX}
-                    scaleY={layer.scaleY}
-                    rotation={
-                      layer.rotation
-                    }
-                    draggable={
-                      !layer.locked &&
-                      isEditMode
-                    }
-                    onClick={handleLayerClick(
-                      layer.id,
-                    )}
-                    onTap={handleLayerClick(
-                      layer.id,
-                    )}
-                    onDragEnd={handleDragEnd(
-                      layer,
-                    )}
-                    onTransformEnd={handleTransformEnd(
-                      layer,
-                    )}
-                  />
-                );
-              }
+              return (
+                <KonvaImage
+                  key={layer.id}
+                  id={layer.id}
+                  image={image}
+                  x={layer.x}
+                  y={layer.y}
+                  width={layer.width}
+                  height={layer.height}
+                  offsetX={layer.width / 2}
+                  offsetY={layer.height / 2}
+                  scaleX={layer.scaleX}
+                  scaleY={layer.scaleY}
+                  rotation={layer.rotation}
+                  opacity={layer.opacity ?? 1}
+                  draggable={
+                    !layer.locked && isEditMode
+                  }
+                  onClick={handleLayerClick(layer.id)}
+                  onTap={handleLayerClick(layer.id)}
+                  onDragMove={handleDragMove(layer)}
+                  onDragEnd={handleDragEnd(layer)}
+                  onTransformEnd={handleTransformEnd(
+                    layer,
+                  )}
+                />
+              );
+            }
 
-              if (
-                layer.type === "text"
-              ) {
-                return (
-                  <Text
-                    key={layer.id}
-                    id={layer.id}
-                    text={layer.text}
-                    x={layer.x}
-                    y={layer.y}
-                    width={layer.width}
-                    fontSize={
-                      layer.fontSize
-                    }
-                    fontFamily={
-                      layer.fontFamily
-                    }
-                    fill={layer.fill}
-                    fontStyle={
-                      layer.fontStyle
-                    }
-                    align={layer.align}
-                    scaleX={layer.scaleX}
-                    scaleY={layer.scaleY}
-                    rotation={
-                      layer.rotation
-                    }
-                    draggable={
-                      !layer.locked &&
-                      isEditMode
-                    }
-                    onClick={handleLayerClick(
-                      layer.id,
-                    )}
-                    onTap={handleLayerClick(
-                      layer.id,
-                    )}
-                    onDragEnd={handleDragEnd(
-                      layer,
-                    )}
-                    onTransformEnd={handleTransformEnd(
-                      layer,
-                    )}
-                  />
-                );
-              }
+            if (layer.type === "text") {
+              return (
+                <Text
+                  key={layer.id}
+                  id={layer.id}
+                  text={layer.text}
+                  x={layer.x}
+                  y={layer.y}
+                  width={layer.width}
+                  fontSize={layer.fontSize}
+                  fontFamily={layer.fontFamily}
+                  fill={layer.fill}
+                  fontStyle={layer.fontStyle}
+                  align={layer.align}
+                  scaleX={layer.scaleX}
+                  scaleY={layer.scaleY}
+                  rotation={layer.rotation}
+                  opacity={layer.opacity ?? 1}
+                  draggable={
+                    !layer.locked && isEditMode
+                  }
+                  onClick={handleLayerClick(layer.id)}
+                  onTap={handleLayerClick(layer.id)}
+                  onDragMove={handleDragMove(layer)}
+                  onDragEnd={handleDragEnd(layer)}
+                  onTransformEnd={handleTransformEnd(
+                    layer,
+                  )}
+                />
+              );
+            }
 
-              return null;
-            },
-          )}
+            return null;
+          })}
         </Group>
+
+        {isEditMode && snap.v && (
+          <Line
+            points={[centerX, paY, centerX, paY + paH]}
+            stroke="#ff1fa4"
+            strokeWidth={1.5}
+            dash={[6, 4]}
+            listening={false}
+          />
+        )}
+
+        {isEditMode && snap.h && (
+          <Line
+            points={[paX, centerY, paX + paW, centerY]}
+            stroke="#ff1fa4"
+            strokeWidth={1.5}
+            dash={[6, 4]}
+            listening={false}
+          />
+        )}
 
         {isEditMode && (
           <Transformer
@@ -616,7 +600,15 @@ function KonvaStageInner({
             anchorFill="#ffffff"
             anchorStroke="#00c8ff"
             anchorSize={10}
-            rotateAnchorOffset={20}
+            rotateEnabled
+            rotateAnchorOffset={22}
+            rotationSnaps={[
+              0, 15, 30, 45, 60, 75, 90, 105, 120, 135,
+              150, 165, 180, 195, 210, 225, 240, 255,
+              270, 285, 300, 315, 330, 345,
+            ]}
+            rotationSnapTolerance={6}
+            keepRatio
             enabledAnchors={[
               "top-left",
               "top-right",
@@ -626,17 +618,10 @@ function KonvaStageInner({
               "middle-right",
             ]}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            boundBoxFunc={(
-              oldBox: any,
-              newBox: any,
-            ) => {
+            boundBoxFunc={(oldBox: any, newBox: any) => {
               if (
-                Math.abs(
-                  newBox.width,
-                ) < 10 ||
-                Math.abs(
-                  newBox.height,
-                ) < 10
+                Math.abs(newBox.width) < 10 ||
+                Math.abs(newBox.height) < 10
               ) {
                 return oldBox;
               }
@@ -647,10 +632,7 @@ function KonvaStageInner({
         )}
       </Layer>
 
-      <Layer
-        name="overlay-layer"
-        listening={false}
-      >
+      <Layer name="overlay-layer" listening={false}>
         <Group clipFunc={clipFunc}>
           <Rect
             x={paX}
