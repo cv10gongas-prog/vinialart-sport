@@ -7,7 +7,9 @@ import type {
 import { caneleirasConfig } from "./caneleiras";
 
 import {
+  flagShadeOverlay,
   flagWhite,
+  jerseyShadeOverlay,
   jerseyBackWhite,
   jerseyFrontWhite,
   printSurfaceWhite,
@@ -78,6 +80,7 @@ export const equipamentoConfig = buildConfig(
       mockupSrc: jerseyFrontWhite,
       mockup: {
         baseSrc: jerseyFrontWhite,
+        overlaySrc: jerseyShadeOverlay,
       },
       printArea: {
         xFraction: 0.33,
@@ -96,6 +99,7 @@ export const equipamentoConfig = buildConfig(
       mockupSrc: jerseyBackWhite,
       mockup: {
         baseSrc: jerseyBackWhite,
+        overlaySrc: jerseyShadeOverlay,
       },
       printArea: {
         xFraction: 0.33,
@@ -135,6 +139,7 @@ export const bandeiraConfig = buildConfig(
       mockupSrc: flagWhite,
       mockup: {
         baseSrc: flagWhite,
+        overlaySrc: flagShadeOverlay,
       },
       printArea: {
         xFraction: 0.1325,
@@ -185,6 +190,7 @@ export const estampagemConfig = buildConfig(
       mockupSrc: jerseyFrontWhite,
       mockup: {
         baseSrc: jerseyFrontWhite,
+        overlaySrc: jerseyShadeOverlay,
       },
       printArea: {
         xFraction: 0.31,

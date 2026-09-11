@@ -59,13 +59,22 @@ function Produto() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.slug]);
 
-  const related = products
-    .filter(
+  const relatedPreferred = products.filter(
+    (item) =>
+      item.slug !== product.slug &&
+      (item.category === product.category || item.isCustomizable),
+  );
+
+  // Preenche sempre a grelha (evita colunas vazias) com os restantes artigos.
+  const related = [
+    ...relatedPreferred,
+    ...products.filter(
       (item) =>
         item.slug !== product.slug &&
-        (item.category === product.category || item.isCustomizable),
-    )
-    .slice(0, 3);
+        !relatedPreferred.some((r) => r.slug === item.slug),
+    ),
+  ].slice(0, 3);
+
 
   const isService = product.customizationMode === "service";
 

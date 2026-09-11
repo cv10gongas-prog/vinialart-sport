@@ -2,7 +2,10 @@ import type {
   AllowedTool,
   ProductCustomizerConfig,
 } from "@/lib/customizer/types";
-import { shinGuardSingleWhite } from "@/lib/customizer/mockups";
+import {
+  shinGuardShadeOverlay,
+  shinGuardSingleWhite,
+} from "@/lib/customizer/mockups";
 
 export const SHIN_GUARD_CONTOUR_POINTS: number[] = [
   0.5,0,0.5475,0.0007,0.5942,0.0028,0.6396,0.0064,0.6836,0.0114,0.7258,0.0181,
@@ -53,6 +56,7 @@ export const caneleirasConfig: ProductCustomizerConfig = {
       mockupSrc: shinGuardSingleWhite,
       mockup: {
         baseSrc: shinGuardSingleWhite,
+        overlaySrc: shinGuardShadeOverlay,
       },
       printArea: {
         xFraction: 0.2675,
@@ -71,6 +75,7 @@ export const caneleirasConfig: ProductCustomizerConfig = {
       mockupSrc: shinGuardSingleWhite,
       mockup: {
         baseSrc: shinGuardSingleWhite,
+        overlaySrc: shinGuardShadeOverlay,
       },
       printArea: {
         xFraction: 0.2675,

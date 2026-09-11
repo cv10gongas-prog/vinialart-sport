@@ -471,6 +471,7 @@ export function LiveSurfaceRenderer({
   const baseScale = Math.min(containerWidth / config.canvasWidth, 1);
 
   const [mockupImg, setMockupImg] = useState<HTMLImageElement | null>(null);
+  const [shadeImg, setShadeImg] = useState<HTMLImageElement | null>(null);
   const [layerImgs, setLayerImgs] = useState<Record<string, HTMLImageElement>>({});
 
   useEffect(() => {
@@ -478,6 +479,19 @@ export function LiveSurfaceRenderer({
     img.onload = () => setMockupImg(img);
     img.src = surface.mockupSrc;
   }, [surface.mockupSrc]);
+
+  const shadeSrc = surface.mockup?.overlaySrc;
+
+  useEffect(() => {
+    if (!shadeSrc) {
+      setShadeImg(null);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => setShadeImg(img);
+    img.src = shadeSrc;
+  }, [shadeSrc]);
+
 
   const layers = customizer.state.surfaces[surface.id]?.layers ?? [];
   const visibleLayers = [...layers]
@@ -614,10 +628,19 @@ export function LiveSurfaceRenderer({
             </Group>
           </Layer>
 
-          {/* Realistic Surface Shading/Highlight */}
+          {/* Sombra/luz do produto por cima da arte */}
           <Layer listening={false}>
             <Group clipFunc={clipFunc}>
+              {shadeImg && (
+                <KonvaImage
+                  image={shadeImg}
+                  width={config.canvasWidth}
+                  height={config.canvasHeight}
+                  opacity={0.9}
+                />
+              )}
               <Rect
+
                 x={paX}
                 y={paY}
                 width={paW}

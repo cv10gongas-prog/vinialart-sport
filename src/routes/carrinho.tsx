@@ -3,6 +3,8 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Edit3 } from "lucide-reac
 import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { useCart } from "@/lib/cart/store";
+import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
+
 
 export const Route = createFileRoute("/carrinho")({
   component: Carrinho,
@@ -27,24 +29,39 @@ function Carrinho() {
   if (items.length === 0) {
     return (
       <PageShell>
-        <PageHero
-          eyebrow="Carrinho"
-          title="O teu carrinho está vazio."
-          text="Explora a loja e adiciona produtos para pedir um orçamento."
-        />
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <div className="flex flex-wrap gap-3">
-            <SportLink to="/loja" size="lg">
-              Explorar loja
-            </SportLink>
-            <SportLink to="/personalizar" variant="outline" shape="square" size="lg">
-              Personalizar produto
-            </SportLink>
+        <section className="mx-auto grid max-w-[1600px] items-center gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_0.9fr]">
+          <div>
+            <span className="label-eyebrow">Carrinho</span>
+            <h1 className="mt-4 max-w-xl text-[2.4rem] leading-[0.9] sm:text-6xl">
+              O teu carrinho está vazio.
+            </h1>
+            <p className="mt-6 max-w-md text-base text-muted-foreground">
+              Explora a loja, escolhe um artigo e personaliza-o para pedires o
+              teu orçamento.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <SportLink to="/loja" size="lg">
+                Explorar loja
+              </SportLink>
+              <SportLink to="/personalizar" variant="outline" size="lg">
+                Personalizar produto
+              </SportLink>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-[2rem] bg-studio">
+            <img
+              src={prodCaneleiras}
+              alt="Caneleiras personalizadas pela VinilArt Sport"
+              className="aspect-[4/5] w-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
           </div>
         </section>
       </PageShell>
     );
   }
+
 
   return (
     <PageShell>
