@@ -54,10 +54,8 @@ export function ProductCustomizer({
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
   const [viewDimension, setViewDimension] = useState<"2D" | "3D">("2D");
 
-  // Real 3D support is only enabled where solid: Caneleiras and Bandeira
-  const supports3D =
-    config.id === "caneleiras-personalizadas" ||
-    config.id === "bandeira-personalizada";
+  // 3D toggle temporarily hidden to prioritize perfect 2D fidelity as requested
+  const supports3D = false;
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;

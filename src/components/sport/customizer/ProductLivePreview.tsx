@@ -178,7 +178,8 @@ export function ProductPresentationModal({
   const isShinGuard = config.id === "caneleiras-personalizadas";
   const isJersey = config.id === "equipamento-personalizado";
   const isFlag = config.id === "bandeira-personalizada";
-  const supports3D = isShinGuard || isFlag;
+  // 3D toggle temporarily hidden to prioritize perfect 2D fidelity as requested
+  const supports3D = false;
   const primarySurface = config.surfaces[0];
 
   return createPortal(

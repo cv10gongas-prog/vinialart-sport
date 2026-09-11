@@ -70,12 +70,12 @@ function Home() {
           <h1 className="mt-6 max-w-4xl text-4xl font-black leading-[0.94] sm:text-6xl md:text-8xl">
             PERSONALIZAMOS{" "}
             <span className="text-sport-gradient">
-              A TUA PAIXÃO.
+              O TEU JOGO.
             </span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Equipamentos e caneleiras à tua medida, artigos para adeptos, estampagem e impressão gráfica desportiva de alto impacto.
+            Caneleiras, equipamentos, bandeiras e soluções gráficas para atletas, clubes e adeptos.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
@@ -161,10 +161,10 @@ function Home() {
                   Caneleiras
                 </span>
                 <h3 className="mt-1 font-display text-base font-bold">
-                  Caneleiras Personalizadas de Jogo
+                  Caneleiras personalizadas
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Fotografia, dorsal e cores integradas na forma anatómica.
+                  Personalização com foto, nome e grafismo desportivo.
                 </p>
               </div>
             </div>
@@ -182,10 +182,10 @@ function Home() {
                   Aplicação
                 </span>
                 <h3 className="mt-1 font-display text-base font-bold">
-                  Detalhe Gráfico e Enquadramento
+                  Caneleiras personalizadas
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Cores vivas e ajuste preciso do teu design ao formato da caneleira.
+                  Ajuste gráfico à curvatura e formato da caneleira.
                 </p>
               </div>
             </div>
@@ -203,10 +203,10 @@ function Home() {
                   Equipamento
                 </span>
                 <h3 className="mt-1 font-display text-base font-bold">
-                  Camisola Técnica para Competição
+                  Equipamento personalizado
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Personalização de emblemas, números e patrocínios de equipa.
+                  Camisola com estampagem de emblemas e patrocinadores.
                 </p>
               </div>
             </div>
@@ -242,30 +242,30 @@ function Home() {
       </section>
 
       {/* 5. CTA FINAL */}
-      <section className="border-t border-border bg-surface py-16">
+      <section className="border-t border-border bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
           <span className="bg-magenta px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-widest text-white">
-            Fala com a equipa
+            Projeto sob medida
           </span>
           <h2 className="mt-4 font-display text-3xl font-black uppercase tracking-tight sm:text-5xl">
-            Tens uma ideia? Pede orçamento.
+            Tens uma ideia?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            A equipa da VinilArt Sport trata de transformar a tua ideia ou ficheiro numa produção desportiva de excelência.
+            A equipa da VinilArt Sport trata de transformar o teu conceito ou ficheiro na personalização ideal.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              to="/loja"
-              className="inline-flex items-center gap-2 border border-cyan bg-cyan px-7 py-3 font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors"
+              to="/contactos"
+              className="inline-flex items-center gap-2 border border-cyan bg-cyan px-8 py-3.5 font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors shadow-glow-cyan"
             >
-              <span>Ver Loja</span>
+              <span>Pedir Orçamento</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/contactos"
-              className="inline-flex items-center gap-2 border border-border bg-background px-7 py-3 font-display text-xs uppercase tracking-wider text-foreground hover:border-magenta hover:text-magenta transition-colors"
+              to="/loja"
+              className="inline-flex items-center gap-2 border border-border bg-background px-7 py-3 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan transition-colors"
             >
-              <span>Pedir Orçamento</span>
+              <span>Explorar Loja</span>
             </Link>
           </div>
         </div>
