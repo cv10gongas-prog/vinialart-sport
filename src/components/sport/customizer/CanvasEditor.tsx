@@ -261,6 +261,13 @@ function KonvaStageInner({
 
   const isEditMode = customizer.viewMode === "edit";
 
+  /**
+   * Guides stay discreet: they only appear while a layer is selected or when
+   * the surface is still empty, so the mockup reads like a real product photo.
+   */
+  const showGuides =
+    Boolean(selectedLayer) || activeLayers.length === 0;
+
   const sortedLayers = [...activeLayers]
     .filter((layer) => layer.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
