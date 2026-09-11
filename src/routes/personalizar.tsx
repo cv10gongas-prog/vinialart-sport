@@ -113,8 +113,8 @@ function Personalizar() {
                         className="h-full w-full object-contain p-10 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                       />
                     )}
-                    <div 
                     <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
+
                       <div>
                         <h2 className="text-2xl leading-[0.92] sm:text-[2rem]">
                           {item.name}
