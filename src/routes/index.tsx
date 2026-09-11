@@ -179,7 +179,7 @@ function Home() {
                   src={product!.image}
                   alt={`Mockup neutro — ${label}`}
                   loading="lazy"
-                  className="h-full w-full object-contain p-8 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                  className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                 />
                 <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
                   <div>

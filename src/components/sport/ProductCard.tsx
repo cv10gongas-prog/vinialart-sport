@@ -32,7 +32,7 @@ export function ProductCard({
           src={product.image}
           alt={`Mockup neutro — ${product.name}`}
           loading="lazy"
-          className="h-full w-full object-contain p-10 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+          className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
         />
 
         <span className="absolute left-6 top-6 font-mono text-[0.58rem] uppercase tracking-[0.24em] text-muted-foreground">
