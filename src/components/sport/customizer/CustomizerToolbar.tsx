@@ -52,7 +52,7 @@ export function CustomizerToolbar({
     canRedo,
     activeLayers,
     saveStatus,
-    addImageFromFile,
+    addImagesFromFiles,
     addText,
     updateLayer,
     deleteLayer,
@@ -101,12 +101,11 @@ export function CustomizerToolbar({
   function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
-    const file =
-      event.target.files?.[0];
+    const files = event.target.files;
 
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
-    addImageFromFile(file);
+    addImagesFromFiles(files);
 
     event.target.value = "";
     setShowTextPanel(false);
@@ -257,6 +256,7 @@ export function CustomizerToolbar({
         <input
           ref={fileInputRef}
           type="file"
+          multiple
           accept="image/jpeg,image/png,image/webp"
           className="sr-only"
           onChange={handleFileChange}
@@ -274,12 +274,12 @@ export function CustomizerToolbar({
           <Upload className="h-5 w-5 text-magenta" />
 
           <span className="text-xs text-foreground">
-            Carregar imagem ou
-            logótipo
+            Carregar imagens ou
+            logótipos
           </span>
 
           <span className="font-mono text-[0.58rem] uppercase tracking-widest text-muted-foreground">
-            JPG · PNG · WEBP
+            Arrasta para a área de design · JPG · PNG · WEBP · Ctrl+V
           </span>
         </button>
       </div>
