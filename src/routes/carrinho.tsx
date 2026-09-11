@@ -3,6 +3,8 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Edit3 } from "lucide-reac
 import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { useCart } from "@/lib/cart/store";
+import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
+
 
 export const Route = createFileRoute("/carrinho")({
   component: Carrinho,
