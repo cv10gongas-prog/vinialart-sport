@@ -94,6 +94,9 @@ export function CustomizerToolbar({
   const [bgError, setBgError] =
     useState<string | null>(null);
 
+  const [isPanelDragOver, setIsPanelDragOver] =
+    useState(false);
+
   useEffect(() => {
     setShowTextPanel(false);
   }, [state.activeSurfaceId]);
