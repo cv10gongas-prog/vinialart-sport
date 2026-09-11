@@ -790,6 +790,165 @@ export function useProductCustomizer(
     link.click();
   }, [exportProductionArt, state.activeSurfaceId]);
 
+  // ------------------------------------------------------------------
+  // Layer manipulation helpers (nudge / flip / align / opacity)
+  // ------------------------------------------------------------------
+
+  const addImagesFromFiles = useCallback(
+    (files: FileList | File[]) => {
+      Array.from(files).forEach((file) => {
+        if (file.type.startsWith("image/")) {
+          addImageFromFile(file);
+        }
+      });
+    },
+    [addImageFromFile],
+  );
+
+  const nudgeSelected = useCallback(
+    (dx: number, dy: number) => {
+      if (!selectedLayer || selectedLayer.locked) return;
+      updateLayer(selectedLayer.id, {
+        x: selectedLayer.x + dx,
+        y: selectedLayer.y + dy,
+      });
+    },
+    [selectedLayer, updateLayer],
+  );
+
+  const flipSelected = useCallback(
+    (axis: "x" | "y") => {
+      if (!selectedLayer || selectedLayer.locked) return;
+      updateLayer(
+        selectedLayer.id,
+        axis === "x"
+          ? { scaleX: -selectedLayer.scaleX }
+          : { scaleY: -selectedLayer.scaleY },
+      );
+    },
+    [selectedLayer, updateLayer],
+  );
+
+  const alignSelected = useCallback(
+    (mode: "horizontal" | "vertical" | "both") => {
+      if (!selectedLayer || selectedLayer.locked) return;
+
+      const pa = activeSurface.printArea;
+      const centerX =
+        (pa.xFraction + pa.widthFraction / 2) * config.canvasWidth;
+      const centerY =
+        (pa.yFraction + pa.heightFraction / 2) * config.canvasHeight;
+
+      const isImage = selectedLayer.type === "image";
+      const widthPx =
+        selectedLayer.width * Math.abs(selectedLayer.scaleX || 1);
+      const heightPx = isImage
+        ? (selectedLayer as ImageLayer).height *
+          Math.abs(selectedLayer.scaleY || 1)
+        : selectedLayer.fontSize * Math.abs(selectedLayer.scaleY || 1);
+
+      const nextX = isImage ? centerX : centerX - widthPx / 2;
+      const nextY = isImage ? centerY : centerY - heightPx / 2;
+
+      const changes: Partial<DesignLayer> = {};
+      if (mode === "horizontal" || mode === "both") changes.x = nextX;
+      if (mode === "vertical" || mode === "both") changes.y = nextY;
+
+      updateLayer(selectedLayer.id, changes);
+    },
+    [selectedLayer, updateLayer, activeSurface, config],
+  );
+
+  const setSelectedOpacity = useCallback(
+    (opacity: number) => {
+      if (!selectedLayer) return;
+      updateLayer(
+        selectedLayer.id,
+        { opacity: Math.min(1, Math.max(0.05, opacity)) },
+        true,
+      );
+    },
+    [selectedLayer, updateLayer],
+  );
+
+  const rotateSelected = useCallback(
+    (delta: number) => {
+      if (!selectedLayer || selectedLayer.locked) return;
+      updateLayer(selectedLayer.id, {
+        rotation: Math.round(selectedLayer.rotation + delta),
+      });
+    },
+    [selectedLayer, updateLayer],
+  );
+
+  // Arrow-key nudging
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (!selectedLayer) return;
+
+      const step = e.shiftKey ? 10 : 1;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          nudgeSelected(-step, 0);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          nudgeSelected(step, 0);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          nudgeSelected(0, -step);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          nudgeSelected(0, step);
+          break;
+        default:
+          break;
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedLayer, nudgeSelected]);
+
+  // Paste images directly from the clipboard
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const files = e.clipboardData?.files;
+      if (files && files.length > 0) {
+        addImagesFromFiles(files);
+        return;
+      }
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) addImageFromFile(file);
+        }
+      }
+    }
+
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [addImageFromFile, addImagesFromFiles]);
+
   const serializeDesign = useCallback((): string => {
     return serializeCustomizerDesign(state);
   }, [state]);
@@ -813,7 +972,13 @@ export function useProductCustomizer(
     resetZoom,
     setSurface,
     addImageFromFile,
+    addImagesFromFiles,
     addText,
+    nudgeSelected,
+    flipSelected,
+    alignSelected,
+    setSelectedOpacity,
+    rotateSelected,
     updateLayer,
     deleteLayer,
     duplicateLayer,

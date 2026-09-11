@@ -100,6 +100,8 @@ export interface BaseLayer {
   visible: boolean;
   /** Lock toggle (true = cannot be dragged, resized or rotated) */
   locked: boolean;
+  /** Layer opacity (0..1). Defaults to 1 when omitted. */
+  opacity?: number | undefined;
 }
 
 export interface SubjectBoundingBox {
