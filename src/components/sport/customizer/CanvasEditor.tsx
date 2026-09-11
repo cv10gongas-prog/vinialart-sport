@@ -527,6 +527,11 @@ function KonvaStageInner({
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
                   opacity={layer.opacity ?? 1}
+                  globalCompositeOperation={
+                    layer.blendMode === "normal"
+                      ? "source-over"
+                      : (layer.blendMode ?? "multiply")
+                  }
                   draggable={
                     !layer.locked && isEditMode
                   }
@@ -639,6 +644,19 @@ function KonvaStageInner({
       </Layer>
 
       <Layer name="overlay-layer" listening={false}>
+        {/* Fabric texture, seams and product shadows re-projected over the art */}
+        {mockupImg && (
+          <Group clipFunc={clipFunc}>
+            <KonvaImage
+              image={mockupImg}
+              width={config.canvasWidth}
+              height={config.canvasHeight}
+              opacity={0.55}
+              globalCompositeOperation="multiply"
+            />
+          </Group>
+        )}
+
         <Group clipFunc={clipFunc}>
           <Rect
             x={paX}
