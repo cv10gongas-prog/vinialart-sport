@@ -953,6 +953,91 @@ export function useProductCustomizer(
     return serializeCustomizerDesign(state);
   }, [state]);
 
+  /**
+   * Production-ready description of the design, independent of screen size.
+   * Every placement is normalised (0..1) against the print area so the same
+   * numbers can drive print output from WooCommerce/WordPress later on.
+   */
+  const buildProductionSpec = useCallback(() => {
+    return {
+      productId: config.id,
+      productName: config.name,
+      generatedAt: new Date().toISOString(),
+      canvas: {
+        width: config.canvasWidth,
+        height: config.canvasHeight,
+      },
+      surfaces: config.surfaces.map((surface) => {
+        const pa = surface.printArea;
+        const paX = pa.xFraction * config.canvasWidth;
+        const paY = pa.yFraction * config.canvasHeight;
+        const paW = pa.widthFraction * config.canvasWidth;
+        const paH = pa.heightFraction * config.canvasHeight;
+
+        const layers = state.surfaces[surface.id]?.layers ?? [];
+
+        return {
+          surfaceId: surface.id,
+          label: surface.label,
+          printArea: { x: paX, y: paY, width: paW, height: paH },
+          layers: layers.map((layer) => {
+            const common = {
+              id: layer.id,
+              type: layer.type,
+              zIndex: layer.zIndex,
+              visible: layer.visible,
+              rotation: layer.rotation,
+              opacity: layer.opacity ?? 1,
+              /** Position in canvas pixels */
+              positionPx: { x: layer.x, y: layer.y },
+              /** Position relative to the print area (0..1) */
+              positionRelative: {
+                x: paW > 0 ? (layer.x - paX) / paW : 0,
+                y: paH > 0 ? (layer.y - paY) / paH : 0,
+              },
+              scale: { x: layer.scaleX, y: layer.scaleY },
+            };
+
+            if (layer.type === "image") {
+              return {
+                ...common,
+                blendMode: layer.blendMode ?? "multiply",
+                source: {
+                  filename: layer.filename,
+                  /** IndexedDB key of the original high-resolution upload */
+                  originalFileKey:
+                    layer.originalFileKey ?? layer.fileKey ?? null,
+                  activeFileKey: layer.fileKey ?? null,
+                  backgroundRemoved: Boolean(layer.isBackgroundRemoved),
+                  naturalWidth: layer.naturalWidth,
+                  naturalHeight: layer.naturalHeight,
+                },
+                renderedSizePx: {
+                  width: layer.width * layer.scaleX,
+                  height: layer.height * layer.scaleY,
+                },
+                renderedSizeRelative: {
+                  width: paW > 0 ? (layer.width * layer.scaleX) / paW : 0,
+                  height: paH > 0 ? (layer.height * layer.scaleY) / paH : 0,
+                },
+              };
+            }
+
+            return {
+              ...common,
+              text: layer.text,
+              fontFamily: layer.fontFamily,
+              fontSize: layer.fontSize,
+              fontStyle: layer.fontStyle,
+              fill: layer.fill,
+              align: layer.align,
+            };
+          }),
+        };
+      }),
+    };
+  }, [config, state]);
+
   return {
     config,
     state,
