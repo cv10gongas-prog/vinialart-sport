@@ -250,8 +250,18 @@ export function ProductCustomizer({
             </div>
 
             {/* Design Canvas Viewport */}
-            <div className="relative flex min-h-[340px] max-h-[420px] w-full min-w-0 flex-1 items-center justify-center p-2 sm:max-h-[620px] sm:min-h-[520px] sm:p-3">
-              <CanvasEditor config={config} customizer={customizer} />
+            <div className="relative flex w-full min-w-0 items-center justify-center p-2 sm:p-3">
+              {/* Stage keeps the product proportions so there is no dead space */}
+              <div
+                className="relative mx-auto w-full min-w-0"
+                style={{
+                  aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
+                  maxHeight: "min(66vh, 620px)",
+                  maxWidth: `calc(min(66vh, 620px) * ${config.canvasWidth / config.canvasHeight})`,
+                }}
+              >
+                <CanvasEditor config={config} customizer={customizer} />
+              </div>
 
               {isDraggingFile && (
                 <div className="pointer-events-none absolute inset-2 flex items-center justify-center border-2 border-dashed border-magenta bg-magenta/10">
