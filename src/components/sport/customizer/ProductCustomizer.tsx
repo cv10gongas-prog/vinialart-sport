@@ -262,10 +262,47 @@ export function ProductCustomizer({
               )}
             </div>
 
-            {/* Bottom Surface Subtitle */}
-            <div className="flex items-center justify-between border-t border-border/60 bg-surface/50 px-3 py-1.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-              <span>{activeSurface.label}</span>
-              <span>Grelha ativa</span>
+            {/* Quick gizmo actions for the selected artwork */}
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] px-3 py-2"
+              style={{ background: "#121214" }}
+            >
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => customizer.alignSelected("horizontal")}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
+                >
+                  Centrar H
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => customizer.alignSelected("vertical")}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
+                >
+                  Centrar V
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => {
+                    if (customizer.selectedLayer) {
+                      customizer.deleteLayer(customizer.selectedLayer.id);
+                    }
+                  }}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-destructive hover:text-destructive disabled:opacity-30"
+                >
+                  Limpar camada
+                </button>
+              </div>
+
+              <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                {activeSurface.label}
+              </span>
             </div>
           </div>
         </div>
