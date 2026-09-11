@@ -65,37 +65,54 @@ function Home() {
 
   return (
     <PageShell>
-      {/* HERO */}
-      <section className="relative -mt-[84px] flex min-h-[92svh] items-end overflow-hidden">
+      {/* HERO — campanha de marca: texto curto, produto grande */}
+      <section className="relative -mt-[84px] overflow-hidden">
         <img
           src={heroBrush}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover opacity-55"
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/25" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/70" />
 
-        <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 pt-40 sm:px-8 sm:pb-24">
-          <span className="label-eyebrow rise-in">VinilArt Sport</span>
+        <div className="relative mx-auto grid w-full max-w-[1600px] items-center gap-12 px-5 pb-16 pt-28 sm:px-8 sm:pb-20 sm:pt-32 lg:min-h-[84svh] lg:grid-cols-[1.02fr_1fr] lg:gap-16">
+          <div className="lg:pb-10">
+            <span className="label-eyebrow rise-in">VinilArt Sport</span>
 
-          <h1 className="rise-in mt-6 max-w-5xl text-[3rem] leading-[0.86] sm:text-[5.5rem] md:text-[7rem]">
-            O teu design.
-            <br />
-            <span className="text-sport-gradient">O teu jogo.</span>
-          </h1>
+            <h1 className="rise-in mt-5 text-[3.1rem] leading-[0.84] sm:text-[5.2rem] lg:text-[6.2rem] xl:text-[7rem]">
+              O teu design.
+              <br />
+              <span className="text-sport-gradient">O teu jogo.</span>
+            </h1>
 
-          <p className="rise-in mt-8 max-w-lg text-base text-muted-foreground sm:text-lg">
-            Personalização desportiva para atletas, clubes e adeptos.
-          </p>
+            <p className="rise-in mt-7 max-w-md text-base text-muted-foreground sm:text-lg">
+              Personalização desportiva para atletas, clubes e adeptos.
+            </p>
 
-          <div className="rise-in mt-10 flex flex-wrap items-center gap-3">
-            <SportLink to="/loja" size="lg" variant="primary">
-              Ver loja
-            </SportLink>
-            <SportLink to="/portfolio" size="lg" variant="outline">
-              Ver portfólio
-            </SportLink>
+            <div className="rise-in mt-9 flex flex-wrap items-center gap-3">
+              <SportLink to="/loja" size="lg" variant="primary">
+                Ver loja
+              </SportLink>
+              <SportLink to="/personalizar" size="lg" variant="outline">
+                Personalizar
+              </SportLink>
+            </div>
+          </div>
+
+          <div className="rise-in relative">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-10 rounded-full bg-magenta/20 blur-[120px]"
+            />
+            <div className="relative overflow-hidden rounded-[2rem] bg-studio">
+              <img
+                src={prodCaneleiras}
+                alt="Caneleiras personalizadas pela VinilArt Sport"
+                className="aspect-[4/5] w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
+            </div>
           </div>
         </div>
       </section>
@@ -108,19 +125,20 @@ function Home() {
           </h2>
           <Link
             to="/loja"
-            className="inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
+            className="group inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
           >
             <span>Ver tudo</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((product) => (
             <ProductCard key={product.slug} product={product} size="feature" />
           ))}
         </div>
       </section>
+
 
       {/* PORTFÓLIO */}
       <section className="border-y border-border bg-surface/30 py-24 md:py-32">

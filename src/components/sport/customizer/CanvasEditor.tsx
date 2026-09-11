@@ -168,6 +168,9 @@ function KonvaStageInner({
   const [mockupImg, setMockupImg] =
     useState<HTMLImageElement | null>(null);
 
+  const [shadeImg, setShadeImg] =
+    useState<HTMLImageElement | null>(null);
+
   const [layerImgs, setLayerImgs] = useState<
     Record<string, HTMLImageElement>
   >({});
@@ -186,6 +189,24 @@ function KonvaStageInner({
 
     img.src = activeSurface.mockupSrc;
   }, [activeSurface.mockupSrc]);
+
+  const shadeSrc = activeSurface.mockup?.overlaySrc;
+
+  useEffect(() => {
+    if (!shadeSrc) {
+      setShadeImg(null);
+      return;
+    }
+
+    const img = new window.Image();
+
+    img.onload = () => {
+      setShadeImg(img);
+    };
+
+    img.src = shadeSrc;
+  }, [shadeSrc]);
+
 
   useEffect(() => {
     activeLayers.forEach((layer) => {
@@ -646,10 +667,19 @@ function KonvaStageInner({
         )}
       </Layer>
 
-      {/* Realistic subtle glossy reflection overlay (does NOT darken or wash out colors) */}
+      {/* Sombra/luz do produto por cima da arte: o design parece impresso */}
       <Layer name="overlay-layer" listening={false}>
         <Group clipFunc={clipFunc}>
+          {shadeImg && (
+            <KonvaImage
+              image={shadeImg}
+              width={config.canvasWidth}
+              height={config.canvasHeight}
+              opacity={0.9}
+            />
+          )}
           <Rect
+
             x={paX}
             y={paY}
             width={paW}

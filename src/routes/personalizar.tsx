@@ -89,28 +89,48 @@ function Personalizar() {
             O que queres personalizar?
           </h1>
 
-          <div className="mt-14 divide-y divide-border border-t border-border">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {customizableProducts.map((item) => {
               const product = products.find((p) => p.slug === item.slug);
+
               return (
                 <Link
                   key={item.slug}
                   to="/personalizar"
                   search={{ produto: item.slug }}
-                  className="group flex flex-wrap items-baseline justify-between gap-4 py-8 transition-colors hover:bg-foreground/[0.03] sm:px-2"
+                  className="group relative block overflow-hidden rounded-[1.75rem] bg-studio"
                 >
-                  <span className="font-display text-2xl sm:text-4xl">
-                    {item.name}
-                  </span>
-                  <span className="max-w-md flex-1 text-sm text-muted-foreground sm:text-right">
-                    {product?.description}
-                  </span>
-                  <ArrowUpRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-1 group-hover:text-foreground" />
+                  <div className="relative aspect-[3/4] overflow-hidden">
+                    {product?.image && (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                      />
+                    )}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-background via-background/55 to-transparent" />
+
+                    <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
+                      <div>
+                        <h2 className="text-2xl leading-[0.92] sm:text-[2rem]">
+                          {item.name}
+                        </h2>
+                        <p className="mt-2 text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cyan opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                          Começar
+                        </p>
+                      </div>
+                      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-foreground/20 bg-background/50 backdrop-blur-sm transition-all duration-500 group-hover:border-transparent group-hover:bg-foreground group-hover:text-background">
+                        <ArrowUpRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               );
             })}
           </div>
         </section>
+
       ) : !effectiveMode ? (
         /* ESCOLHA DE FLUXO */
         <section className="mx-auto max-w-[1100px] px-5 py-16 sm:px-8 sm:py-24">

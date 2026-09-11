@@ -84,7 +84,7 @@ const items = [
 function Portfolio() {
   return (
     <PageShell>
-      <section className="mx-auto max-w-[1600px] px-5 pb-10 pt-14 sm:px-8 sm:pt-20">
+      <section className="mx-auto max-w-[1600px] px-5 pb-8 pt-14 sm:px-8 sm:pt-20">
         <span className="label-eyebrow">Portfólio</span>
         <h1 className="mt-4 text-[2.4rem] leading-[0.9] sm:text-6xl md:text-7xl">
           Trabalhos realizados
@@ -92,24 +92,25 @@ function Portfolio() {
       </section>
 
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8">
-        <div className="grid auto-rows-min gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Mosaico editorial em colunas: sem espaços vazios */}
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3 [&>figure]:mb-5">
           {items.map((item) => (
             <figure
               key={item.id}
-              className={`group relative overflow-hidden rounded-2xl bg-studio ${item.span}`}
+              className="group relative block break-inside-avoid overflow-hidden rounded-[1.5rem] bg-studio"
             >
               <img
                 src={item.image}
                 alt={item.title}
                 loading="lazy"
-                className={`media-zoom w-full object-cover ${item.ratio}`}
+                className="w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <figcaption className="pointer-events-none absolute inset-x-5 bottom-5 translate-y-2 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                <span className="block text-[0.62rem] uppercase tracking-[0.26em] text-muted-foreground">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <figcaption className="pointer-events-none absolute inset-x-6 bottom-6 translate-y-3 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                <span className="block text-[0.6rem] uppercase tracking-[0.28em] text-muted-foreground">
                   {item.category}
                 </span>
-                <span className="mt-1 block font-display text-lg leading-tight">
+                <span className="mt-1.5 block font-display text-lg uppercase leading-tight">
                   {item.title}
                 </span>
               </figcaption>
@@ -117,7 +118,7 @@ function Portfolio() {
           ))}
         </div>
 
-        <section className="mt-24 flex flex-wrap items-center justify-between gap-8 rounded-3xl bg-surface/50 px-6 py-14 sm:px-12">
+        <section className="mb-8 mt-20 flex flex-wrap items-center justify-between gap-8 rounded-[2rem] bg-surface/50 px-6 py-14 sm:px-12">
           <div className="max-w-lg">
             <h2 className="text-[1.8rem] leading-[1] sm:text-4xl">
               Queres algo assim para a tua equipa?
@@ -139,3 +140,4 @@ function Portfolio() {
     </PageShell>
   );
 }
+
