@@ -5,18 +5,19 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * VinilArt Sport design system.
- * Charcoal/black base, magenta + cyan + yellow brush accents, white text.
- * All colors in oklch. Never hardcode colors in components.
+ * VinilArt Sport — Editorial Premium Sport design system.
+ * Deep charcoal base, generous space, one accent at a time.
+ * Magenta = brand/primary, cyan = interaction, yellow = rare accent.
+ * Never hardcode colors in components.
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-3xl: calc(var(--radius) + 20px);
 
   --font-display: "Archivo Black", "Arial Black", sans-serif;
   --font-sans: "Barlow", system-ui, sans-serif;
@@ -47,49 +48,51 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  --shadow-glow-magenta: 0 12px 40px -12px color-mix(in oklab, var(--magenta) 60%, transparent);
-  --shadow-glow-cyan: 0 12px 40px -12px color-mix(in oklab, var(--cyan) 55%, transparent);
-  --shadow-card: 0 18px 50px -24px oklch(0 0 0 / 0.9);
+  --shadow-glow-magenta: 0 20px 60px -28px color-mix(in oklab, var(--magenta) 55%, transparent);
+  --shadow-glow-cyan: 0 20px 60px -28px color-mix(in oklab, var(--cyan) 45%, transparent);
+  --shadow-card: 0 30px 70px -40px oklch(0 0 0 / 0.95);
+  --shadow-lift: 0 40px 90px -50px oklch(0 0 0 / 1);
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
-  --radius: 0.25rem;
+  --radius: 1rem;
 
-  --background: oklch(0.14 0.006 285);
+  --background: oklch(0.135 0.005 285);
   --foreground: oklch(0.985 0 0);
-  --surface: oklch(0.185 0.008 285);
-  --surface-2: oklch(0.235 0.01 285);
+  --surface: oklch(0.175 0.006 285);
+  --surface-2: oklch(0.225 0.008 285);
 
-  --card: oklch(0.185 0.008 285);
+  --card: oklch(0.175 0.006 285);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.185 0.008 285);
+  --popover: oklch(0.175 0.006 285);
   --popover-foreground: oklch(0.985 0 0);
 
   --magenta: oklch(0.63 0.28 342);
-  --cyan: oklch(0.79 0.15 212);
+  --cyan: oklch(0.82 0.13 210);
   --yellow: oklch(0.87 0.18 96);
 
   --primary: var(--magenta);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.235 0.01 285);
+  --secondary: oklch(0.225 0.008 285);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.235 0.01 285);
-  --muted-foreground: oklch(0.7 0.008 285);
+  --muted: oklch(0.225 0.008 285);
+  --muted-foreground: oklch(0.72 0.006 285);
   --accent: var(--cyan);
-  --accent-foreground: oklch(0.14 0.006 285);
+  --accent-foreground: oklch(0.135 0.005 285);
 
   --destructive: oklch(0.62 0.24 25);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: var(--magenta);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: var(--cyan);
 
   --gradient-sport: linear-gradient(
     100deg,
     var(--magenta) 0%,
-    var(--magenta) 38%,
-    var(--cyan) 70%,
-    var(--yellow) 100%
+    var(--magenta) 45%,
+    var(--cyan) 100%
   );
   --gradient-magenta: linear-gradient(
     120deg,
@@ -124,17 +127,30 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
+  }
+
+  h1 {
+    line-height: 0.9;
+  }
+
+  p {
+    line-height: 1.7;
   }
 
   ::selection {
     background: var(--magenta);
     color: oklch(0.985 0 0);
   }
+
+  :focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
 }
 
-/* Subtle dark grain texture layer */
+/* Very light grain, editorial not noisy */
 @utility grain {
   position: relative;
   &::after {
@@ -142,44 +158,52 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.35;
+    opacity: 0.18;
     background-image: radial-gradient(
       oklch(1 0 0 / 0.05) 1px,
       transparent 1px
     );
-    background-size: 3px 3px;
+    background-size: 4px 4px;
   }
 }
 
-/* Technical athletic dot grid */
 @utility bg-tech-grid {
   background-image: radial-gradient(
-    oklch(1 0 0 / 0.07) 1px,
+    oklch(1 0 0 / 0.035) 1px,
     transparent 1px
   );
-  background-size: 20px 20px;
+  background-size: 28px 28px;
 }
 
-/* Subtle carbon diagonal texture */
 @utility bg-carbon {
   background-image: repeating-linear-gradient(
     -45deg,
-    oklch(0.12 0.005 285),
-    oklch(0.12 0.005 285) 2px,
-    oklch(0.15 0.007 285) 2px,
-    oklch(0.15 0.007 285) 4px
+    oklch(0.14 0.004 285),
+    oklch(0.14 0.004 285) 3px,
+    oklch(0.16 0.005 285) 3px,
+    oklch(0.16 0.005 285) 6px
   );
 }
 
-/* Kinetic athletic speed stripes */
 @utility bg-speed-lines {
   background: repeating-linear-gradient(
     -60deg,
     transparent,
-    transparent 24px,
-    oklch(1 0 0 / 0.02) 24px,
-    oklch(1 0 0 / 0.02) 26px
+    transparent 34px,
+    oklch(1 0 0 / 0.015) 34px,
+    oklch(1 0 0 / 0.015) 36px
   );
+}
+
+/* Deep studio floor used behind large product shots */
+@utility bg-studio {
+  background:
+    radial-gradient(
+      70% 60% at 50% 15%,
+      oklch(0.24 0.008 285) 0%,
+      transparent 70%
+    ),
+    linear-gradient(to bottom, oklch(0.155 0.005 285), oklch(0.115 0.004 285));
 }
 
 @utility text-sport-gradient {
@@ -192,60 +216,96 @@
   background: var(--gradient-sport);
 }
 
-/* Angled brush-like slash used to divide sections */
+/* Hairline divider replacing the old heavy brush slash */
 @utility brush-rule {
-  height: 6px;
+  height: 2px;
   width: 100%;
   background: var(--gradient-sport);
-  clip-path: polygon(0 0, 100% 35%, 100% 100%, 0 65%);
+  opacity: 0.55;
 }
 
+/* Small editorial label — no skew, just quiet typography */
 @utility skew-tag {
   display: inline-block;
-  transform: skewX(-10deg);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.22em;
 }
 
 @utility slant-pill {
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  border-radius: 999px;
 }
 
+/* Editorial label used for eyebrows / metadata */
+@utility label-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--muted-foreground);
+}
+
+/* Unified card: soft surface, almost no border, lifts gently */
 @utility card-sport {
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   transition:
-    border-color 0.25s ease,
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    background-color 0.25s ease;
+    border-color 0.4s var(--ease-editorial),
+    transform 0.4s var(--ease-editorial),
+    box-shadow 0.4s var(--ease-editorial),
+    background-color 0.4s var(--ease-editorial);
   &:hover {
-    border-color: color-mix(in oklab, var(--magenta) 60%, transparent);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-glow-magenta);
+    border-color: oklch(1 0 0 / 18%);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
   }
 }
 
 @utility card-sport-cyan {
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   transition:
-    border-color 0.25s ease,
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    border-color 0.4s var(--ease-editorial),
+    transform 0.4s var(--ease-editorial),
+    box-shadow 0.4s var(--ease-editorial);
   &:hover {
-    border-color: color-mix(in oklab, var(--cyan) 60%, transparent);
-    transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--cyan) 45%, transparent);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-glow-cyan);
   }
 }
 
 @utility glow-text-magenta {
-  text-shadow: 0 0 24px color-mix(in oklab, var(--magenta) 50%, transparent);
+  text-shadow: 0 0 40px color-mix(in oklab, var(--magenta) 35%, transparent);
 }
 
 @utility glow-text-cyan {
-  text-shadow: 0 0 24px color-mix(in oklab, var(--cyan) 50%, transparent);
+  text-shadow: 0 0 40px color-mix(in oklab, var(--cyan) 35%, transparent);
+}
+
+/* Slow image reveal for editorial galleries */
+@utility media-zoom {
+  transition: transform 0.9s var(--ease-editorial);
+  &:hover {
+    transform: scale(1.04);
+  }
+}
+
+@utility rise-in {
+  animation: rise-in 0.7s var(--ease-editorial) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

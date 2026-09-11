@@ -43,7 +43,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const fieldClass =
-  "h-11 w-full border border-input bg-surface px-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-cyan transition-colors";
+  "h-12 w-full rounded-xl border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors";
 
 const errorClass = "mt-1 text-[0.65rem] text-destructive";
 
@@ -69,11 +69,11 @@ function Contactos() {
     return (
       <PageShell>
         <PageHero eyebrow="Contactos" title="Pedido preparado com sucesso." />
-        <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-          <div className="card-sport hover:!translate-y-0 p-8 text-center">
+        <section className="mx-auto max-w-2xl px-5 py-16 sm:px-8">
+          <div className="rounded-3xl bg-surface/50 p-10 text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-cyan" aria-hidden="true" />
-            <h2 className="mt-4 text-xl">Pedido preparado com sucesso.</h2>
-            <p className="mt-3 text-sm text-muted-foreground">
+            <h2 className="mt-6 text-2xl">Pedido preparado com sucesso.</h2>
+            <p className="mt-4 text-sm text-muted-foreground">
               O pedido foi preparado com sucesso. O envio online direto será ativado quando os dados de contacto e canais de receção da VinilArt Sport forem configurados.
             </p>
           </div>
@@ -90,12 +90,12 @@ function Contactos() {
         text="Conta-nos o que queres personalizar. Entramos em contacto para te apresentar uma proposta."
       />
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <section className="mx-auto grid max-w-[1600px] gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           noValidate
           aria-label="Formulário de contacto"
-          className="card-sport hover:!translate-y-0 grid gap-4 p-6"
+          className="grid gap-5 rounded-3xl bg-surface/50 p-6 sm:p-10"
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -211,7 +211,7 @@ function Contactos() {
               aria-invalid={!!errors.mensagem}
               aria-describedby={errors.mensagem ? "mensagem-error" : undefined}
               className={cn(
-                "mt-2 w-full border border-input bg-surface p-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-cyan transition-colors",
+                "mt-2 w-full rounded-xl border border-input bg-background/60 p-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors",
                 errors.mensagem && "border-destructive",
               )}
               placeholder="Descreve o que precisas: quantidades, tamanhos, prazos, referências visuais…"
@@ -237,16 +237,20 @@ function Contactos() {
           </p>
         </form>
 
-        <aside className="card-sport hover:!translate-y-0 h-fit p-6">
-          <p className="font-display text-sm">Dados de contacto</p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Dados de contacto direto a confirmar contigo antes de publicar.
+        <aside className="h-fit lg:sticky lg:top-28">
+          <p className="label-eyebrow">Dados de contacto</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Email, telefone, morada e redes sociais a confirmar contigo antes de
+            publicar.
           </p>
-          <div className="brush-rule my-6" />
-          <p className="font-display text-sm">Encomendas de equipa</p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Para clubes, envia a lista de nomes, números e tamanhos junto com o pedido.
-          </p>
+
+          <div className="mt-10 border-t border-border pt-10">
+            <p className="label-eyebrow">Encomendas de equipa</p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Para clubes, envia a lista de nomes, números e tamanhos junto com o
+              pedido.
+            </p>
+          </div>
         </aside>
       </section>
     </PageShell>

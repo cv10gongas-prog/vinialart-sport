@@ -54,26 +54,26 @@ function Carrinho() {
         text="Revê a tua seleção antes de pedir o orçamento."
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <section className="mx-auto max-w-[1600px] px-5 py-12 sm:px-8">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
           {/* Items list */}
-          <div className="space-y-4">
+          <div className="divide-y divide-border border-t border-border">
             {items.map((item) => (
               <div
                 key={item.id}
-                className="card-sport hover:!translate-y-0 flex items-start gap-4 p-4 sm:p-5"
+                className="flex items-start gap-5 py-6"
               >
                 {/* Preview thumbnail */}
                 {item.previewDataUrl ? (
                   <img
                     src={item.previewDataUrl}
-                    alt={`Preview de ${item.productName}`}
-                    width={80}
-                    height={80}
-                    className="h-20 w-20 shrink-0 border border-border object-cover"
+                    alt={`Pré-visualização de ${item.productName}`}
+                    width={112}
+                    height={112}
+                    className="h-24 w-24 shrink-0 rounded-2xl bg-studio object-cover sm:h-28 sm:w-28"
                   />
                 ) : (
-                  <div className="grid h-20 w-20 shrink-0 place-items-center border border-dashed border-border bg-background">
+                  <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-studio sm:h-28 sm:w-28">
                     <ShoppingBag className="h-6 w-6 text-muted-foreground/40" aria-hidden="true" />
                   </div>
                 )}
@@ -140,7 +140,7 @@ function Carrinho() {
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
-                  <div className="inline-flex items-center border border-border">
+                  <div className="inline-flex items-center rounded-full border border-border">
                     <button
                       aria-label="Diminuir quantidade"
                       onClick={() => updateQty(item.id, item.quantity - 1)}
@@ -166,10 +166,10 @@ function Carrinho() {
           </div>
 
           {/* Summary sidebar */}
-          <aside>
-            <div className="card-sport hover:!translate-y-0 p-6">
-              <p className="font-display text-sm">Resumo do pedido</p>
-              <div className="brush-rule my-4" />
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <div className="rounded-3xl bg-surface/50 p-8">
+              <p className="label-eyebrow">Resumo do pedido</p>
+              <div className="my-6 border-t border-border" />
 
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">

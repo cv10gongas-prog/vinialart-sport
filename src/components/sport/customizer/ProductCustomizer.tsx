@@ -1,21 +1,9 @@
-import { useState, lazy, Suspense } from "react";
-import {
-  Eye,
-  ShoppingBag,
-  CheckCircle,
-  ArrowRight,
-  Sparkles,
-  Box,
-  Image as ImageIcon,
-} from "lucide-react";
+import { useState } from "react";
+import { Eye, ShoppingBag, Check } from "lucide-react";
 
 import { CanvasEditor } from "./CanvasEditor";
 import { CustomizerControlPanel } from "./CustomizerControlPanel";
 import { ProductPresentationModal } from "./ProductLivePreview";
-
-const Product3DViewer = lazy(() =>
-  import("./Product3DViewer").then((mod) => ({ default: mod.Product3DViewer }))
-);
 
 import { useProductCustomizer } from "@/hooks/useProductCustomizer";
 import { useCart } from "@/lib/cart/store";
@@ -30,32 +18,25 @@ interface ProductCustomizerProps {
   cartItemId?: string | undefined;
 }
 
+/**
+ * Product-first customizer: the product takes ~75% of the screen and the
+ * commercial rail stays quiet on the right. 3D is intentionally not exposed.
+ */
 export function ProductCustomizer({
   config,
   className,
   initialDesignJson,
   cartItemId,
 }: ProductCustomizerProps) {
-  const customizer = useProductCustomizer(config, {
-    initialDesignJson,
-  });
+  const customizer = useProductCustomizer(config, { initialDesignJson });
 
-  const {
-    state,
-    setSurface,
-    activeSurface,
-    exportCustomerPreview,
-    serializeDesign,
-  } = customizer;
+  const { state, setSurface, exportCustomerPreview, serializeDesign } =
+    customizer;
 
   const { addItem, updateItem } = useCart();
 
   const [savedToCart, setSavedToCart] = useState(false);
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
-  const [viewDimension, setViewDimension] = useState<"2D" | "3D">("2D");
-
-  // 3D toggle temporarily hidden to prioritize perfect 2D fidelity as requested
-  const supports3D = false;
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;
@@ -71,10 +52,7 @@ export function ProductCustomizer({
     }
 
     if (cartItemId) {
-      updateItem(cartItemId, {
-        customizerDesign,
-        previewDataUrl,
-      });
+      updateItem(cartItemId, { customizerDesign, previewDataUrl });
     } else {
       addItem(config.id, config.name, {
         quantity: 1,
@@ -84,173 +62,98 @@ export function ProductCustomizer({
     }
 
     setSavedToCart(true);
-    window.setTimeout(() => {
-      setSavedToCart(false);
-    }, 3000);
+    window.setTimeout(() => setSavedToCart(false), 3000);
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
-      {/* 1. TÍTULO DO PRODUTO & CONTROLO DE VISTA */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4">
+    <div className={cn("flex flex-col gap-8", className)}>
+      {/* TÍTULO + SUPERFÍCIES */}
+      <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-cyan font-bold">
-            Personalização Online
-          </span>
-          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-black uppercase text-foreground">
+          <span className="label-eyebrow">Personalização</span>
+          <h1 className="mt-3 text-[2rem] leading-[0.95] sm:text-5xl">
             {config.name}
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Tabs de Superfície: [ CANELEIRA ESQUERDA ] [ CANELEIRA DIREITA ] ou [ FRENTE ] [ COSTAS ] */}
-          {config.surfaces.length > 1 && (
-            <div className="flex items-center gap-1.5 bg-surface p-1 border border-border">
-              {config.surfaces.map((surface) => {
-                const active = state.activeSurfaceId === surface.id;
-                return (
-                  <button
-                    key={surface.id}
-                    type="button"
-                    onClick={() => setSurface(surface.id)}
-                    className={cn(
-                      "px-4 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
-                      active
-                        ? "bg-cyan text-black shadow-glow-cyan"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {surface.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Toggle 2D / 3D: apenas visível se 3D verdadeiro estiver disponível */}
-          {supports3D && (
-            <div className="flex items-center gap-1 bg-surface p-1 border border-border">
-              <button
-                type="button"
-                onClick={() => setViewDimension("2D")}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
-                  viewDimension === "2D"
-                    ? "bg-white text-black"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <ImageIcon className="h-3.5 w-3.5" />
-                <span>2D</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewDimension("3D")}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
-                  viewDimension === "3D"
-                    ? "bg-cyan text-black shadow-glow-cyan"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <Box className="h-3.5 w-3.5" />
-                <span>3D</span>
-              </button>
-            </div>
-          )}
-        </div>
+        {config.surfaces.length > 1 && (
+          <div
+            role="tablist"
+            aria-label="Lados do produto"
+            className="inline-flex rounded-full border border-border p-1"
+          >
+            {config.surfaces.map((surface) => {
+              const active = state.activeSurfaceId === surface.id;
+              return (
+                <button
+                  key={surface.id}
+                  role="tab"
+                  aria-selected={active}
+                  type="button"
+                  onClick={() => setSurface(surface.id)}
+                  className={cn(
+                    "rounded-full px-5 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition-all duration-300",
+                    active
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {surface.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* 2. NOVO LAYOUT PREMIUM (70% PRODUTO / 30% CONTROLOS):
-             ESQUERDA: PRODUTO GRANDE COM ARTE APLICADA (2D ou 3D INTERATIVO)
-             DIREITA: PAINEL DE CONTROLO COMERCIAL LIMPO
-      */}
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
-        {/* COLUNA: O PRODUTO É O PREVIEW PRINCIPAL */}
-        <div className="order-1 lg:order-1 relative overflow-hidden border border-border/80 bg-[#06080b] p-2 sm:p-6 flex flex-col items-center justify-center min-h-[480px]">
-          {/* Subtitle discreto */}
-          <div className="mb-2 flex w-full items-center justify-between font-mono text-[0.68rem] text-muted-foreground">
-            <span className="uppercase tracking-wider text-cyan font-semibold">
-              {activeSurface.label}
-            </span>
-            <span className="hidden sm:inline">
-              {viewDimension === "3D" ? "Arrasta para rodar em 3D" : "Arrasta para mover · Clica e ajusta"}
-            </span>
-          </div>
-
-          {/* O PRODUTO EM 2D (Konva) OU EM 3D (Three.js PBR) */}
-          {supports3D && (
-            <div
-              className={cn(
-                "relative h-[540px] w-full items-center justify-center",
-                viewDimension === "3D" ? "flex" : "hidden",
-              )}
-            >
-              <Suspense
-                fallback={
-                  <div className="flex h-full w-full items-center justify-center text-xs font-mono text-muted-foreground uppercase">
-                    A inicializar estúdio 3D…
-                  </div>
-                }
-              >
-                <Product3DViewer
-                  config={config}
-                  customizer={customizer}
-                  className="h-full w-full"
-                  onFallbackTo2D={() => setViewDimension("2D")}
-                />
-              </Suspense>
-            </div>
-          )}
-
+      {/* PRODUTO GRANDE + RAIL DE CONTROLOS */}
+      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-16 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="relative overflow-hidden rounded-3xl bg-studio">
           <div
-            className={cn(
-              "relative flex w-full items-center justify-center",
-              viewDimension === "3D" && supports3D && "hidden",
-            )}
+            className="relative mx-auto flex w-full items-center justify-center"
             style={{
               aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
-              maxHeight: "min(75vh, 660px)",
+              maxHeight: "min(78vh, 720px)",
             }}
           >
             <CanvasEditor config={config} customizer={customizer} />
           </div>
         </div>
 
-        {/* COLUNA: PAINEL DE CONTROLO + CTAS */}
-        <div className="order-2 lg:order-2 flex flex-col gap-5">
+        <div className="flex flex-col gap-8 lg:sticky lg:top-28">
           <CustomizerControlPanel customizer={customizer} />
 
-          {/* AÇÕES FINAIS: VER RESULTADO + ADICIONAR AO PEDIDO */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3 border-t border-border pt-8">
             <button
               type="button"
               onClick={() => setIsPresentationOpen(true)}
-              className="flex h-12 w-full items-center justify-center gap-2 border border-magenta bg-magenta/10 font-display text-xs uppercase tracking-wider text-magenta font-bold hover:bg-magenta hover:text-white transition-colors"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border text-[0.7rem] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-foreground/40 hover:bg-foreground/5"
             >
               <Eye className="h-4 w-4" />
-              <span>Ver Resultado Final</span>
+              <span>Ver resultado</span>
             </button>
 
             <button
               type="button"
               onClick={handleAddToCart}
               className={cn(
-                "flex h-14 w-full items-center justify-center gap-2 font-display text-sm uppercase tracking-wider font-bold transition-all shadow-lg",
+                "flex h-14 w-full items-center justify-center gap-2 rounded-full text-[0.74rem] font-semibold uppercase tracking-[0.2em] transition-all",
                 savedToCart
-                  ? "bg-green-600 text-white"
-                  : "bg-cyan text-black hover:bg-cyan/90 shadow-glow-cyan",
+                  ? "bg-cyan text-accent-foreground"
+                  : "bg-magenta text-primary-foreground hover:shadow-glow-magenta hover:brightness-110",
               )}
             >
               {savedToCart ? (
                 <>
-                  <CheckCircle className="h-5 w-5" />
-                  <span>{cartItemId ? "Alterações Guardadas" : "Guardado no Pedido"}</span>
+                  <Check className="h-5 w-5" />
+                  <span>{cartItemId ? "Alterações guardadas" : "Guardado"}</span>
                 </>
               ) : (
                 <>
                   <ShoppingBag className="h-5 w-5" />
-                  <span>{cartItemId ? "Guardar Alterações" : "Adicionar ao Pedido"}</span>
+                  <span>
+                    {cartItemId ? "Guardar alterações" : "Adicionar ao pedido"}
+                  </span>
                 </>
               )}
             </button>
@@ -258,7 +161,6 @@ export function ProductCustomizer({
         </div>
       </div>
 
-      {/* Modal de Apresentação / Preview Final Limpo */}
       <ProductPresentationModal
         isOpen={isPresentationOpen}
         onClose={() => setIsPresentationOpen(false)}

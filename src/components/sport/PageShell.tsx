@@ -12,6 +12,7 @@ export function PageShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Editorial page opener: quiet label, oversized title, lots of air. */
 export function PageHero({
   eyebrow,
   title,
@@ -22,21 +23,18 @@ export function PageHero({
   text?: string;
 }) {
   return (
-    <section className="grain relative overflow-hidden border-b border-border">
-      <div
-        className="pointer-events-none absolute -right-24 top-0 h-full w-[60%] opacity-25"
-        style={{ background: "var(--gradient-sport)", clipPath: "polygon(30% 0,100% 0,100% 100%,0 100%)" }}
-        aria-hidden
-      />
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20">
-        <span className="skew-tag bg-cyan px-3 py-1 font-display text-[0.6rem] text-accent-foreground">
-          {eyebrow}
-        </span>
-        <h1 className="mt-4 max-w-3xl text-[1.9rem] leading-[0.92] break-words sm:text-5xl md:text-6xl">
+    <section className="relative overflow-hidden">
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-magenta/12 blur-[140px]" />
+      <div className="relative mx-auto max-w-[1600px] px-5 pb-14 pt-16 sm:px-8 md:pb-20 md:pt-24">
+        <span className="label-eyebrow">{eyebrow}</span>
+        <h1 className="mt-5 max-w-4xl break-words text-[2.4rem] leading-[0.9] sm:text-6xl md:text-7xl">
           {title}
         </h1>
-
-        {text && <p className="mt-4 max-w-xl text-muted-foreground">{text}</p>}
+        {text && (
+          <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
+            {text}
+          </p>
+        )}
       </div>
     </section>
   );

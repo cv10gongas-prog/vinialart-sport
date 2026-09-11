@@ -19,13 +19,13 @@ export function SectionHeading({
           : "max-w-2xl text-left"
       }
     >
-      {eyebrow && (
-        <span className="skew-tag bg-magenta px-3 py-1 font-display text-[0.6rem] text-primary-foreground">
-          {eyebrow}
-        </span>
+      {eyebrow && <span className="label-eyebrow">{eyebrow}</span>}
+      <h2 className="mt-4 text-[2rem] leading-[0.95] sm:text-5xl md:text-6xl">
+        {title}
+      </h2>
+      {text && (
+        <p className="mt-5 text-base text-muted-foreground sm:text-lg">{text}</p>
       )}
-      <h2 className="mt-4 text-3xl leading-[0.95] sm:text-4xl md:text-5xl">{title}</h2>
-      {text && <p className="mt-4 text-base text-muted-foreground">{text}</p>}
     </div>
   );
 }

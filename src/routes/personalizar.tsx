@@ -1,19 +1,8 @@
-﻿import {
-  createFileRoute,
-  Link,
-} from "@tanstack/react-router";
-
-import {
-  Sparkles,
-  Upload,
-  ArrowRight,
-  Shield,
-  Shirt,
-  Flag,
-  HelpCircle,
-} from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, Upload, HelpCircle } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
+import { SportLink } from "@/components/sport/SportButton";
 import { ProductCustomizer } from "@/components/sport/customizer/ProductCustomizer";
 import { ProductAssistanceForm } from "@/components/sport/ProductAssistanceForm";
 
@@ -22,12 +11,9 @@ import {
   getProductCustomizerConfig,
 } from "@/lib/customizer/configs";
 
-import {
-  products,
-} from "@/lib/sport-data";
+import { products } from "@/lib/sport-data";
 
 import { useCart } from "@/lib/cart/store";
-import { cn } from "@/lib/utils";
 
 export interface PersonalizarSearch {
   produto?: string | undefined;
@@ -35,12 +21,8 @@ export interface PersonalizarSearch {
   modo?: "design" | "ajuda" | undefined;
 }
 
-export const Route = createFileRoute(
-  "/personalizar",
-)({
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): PersonalizarSearch => ({
+export const Route = createFileRoute("/personalizar")({
+  validateSearch: (search: Record<string, unknown>): PersonalizarSearch => ({
     produto:
       typeof search["produto"] === "string" ? search["produto"] : undefined,
     cartItem:
@@ -55,24 +37,31 @@ export const Route = createFileRoute(
 
   head: () => ({
     meta: [
-      {
-        title: "Personalização — VinilArt Sport",
-      },
+      { title: "Personalização — VinilArt Sport" },
       {
         name: "description",
         content:
-          "Personaliza caneleiras, equipamentos e artigos desportivos online na VinilArt Sport.",
+          "Aplica o teu design em caneleiras, equipamentos e bandeiras, ou pede ajuda à equipa da VinilArt Sport.",
       },
+      { property: "og:title", content: "Personalização — VinilArt Sport" },
+      {
+        property: "og:description",
+        content: "Aplica o teu design no produto ou pede apoio à VinilArt Sport.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
+const customizableProducts = [
+  { slug: "caneleiras-personalizadas", name: "Caneleiras" },
+  { slug: "equipamento-personalizado", name: "Equipamento" },
+  { slug: "bandeira-personalizada", name: "Bandeira" },
+];
+
 function Personalizar() {
-  const {
-    produto,
-    cartItem: cartItemId,
-    modo,
-  } = Route.useSearch();
+  const { produto, cartItem: cartItemId, modo } = Route.useSearch();
 
   const { items } = useCart();
 
@@ -92,248 +81,137 @@ function Personalizar() {
 
   return (
     <PageShell>
-      {/* 1. SE NENHUM PRODUTO FOI ESCOLHIDO: ESCOLHA DE ARTIGO */}
+      {/* ESCOLHA DE PRODUTO */}
       {!activeProductId ? (
-        <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="text-center">
-            <span className="bg-magenta px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-widest text-white">
-              Personalização Online
-            </span>
-            <h1 className="mt-4 font-display text-3xl font-black uppercase tracking-tight sm:text-5xl">
-              O que queres personalizar?
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Escolhe o produto para aplicares o teu design pronto ou pedires apoio à equipa da VinilArt Sport.
-            </p>
-          </div>
+        <section className="mx-auto max-w-[1600px] px-5 py-16 sm:px-8 sm:py-24">
+          <span className="label-eyebrow">Personalização</span>
+          <h1 className="mt-4 max-w-2xl text-[2.4rem] leading-[0.9] sm:text-6xl">
+            O que queres personalizar?
+          </h1>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            {/* CANELEIRAS */}
-            <Link
-              to="/personalizar"
-              search={{ produto: "caneleiras-personalizadas" }}
-              className="card-sport group flex flex-col justify-between border-2 border-border bg-surface p-6 transition-all hover:border-cyan hover:shadow-lg hover:shadow-cyan/5"
-            >
-              <div>
-                <div className="flex h-12 w-12 items-center justify-center border border-cyan/40 bg-cyan/10 text-cyan group-hover:bg-cyan group-hover:text-black transition-colors">
-                  <Shield className="h-6 w-6" />
-                </div>
-                <h3 className="mt-4 font-display text-xl font-bold uppercase">
-                  Caneleiras
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  Par completo personalizável (perna esquerda e direita). Aplica a tua fotografia, logo ou grafismo.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 font-display text-xs uppercase text-cyan font-bold">
-                <span>Personalizar</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
-
-            {/* EQUIPAMENTO */}
-            <Link
-              to="/personalizar"
-              search={{ produto: "equipamento-personalizado" }}
-              className="card-sport group flex flex-col justify-between border-2 border-border bg-surface p-6 transition-all hover:border-magenta hover:shadow-lg hover:shadow-magenta/5"
-            >
-              <div>
-                <div className="flex h-12 w-12 items-center justify-center border border-magenta/40 bg-magenta/10 text-magenta group-hover:bg-magenta group-hover:text-white transition-colors">
-                  <Shirt className="h-6 w-6" />
-                </div>
-                <h3 className="mt-4 font-display text-xl font-bold uppercase">
-                  Equipamento
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  Camisola técnica para atletas e equipas. Personalização de frente e costas com logos, dorsais e nomes.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 font-display text-xs uppercase text-magenta font-bold">
-                <span>Personalizar</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
-
-            {/* BANDEIRA */}
-            <Link
-              to="/personalizar"
-              search={{ produto: "bandeira-personalizada" }}
-              className="card-sport group flex flex-col justify-between border-2 border-border bg-surface p-6 transition-all hover:border-yellow hover:shadow-lg hover:shadow-yellow/5"
-            >
-              <div>
-                <div className="flex h-12 w-12 items-center justify-center border border-yellow/40 bg-yellow/10 text-yellow group-hover:bg-yellow group-hover:text-black transition-colors">
-                  <Flag className="h-6 w-6" />
-                </div>
-                <h3 className="mt-4 font-display text-xl font-bold uppercase">
-                  Bandeira
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  Bandeira de apoio desportivo de grande impacto para claques, clubes e adeptos.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 font-display text-xs uppercase text-yellow font-bold">
-                <span>Personalizar</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
+          <div className="mt-14 divide-y divide-border border-t border-border">
+            {customizableProducts.map((item) => {
+              const product = products.find((p) => p.slug === item.slug);
+              return (
+                <Link
+                  key={item.slug}
+                  to="/personalizar"
+                  search={{ produto: item.slug }}
+                  className="group flex flex-wrap items-baseline justify-between gap-4 py-8 transition-colors hover:bg-foreground/[0.03] sm:px-2"
+                >
+                  <span className="font-display text-2xl sm:text-4xl">
+                    {item.name}
+                  </span>
+                  <span className="max-w-md flex-1 text-sm text-muted-foreground sm:text-right">
+                    {product?.description}
+                  </span>
+                  <ArrowUpRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-1 group-hover:text-foreground" />
+                </Link>
+              );
+            })}
           </div>
         </section>
       ) : !effectiveMode ? (
-        /* 2. PRODUTO ESCOLHIDO: ESCOLHER FLUXO (TENHO DESIGN vs QUERO AJUDA) */
-        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-          <div className="text-center">
-            <span className="bg-cyan px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-widest text-black">
-              {currentProduct?.name ?? "Produto Selecionado"}
-            </span>
-            <h1 className="mt-4 font-display text-3xl font-black uppercase tracking-tight sm:text-5xl">
-              Já tens o design pronto?
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Se já tens o teu ficheiro pronto, podes carregá-lo e posicioná-lo diretamente no artigo. Se precisas de ajuda, a VinilArt trata da criação gráfica.
-            </p>
-          </div>
+        /* ESCOLHA DE FLUXO */
+        <section className="mx-auto max-w-[1100px] px-5 py-16 sm:px-8 sm:py-24">
+          <span className="label-eyebrow">
+            {currentProduct?.name ?? "Produto selecionado"}
+          </span>
+          <h1 className="mt-4 max-w-2xl text-[2.2rem] leading-[0.92] sm:text-6xl">
+            Já tens o design?
+          </h1>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            {/* OPÇÃO A: SIM, TENHO O DESIGN */}
-            <div className="card-sport flex flex-col justify-between border-2 border-cyan bg-surface p-6 sm:p-8 hover:!translate-y-0">
+          <div className="mt-14 grid gap-6 sm:grid-cols-2">
+            <div className="flex flex-col justify-between rounded-3xl bg-surface/60 p-8 transition-colors hover:bg-surface">
               <div>
-                <div className="inline-flex items-center gap-2 bg-cyan/15 px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-cyan">
-                  <Upload className="h-3.5 w-3.5" />
-                  Fluxo Direto
-                </div>
-                <h3 className="mt-4 font-display text-2xl font-black uppercase text-foreground">
-                  Sim, tenho o design
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  Carrega o teu ficheiro (PNG, JPG, WEBP ou PDF), posiciona-o sobre o produto e confirma o preview final.
+                <Upload className="h-5 w-5 text-cyan" />
+                <h2 className="mt-6 text-2xl">Tenho o design</h2>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Carrega o teu ficheiro, posiciona-o no produto e vê o resultado
+                  antes de fechar o pedido.
                 </p>
-
-                <ul className="mt-5 space-y-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
-                    Carregamento direto da imagem ou ficheiro
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
-                    Ajustar, preencher, rodar e dimensionar
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
-                    Pré-visualização limpa no produto
-                  </li>
-                </ul>
               </div>
-
-              <div className="mt-8">
-                <Link
-                  to="/personalizar"
-                  search={{ produto: activeProductId, modo: "design" }}
-                  className="flex h-12 w-full items-center justify-center gap-2 border border-cyan bg-cyan font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors shadow-glow-cyan"
-                >
-                  <span>Tenho o Design — Começar</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+              <SportLink
+                to="/personalizar"
+                search={{ produto: activeProductId, modo: "design" }}
+                size="lg"
+                variant="primary"
+                className="mt-10 w-full"
+              >
+                Começar
+              </SportLink>
             </div>
 
-            {/* OPÇÃO B: NÃO, QUERO AJUDA */}
-            <div className="card-sport flex flex-col justify-between border-2 border-magenta bg-surface p-6 sm:p-8 hover:!translate-y-0">
+            <div className="flex flex-col justify-between rounded-3xl bg-surface/60 p-8 transition-colors hover:bg-surface">
               <div>
-                <div className="inline-flex items-center gap-2 bg-magenta/15 px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-magenta">
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  Apoio VinilArt
-                </div>
-                <h3 className="mt-4 font-display text-2xl font-black uppercase text-foreground">
-                  Não, quero ajuda da VinilArt
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  Envia a tua ideia, imagem ou referência. A VinilArt trata do resto. Criamos a proposta gráfica para ti.
+                <HelpCircle className="h-5 w-5 text-magenta" />
+                <h2 className="mt-6 text-2xl">Quero ajuda</h2>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Envia-nos a tua ideia ou referência. A VinilArt trata do resto.
                 </p>
-
-                <ul className="mt-5 space-y-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-magenta" />
-                    Sem necessidade de ficheiros técnicos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-magenta" />
-                    Apoio especializado da nossa equipa
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-magenta" />
-                    Orçamento rápido e proposta personalizada
-                  </li>
-                </ul>
               </div>
-
-              <div className="mt-8">
-                <Link
-                  to="/personalizar"
-                  search={{ produto: activeProductId, modo: "ajuda" }}
-                  className="flex h-12 w-full items-center justify-center gap-2 border border-magenta bg-magenta font-display text-xs uppercase tracking-wider text-white font-bold hover:bg-magenta/90 transition-colors shadow-glow-magenta"
-                >
-                  <span>Pedir Ajuda de Design</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+              <SportLink
+                to="/personalizar"
+                search={{ produto: activeProductId, modo: "ajuda" }}
+                size="lg"
+                variant="outline"
+                className="mt-10 w-full"
+              >
+                Pedir personalização
+              </SportLink>
             </div>
           </div>
         </section>
       ) : effectiveMode === "ajuda" ? (
-        /* 3. FLUXO B: FORMULÁRIO DE AJUDA */
-        <section className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-          <div className="mb-6 flex items-center justify-between">
-            <Link
-              to="/personalizar"
-              search={{ produto: activeProductId }}
-              className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-cyan"
-            >
-              ← Voltar à escolha do modo
-            </Link>
-            <span className="font-mono text-xs text-muted-foreground">
-              {currentProduct?.name}
-            </span>
-          </div>
+        /* FLUXO AJUDA */
+        <section className="mx-auto max-w-3xl px-5 py-14 sm:px-8">
+          <Link
+            to="/personalizar"
+            search={{ produto: activeProductId }}
+            className="text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            ← Voltar
+          </Link>
 
-          <ProductAssistanceForm
-            productId={activeProductId}
-            productName={currentProduct?.name ?? "Artigo Personalizado"}
-          />
+          <h1 className="mt-8 text-[2rem] leading-[0.95] sm:text-5xl">
+            Ainda não tens o design?
+          </h1>
+          <p className="mt-5 max-w-lg text-sm text-muted-foreground sm:text-base">
+            Envia-nos a tua ideia ou referência. A VinilArt trata do resto.
+          </p>
+
+          <div className="mt-10">
+            <ProductAssistanceForm
+              productId={activeProductId}
+              productName={currentProduct?.name ?? "Artigo personalizado"}
+            />
+          </div>
         </section>
       ) : (
-        /* 4. FLUXO A: APLICAÇÃO DIRETA NO PRODUTO GRANDE */
-        <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <div className="mb-4 flex items-center justify-between border-b border-border/60 pb-3">
+        /* FLUXO DESIGN — PRODUTO EM GRANDE */
+        <section className="mx-auto max-w-[1600px] px-5 py-10 sm:px-8">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
             <Link
               to="/personalizar"
               search={{ produto: activeProductId }}
-              className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-cyan"
+              className="text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
             >
-              ← Alterar modo / Ver opções
+              ← Voltar
             </Link>
             <Link
               to="/loja"
-              className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-cyan"
+              className="text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
             >
-              Ver outros produtos na Loja →
+              Ver loja →
             </Link>
           </div>
 
-          {config ? (
-            <ProductCustomizer
-              key={config.id}
-              config={config}
-              initialDesignJson={initialDesign}
-              cartItemId={cartItemId}
-            />
-          ) : (
-            <ProductCustomizer
-              key={caneleirasConfig.id}
-              config={caneleirasConfig}
-              initialDesignJson={initialDesign}
-              cartItemId={cartItemId}
-            />
-          )}
+          <ProductCustomizer
+            key={config?.id ?? caneleirasConfig.id}
+            config={config ?? caneleirasConfig}
+            initialDesignJson={initialDesign}
+            cartItemId={cartItemId}
+          />
         </section>
       )}
     </PageShell>

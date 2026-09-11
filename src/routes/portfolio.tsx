@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/sport/PageShell";
-import { ArrowRight, Shield, Shirt, Flag, Sparkles } from "lucide-react";
+import { SportLink } from "@/components/sport/SportButton";
 
 import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
 import prodCaneleiraDetail from "@/assets/prod-caneleira-detail.jpg";
@@ -17,153 +17,122 @@ export const Route = createFileRoute("/portfolio")({
       {
         name: "description",
         content:
-          "Trabalhos reais e produções desportivas realizadas pela VinilArt Sport: caneleiras, equipamentos e artigos desportivos.",
+          "Trabalhos realizados pela VinilArt Sport: caneleiras personalizadas, equipamentos e artigos desportivos.",
       },
+      { property: "og:title", content: "Portfólio — VinilArt Sport" },
+      {
+        property: "og:description",
+        content: "Galeria de trabalhos realizados pela VinilArt Sport.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
-interface PortfolioItem {
-  id: string;
-  title: string;
-  category: string;
-  image: string;
-  description: string;
-  tag: string;
-}
-
-const portfolioItems: PortfolioItem[] = [
+const items = [
   {
     id: "caneleiras-real-1",
     title: "Caneleiras personalizadas",
     category: "Caneleiras",
     image: prodCaneleiras,
-    description: "Caneleiras com personalização fotográfica e gráfica.",
-    tag: "Caneleiras",
+    span: "sm:col-span-2 lg:row-span-2",
+    ratio: "aspect-[4/3] lg:aspect-auto lg:h-full",
   },
   {
     id: "caneleiras-detail",
     title: "Caneleiras personalizadas",
-    category: "Caneleiras",
+    category: "Detalhe",
     image: prodCaneleiraDetail,
-    description: "Aplicação de imagem e grafismo sobre a forma da caneleira.",
-    tag: "Detalhe",
+    span: "",
+    ratio: "aspect-square",
   },
   {
     id: "caneleiras-angle",
     title: "Caneleiras personalizadas",
-    category: "Caneleiras",
+    category: "Perspetiva",
     image: prodCaneleiraAngle,
-    description: "Vista de perfil da personalização de caneleira.",
-    tag: "Perspetiva",
-  },
-  {
-    id: "caneleiras-back",
-    title: "Caneleiras personalizadas",
-    category: "Caneleiras",
-    image: prodCaneleiraBack,
-    description: "Vista posterior com acabamento neutro.",
-    tag: "Verso",
+    span: "",
+    ratio: "aspect-square",
   },
   {
     id: "equipamento-jogo",
     title: "Equipamento personalizado",
     category: "Equipamentos",
     image: prodEquipamento,
-    description: "Camisola com estampagem desportiva.",
-    tag: "Equipamento",
+    span: "sm:col-span-2",
+    ratio: "aspect-[16/10]",
+  },
+  {
+    id: "caneleiras-back",
+    title: "Caneleiras personalizadas",
+    category: "Verso",
+    image: prodCaneleiraBack,
+    span: "",
+    ratio: "aspect-square",
   },
   {
     id: "bandeira-clube",
     title: "Bandeira personalizada",
     category: "Bandeiras",
     image: prodBandeira,
-    description: "Bandeira com impressão têxtil para adeptos e clubes.",
-    tag: "Bandeira",
+    span: "",
+    ratio: "aspect-square",
   },
 ];
 
 function Portfolio() {
   return (
     <PageShell>
-      {/* Portfolio Hero Header */}
-      <section className="grain relative border-b border-border bg-tech-grid py-12 sm:py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <span className="bg-cyan px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-widest text-black">
-            Galeria de Trabalhos
-          </span>
-          <h1 className="mt-4 font-display text-3xl font-black uppercase tracking-tight sm:text-5xl md:text-6xl">
-            Portfólio VinilArt Sport
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Produções reais de caneleiras personalizadas, equipamentos desportivos e artigos de apoio para atletas e clubes.
-          </p>
-        </div>
+      <section className="mx-auto max-w-[1600px] px-5 pb-10 pt-14 sm:px-8 sm:pt-20">
+        <span className="label-eyebrow">Portfólio</span>
+        <h1 className="mt-4 text-[2.4rem] leading-[0.9] sm:text-6xl md:text-7xl">
+          Trabalhos realizados
+        </h1>
       </section>
 
-      {/* Portfolio Gallery Grid */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {portfolioItems.map((item) => (
-            <div
+      <div className="mx-auto max-w-[1600px] px-5 sm:px-8">
+        <div className="grid auto-rows-min gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <figure
               key={item.id}
-              className="card-sport group relative flex flex-col overflow-hidden border border-border bg-surface hover:border-cyan hover:shadow-lg hover:shadow-cyan/5 transition-all"
+              className={`group relative overflow-hidden rounded-2xl bg-studio ${item.span}`}
             >
-              <div className="relative aspect-square overflow-hidden bg-black/50">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute top-3 left-3">
-                  <span className="bg-black/80 border border-border px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-wider text-cyan backdrop-blur-sm">
-                    {item.tag}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-1 flex-col p-5">
-                <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">
+              <img
+                src={item.image}
+                alt={item.title}
+                loading="lazy"
+                className={`media-zoom w-full object-cover ${item.ratio}`}
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <figcaption className="pointer-events-none absolute inset-x-5 bottom-5 translate-y-2 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                <span className="block text-[0.62rem] uppercase tracking-[0.26em] text-muted-foreground">
                   {item.category}
                 </span>
-                <h3 className="mt-1 font-display text-lg font-bold text-foreground group-hover:text-cyan transition-colors">
+                <span className="mt-1 block font-display text-lg leading-tight">
                   {item.title}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            </div>
+                </span>
+              </figcaption>
+            </figure>
           ))}
         </div>
 
-        {/* CTA Section */}
-        <section className="mt-16 card-sport flex flex-col items-center justify-between gap-6 border-2 border-magenta/40 bg-surface p-8 text-center sm:flex-row sm:text-left">
-          <div>
-            <span className="font-mono text-xs uppercase tracking-widest text-magenta font-bold">
-              Gostaste dos nossos trabalhos?
-            </span>
-            <h3 className="mt-2 font-display text-xl sm:text-2xl font-black uppercase text-foreground">
-              Personaliza o teu artigo ou pede orçamento à equipa
-            </h3>
-            <p className="mt-1 text-xs text-muted-foreground max-w-xl">
-              Podes testar o teu design online ou enviar a tua ideia para a VinilArt Sport tratar de toda a criação.
+        <section className="mt-24 flex flex-wrap items-center justify-between gap-8 rounded-3xl bg-surface/50 px-6 py-14 sm:px-12">
+          <div className="max-w-lg">
+            <h2 className="text-[1.8rem] leading-[1] sm:text-4xl">
+              Queres algo assim para a tua equipa?
+            </h2>
+            <p className="mt-4 text-sm text-muted-foreground sm:text-base">
+              Carrega o teu design na loja ou envia-nos a tua ideia.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link
-              to="/loja"
-              className="inline-flex items-center gap-2 border border-cyan bg-cyan px-6 py-3 font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors"
-            >
-              <span>Ver Loja</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/contactos"
-              className="inline-flex items-center gap-2 border border-border bg-surface px-6 py-3 font-display text-xs uppercase tracking-wider text-foreground hover:border-magenta hover:text-magenta transition-colors"
-            >
-              <span>Pedir Orçamento</span>
-            </Link>
+            <SportLink to="/loja" size="lg" variant="primary">
+              Ver loja
+            </SportLink>
+            <SportLink to="/contactos" size="lg" variant="outline">
+              Pedir orçamento
+            </SportLink>
           </div>
         </section>
       </div>

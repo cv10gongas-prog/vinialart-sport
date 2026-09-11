@@ -480,7 +480,7 @@ function KonvaStageInner({
           <Line
             points={contourPoints}
             closed
-            stroke="#5ac8fa"
+            stroke="rgba(255,255,255,0.5)"
             strokeWidth={1}
             dash={[4, 5]}
             lineJoin="round"
@@ -497,7 +497,7 @@ function KonvaStageInner({
                 ? printArea.shape.cornerRadius
                 : 0
             }
-            stroke="#5ac8fa"
+            stroke="rgba(255,255,255,0.5)"
             strokeWidth={1}
             dash={[4, 5]}
           />
@@ -585,7 +585,7 @@ function KonvaStageInner({
         {isEditMode && snap.v && (
           <Line
             points={[centerX, paY, centerX, paY + paH]}
-            stroke="#ff1fa4"
+            stroke="rgba(255,255,255,0.65)"
             strokeWidth={1.5}
             dash={[6, 4]}
             listening={false}
@@ -595,7 +595,7 @@ function KonvaStageInner({
         {isEditMode && snap.h && (
           <Line
             points={[paX, centerY, paX + paW, centerY]}
-            stroke="#ff1fa4"
+            stroke="rgba(255,255,255,0.65)"
             strokeWidth={1.5}
             dash={[6, 4]}
             listening={false}
@@ -606,11 +606,11 @@ function KonvaStageInner({
           <Transformer
             name="selection-transformer"
             ref={transformerRef}
-            borderStroke="#5ac8fa"
+            borderStroke="rgba(255,255,255,0.85)"
             borderStrokeWidth={1}
             borderDash={[3, 3]}
-            anchorFill="#0f1115"
-            anchorStroke="#5ac8fa"
+            anchorFill="#ffffff"
+            anchorStroke="rgba(255,255,255,0.9)"
             anchorStrokeWidth={1}
             anchorSize={9}
             anchorCornerRadius={5}

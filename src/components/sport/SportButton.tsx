@@ -1,30 +1,36 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Link } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Unified button system: pill shaped, editorial typography, subtle motion.
+ * `shape` is kept for API compatibility but both values are now rounded so the
+ * whole site shares one consistent silhouette.
+ */
 export const sportButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 font-display text-xs uppercase tracking-[0.14em] transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  "inline-flex items-center justify-center gap-2 rounded-full font-display text-[0.72rem] uppercase tracking-[0.18em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   {
     variants: {
       variant: {
         primary:
+          "bg-foreground text-background hover:bg-foreground/90 hover:shadow-lift",
+        magenta:
           "bg-magenta text-primary-foreground hover:shadow-glow-magenta hover:brightness-110",
-        cyan: "bg-cyan text-accent-foreground hover:shadow-glow-cyan hover:brightness-110",
+        cyan: "bg-cyan text-accent-foreground hover:shadow-glow-cyan hover:brightness-105",
         outline:
-          "border border-border bg-transparent text-foreground hover:border-cyan hover:text-cyan",
+          "border border-input bg-transparent text-foreground hover:border-foreground/45 hover:bg-foreground/5",
         ghost: "bg-transparent text-muted-foreground hover:text-foreground",
         gradient:
           "bg-sport-gradient text-background hover:brightness-110 hover:shadow-glow-magenta",
       },
       size: {
-        sm: "h-9 px-4",
-        md: "h-11 px-6",
-        lg: "h-14 px-8 text-sm",
+        sm: "h-9 px-5",
+        md: "h-11 px-7",
+        lg: "h-14 px-9 text-[0.78rem]",
       },
       shape: {
-        slant: "[clip-path:polygon(10px_0,100%_0,calc(100%-10px)_100%,0_100%)]",
-        square: "rounded-sm",
+        slant: "rounded-full",
+        square: "rounded-full",
       },
     },
     defaultVariants: { variant: "primary", size: "md", shape: "slant" },
