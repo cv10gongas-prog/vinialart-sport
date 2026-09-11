@@ -1,14 +1,14 @@
 import { useRef } from "react";
 import {
   Upload,
-  RotateCw,
-  RotateCcw,
   Maximize,
   Minimize,
   Copy,
   Trash2,
   Undo2,
   Redo2,
+  AlignCenterHorizontal,
+  AlignCenterVertical,
 } from "lucide-react";
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,13 @@ interface CustomizerControlPanelProps {
   className?: string | undefined;
 }
 
+const chip =
+  "inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-border bg-transparent px-4 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-foreground transition-colors hover:border-foreground/40 hover:bg-foreground/5 disabled:opacity-35 disabled:hover:bg-transparent";
+
+/**
+ * Minimal, commercial control rail: upload, fit, sliders, duplicate, remove.
+ * No technical vocabulary and no boxed-in software panels.
+ */
 export function CustomizerControlPanel({
   customizer,
   className,
@@ -34,7 +41,6 @@ export function CustomizerControlPanel({
     smartFit,
     coverFit,
     alignSelected,
-    rotateSelected,
     copyDesignToOtherSurface,
     deleteLayer,
     addImagesFromFiles,
@@ -45,11 +51,12 @@ export function CustomizerControlPanel({
 
   const isShinGuard =
     state.activeSurfaceId === "LEFT" || state.activeSurfaceId === "RIGHT";
+
   const otherSideLabel = isShinGuard
     ? state.activeSurfaceId === "LEFT"
-      ? "Copiar para Direita"
-      : "Copiar para Esquerda"
-    : "Copiar para Costas";
+      ? "Copiar para a direita"
+      : "Copiar para a esquerda"
+    : "Copiar para o outro lado";
 
   const otherSurface = config.surfaces.find(
     (s) => s.id !== state.activeSurfaceId,
@@ -62,212 +69,192 @@ export function CustomizerControlPanel({
     }
   }
 
-  const currentLayer = selectedLayer ?? activeLayers[activeLayers.length - 1] ?? null;
+  const currentLayer =
+    selectedLayer ?? activeLayers[activeLayers.length - 1] ?? null;
 
-  function handleScaleChange(delta: number) {
-    if (!currentLayer) return;
-    const currentScale = currentLayer.scaleX ?? 1;
-    const newScale = Math.max(0.1, Math.min(5, currentScale + delta));
-    updateLayer(currentLayer.id, {
-      scaleX: newScale,
-      scaleY: newScale,
-    });
-  }
+  const scale = currentLayer?.scaleX ?? 1;
+  const rotation = currentLayer?.rotation ?? 0;
 
   return (
-    <div className={cn("flex flex-col gap-5", className)}>
-      {/* 1. CARREGAR DESIGN */}
-      <div className="border border-border/80 bg-surface p-5">
-        <h3 className="font-display text-base font-bold uppercase text-foreground">
-          Carregar Design
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Carrega o teu ficheiro para veres o resultado aplicado imediatamente.
-        </p>
+    <div className={cn("flex flex-col gap-8", className)}>
+      {/* CARREGAR DESIGN */}
+      <div>
+        <p className="label-eyebrow">Tenho o design pronto</p>
 
         <input
           ref={fileInputRef}
           type="file"
+          multiple
           accept="image/png,image/jpeg,image/webp,application/pdf"
           onChange={handleFileSelect}
           className="hidden"
           id="customizer-file-input"
         />
 
-        <div className="mt-4 flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex h-12 w-full items-center justify-center gap-2 border-2 border-cyan bg-cyan font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors shadow-glow-cyan"
-          >
-            <Upload className="h-4 w-4" />
-            <span>Carregar Ficheiro</span>
-          </button>
-          <span className="text-center font-mono text-[0.62rem] text-muted-foreground">
-            PNG, JPG, WEBP ou PDF
-          </span>
-        </div>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-full bg-foreground py-4 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90"
+        >
+          <Upload className="h-4 w-4" />
+          <span>Carregar design</span>
+        </button>
+
+        <p className="mt-3 text-xs text-muted-foreground">
+          PNG, JPG, WEBP ou PDF. Arrasta e liberta também funciona.
+        </p>
       </div>
 
-      {/* 2. CONTROLOS DE POSICIONAMENTO E AJUSTE */}
-      <div className="border border-border/80 bg-surface p-5">
-        <div className="flex items-center justify-between border-b border-border/60 pb-2">
-          <span className="font-display text-xs uppercase tracking-wider font-bold text-foreground">
-            Ajustar Posição
-          </span>
+      {/* AJUSTE */}
+      <div className="border-t border-border pt-8">
+        <div className="flex items-center justify-between">
+          <p className="label-eyebrow">Ajuste</p>
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={undo}
               disabled={!canUndo}
-              title="Desfazer"
-              className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+              aria-label="Desfazer"
+              className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground disabled:opacity-30"
             >
-              <Undo2 className="h-3.5 w-3.5" />
+              <Undo2 className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={redo}
               disabled={!canRedo}
-              title="Refazer"
-              className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+              aria-label="Refazer"
+              className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground disabled:opacity-30"
             >
-              <Redo2 className="h-3.5 w-3.5" />
+              <Redo2 className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Botões Ajustar & Preencher */}
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={smartFit}
             disabled={!currentLayer}
-            className="flex items-center justify-center gap-1.5 border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
+            className={chip}
           >
             <Minimize className="h-3.5 w-3.5" />
-            <span>Ajustar</span>
+            Ajustar
           </button>
           <button
             type="button"
             onClick={coverFit}
             disabled={!currentLayer}
-            className="flex items-center justify-center gap-1.5 border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
+            className={chip}
           >
             <Maximize className="h-3.5 w-3.5" />
-            <span>Preencher</span>
+            Preencher
           </button>
-        </div>
-
-        {/* Centrar H / V */}
-        <div className="mt-2 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => alignSelected("horizontal")}
             disabled={!currentLayer}
-            className="border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
+            aria-label="Centrar horizontalmente"
+            className={chip}
           >
-            Centrar H
+            <AlignCenterVertical className="h-3.5 w-3.5" />
+            Centrar
           </button>
           <button
             type="button"
             onClick={() => alignSelected("vertical")}
             disabled={!currentLayer}
-            className="border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
+            aria-label="Centrar verticalmente"
+            className={chip}
           >
-            Centrar V
+            <AlignCenterHorizontal className="h-3.5 w-3.5" />
+            Alinhar
           </button>
         </div>
+      </div>
 
-        {/* Escala */}
-        <div className="mt-4 border-t border-border/60 pt-3">
-          <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground">
-            Escala / Tamanho
+      {/* TAMANHO */}
+      <div className="border-t border-border pt-8">
+        <div className="flex items-baseline justify-between">
+          <label htmlFor="size-slider" className="label-eyebrow">
+            Tamanho
+          </label>
+          <span className="text-xs text-muted-foreground">
+            {Math.round(scale * 100)}%
           </span>
-          <div className="mt-2 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleScaleChange(-0.15)}
-              disabled={!currentLayer}
-              className="flex-1 border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
-            >
-              − Diminuir
-            </button>
-            <button
-              type="button"
-              onClick={() => handleScaleChange(0.15)}
-              disabled={!currentLayer}
-              className="flex-1 border border-border bg-background py-2 font-display text-xs uppercase tracking-wider text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
-            >
-              + Aumentar
-            </button>
-          </div>
         </div>
+        <input
+          id="size-slider"
+          type="range"
+          min={0.2}
+          max={3}
+          step={0.02}
+          value={scale}
+          disabled={!currentLayer}
+          onChange={(event) => {
+            if (!currentLayer) return;
+            const value = Number(event.target.value);
+            updateLayer(currentLayer.id, { scaleX: value, scaleY: value });
+          }}
+          className="mt-4 h-1 w-full cursor-pointer appearance-none rounded-full bg-input accent-cyan disabled:opacity-40"
+        />
+      </div>
 
-        {/* Rotação */}
-        <div className="mt-4 border-t border-border/60 pt-3">
-          <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground">
+      {/* ROTAÇÃO */}
+      <div className="border-t border-border pt-8">
+        <div className="flex items-baseline justify-between">
+          <label htmlFor="rotation-slider" className="label-eyebrow">
             Rotação
+          </label>
+          <span className="text-xs text-muted-foreground">
+            {Math.round(rotation)}°
           </span>
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => rotateSelected(-15)}
-              disabled={!currentLayer}
-              className="border border-border bg-background py-2 font-mono text-xs uppercase text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
-            >
-              -15°
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (currentLayer) updateLayer(currentLayer.id, { rotation: 0 });
-              }}
-              disabled={!currentLayer}
-              className="border border-border bg-background py-2 font-mono text-xs uppercase text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
-            >
-              0°
-            </button>
-            <button
-              type="button"
-              onClick={() => rotateSelected(15)}
-              disabled={!currentLayer}
-              className="border border-border bg-background py-2 font-mono text-xs uppercase text-foreground hover:border-cyan hover:text-cyan disabled:opacity-40 transition-colors"
-            >
-              +15°
-            </button>
-          </div>
         </div>
+        <input
+          id="rotation-slider"
+          type="range"
+          min={-180}
+          max={180}
+          step={1}
+          value={rotation}
+          disabled={!currentLayer}
+          onChange={(event) => {
+            if (!currentLayer) return;
+            updateLayer(currentLayer.id, {
+              rotation: Number(event.target.value),
+            });
+          }}
+          className="mt-4 h-1 w-full cursor-pointer appearance-none rounded-full bg-input accent-cyan disabled:opacity-40"
+        />
+      </div>
 
-        {/* Copiar para o outro lado */}
-        {otherSurface && (
-          <div className="mt-4 border-t border-border/60 pt-3">
+      {/* AÇÕES SECUNDÁRIAS */}
+      {(otherSurface || currentLayer) && (
+        <div className="flex flex-wrap gap-2 border-t border-border pt-8">
+          {otherSurface && (
             <button
               type="button"
               onClick={() => copyDesignToOtherSurface(otherSurface.id)}
               disabled={activeLayers.length === 0}
-              className="flex w-full items-center justify-center gap-1.5 border border-magenta/50 bg-magenta/10 py-2 font-display text-xs uppercase tracking-wider text-magenta hover:bg-magenta hover:text-white disabled:opacity-30 transition-colors"
+              className={chip}
             >
               <Copy className="h-3.5 w-3.5" />
-              <span>{otherSideLabel}</span>
+              {otherSideLabel}
             </button>
-          </div>
-        )}
+          )}
 
-        {/* Remover design */}
-        {currentLayer && (
-          <div className="mt-3">
+          {currentLayer && (
             <button
               type="button"
               onClick={() => deleteLayer(currentLayer.id)}
-              className="flex w-full items-center justify-center gap-1.5 border border-red-500/30 bg-red-500/10 py-1.5 font-mono text-xs uppercase tracking-wider text-red-400 hover:bg-red-500 hover:text-white transition-colors"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
             >
-              <Trash2 className="h-3 w-3" />
-              <span>Remover Imagem</span>
+              <Trash2 className="h-3.5 w-3.5" />
+              Remover
             </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

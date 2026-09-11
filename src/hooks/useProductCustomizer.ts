@@ -1001,7 +1001,7 @@ export function useProductCustomizer(
             if (layer.type === "image") {
               return {
                 ...common,
-                blendMode: layer.blendMode ?? "multiply",
+                blendMode: layer.blendMode ?? "normal",
                 source: {
                   filename: layer.filename,
                   /** IndexedDB key of the original high-resolution upload */
