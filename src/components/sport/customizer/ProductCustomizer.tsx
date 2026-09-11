@@ -1,21 +1,24 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import {
-  CheckCircle,
   Eye,
-  Maximize2,
-  Minus,
-  Plus,
-  RotateCcw,
   ShoppingBag,
+  CheckCircle,
+  ArrowRight,
+  Sparkles,
+  Box,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import { CanvasEditor } from "./CanvasEditor";
-import { CustomizerToolbar } from "./CustomizerToolbar";
-import { ProductLivePreview, ProductPresentationModal } from "./ProductLivePreview";
+import { CustomizerControlPanel } from "./CustomizerControlPanel";
+import { ProductPresentationModal } from "./ProductLivePreview";
+
+const Product3DViewer = lazy(() =>
+  import("./Product3DViewer").then((mod) => ({ default: mod.Product3DViewer }))
+);
 
 import { useProductCustomizer } from "@/hooks/useProductCustomizer";
 import { useCart } from "@/lib/cart/store";
-import { SportButton } from "@/components/sport/SportButton";
 import { cn } from "@/lib/utils";
 
 import type { ProductCustomizerConfig } from "@/lib/customizer/types";
@@ -43,31 +46,30 @@ export function ProductCustomizer({
     activeSurface,
     exportCustomerPreview,
     serializeDesign,
-    zoom,
-    zoomIn,
-    zoomOut,
-    resetZoom,
   } = customizer;
 
   const { addItem, updateItem } = useCart();
 
   const [savedToCart, setSavedToCart] = useState(false);
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
-  const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [viewDimension, setViewDimension] = useState<"2D" | "3D">("2D");
+
+  // Real 3D support is only enabled where solid: Caneleiras and Bandeira
+  const supports3D =
+    config.id === "caneleiras-personalizadas" ||
+    config.id === "bandeira-personalizada";
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;
 
-    // Design payload + production spec (exact placement data for print/WooCommerce)
     let customizerDesign = serializeDesign();
-
     try {
       customizerDesign = JSON.stringify({
         ...JSON.parse(customizerDesign),
         productionSpec: customizer.buildProductionSpec(),
       });
     } catch {
-      // keep the plain design payload if merging fails
+      // fallback to plain design
     }
 
     if (cartItemId) {
@@ -84,287 +86,181 @@ export function ProductCustomizer({
     }
 
     setSavedToCart(true);
-
     window.setTimeout(() => {
       setSavedToCart(false);
-    }, 2500);
+    }, 3000);
   }
 
-  const zoomPercent = Math.round((zoom ?? 1) * 100);
-
   return (
-    <div
-      className={cn(
-        "card-sport p-4 hover:!translate-y-0 sm:p-6",
-        className,
-      )}
-    >
-      {/* Top Header Bar: Product Title + Presentation Action */}
+    <div className={cn("flex flex-col gap-6", className)}>
+      {/* 1. TÍTULO DO PRODUTO & CONTROLO DE VISTA */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-cyan">
-              VinilArt Sport Studio
-            </span>
-            <span className="font-mono text-[0.58rem] text-muted-foreground">
-              • Preço sob consulta
-            </span>
-          </div>
-
-          <h1 className="mt-1 font-display text-xl sm:text-2xl">
+          <span className="font-mono text-xs uppercase tracking-widest text-cyan font-bold">
+            Personalização Online
+          </span>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-black uppercase text-foreground">
             {config.name}
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsPresentationOpen(true)}
-            className="flex items-center gap-1.5 border border-magenta/60 bg-magenta/10 px-3.5 py-2 font-display text-xs uppercase tracking-wider text-magenta hover:bg-magenta hover:text-white transition-colors"
-          >
-            <Eye className="h-3.5 w-3.5" />
-            <span>Ver Resultado</span>
-          </button>
-        </div>
-      </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Tabs de Superfície: [ CANELEIRA ESQUERDA ] [ CANELEIRA DIREITA ] ou [ FRENTE ] [ COSTAS ] */}
+          {config.surfaces.length > 1 && (
+            <div className="flex items-center gap-1.5 bg-surface p-1 border border-border">
+              {config.surfaces.map((surface) => {
+                const active = state.activeSurfaceId === surface.id;
+                return (
+                  <button
+                    key={surface.id}
+                    type="button"
+                    onClick={() => setSurface(surface.id)}
+                    className={cn(
+                      "px-4 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
+                      active
+                        ? "bg-cyan text-black shadow-glow-cyan"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {surface.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-      {/* Surface Switcher Tabs: Caneleira Esquerda | Caneleira Direita OR Frente | Costas */}
-      <div
-        className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3"
-        role="tablist"
-        aria-label="Áreas de personalização"
-      >
-        <div className="flex flex-wrap gap-2">
-          {config.surfaces.map((surface, index) => {
-            const active = state.activeSurfaceId === surface.id;
-            const activeColorClass =
-              index === 0
-                ? "bg-magenta text-white"
-                : index === 1
-                  ? "bg-cyan text-black"
-                  : "bg-yellow text-black";
-
-            return (
+          {/* Toggle 2D / 3D: apenas visível se 3D verdadeiro estiver disponível */}
+          {supports3D && (
+            <div className="flex items-center gap-1 bg-surface p-1 border border-border">
               <button
-                key={surface.id}
                 type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSurface(surface.id)}
+                onClick={() => setViewDimension("2D")}
                 className={cn(
-                  "border px-4 py-2 font-display text-[0.65rem] uppercase tracking-wider transition-all",
-                  active
-                    ? activeColorClass + " border-transparent shadow-sm"
-                    : "border-border bg-surface text-muted-foreground hover:border-cyan hover:text-foreground",
+                  "flex items-center gap-1.5 px-3 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
+                  viewDimension === "2D"
+                    ? "bg-white text-black"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {surface.label}
+                <ImageIcon className="h-3.5 w-3.5" />
+                <span>2D</span>
               </button>
-            );
-          })}
-        </div>
-
-        {/* Zoom Controls for Design Canvas */}
-        <div className="flex items-center gap-1 border border-border/80 bg-surface px-2 py-1">
-          <span className="mr-1 font-mono text-[0.58rem] uppercase tracking-wider text-muted-foreground">
-            Zoom
-          </span>
-          <button
-            type="button"
-            onClick={zoomOut}
-            aria-label="Diminuir zoom"
-            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Minus className="h-3 w-3" />
-          </button>
-
-          <button
-            type="button"
-            onClick={resetZoom}
-            title="Repor zoom 100%"
-            className="min-w-10 font-mono text-[0.6rem] text-cyan hover:underline"
-          >
-            {zoomPercent}%
-          </button>
-
-          <button
-            type="button"
-            onClick={zoomIn}
-            aria-label="Aumentar zoom"
-            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Plus className="h-3 w-3" />
-          </button>
-
-          <button
-            type="button"
-            onClick={resetZoom}
-            title="Repor zoom inicial"
-            aria-label="Repor zoom"
-            className="ml-1 border-l border-border/60 pl-1.5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <RotateCcw className="h-2.5 w-2.5" />
-          </button>
+              <button
+                type="button"
+                onClick={() => setViewDimension("3D")}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 font-display text-xs uppercase tracking-wider font-bold transition-all",
+                  viewDimension === "3D"
+                    ? "bg-cyan text-black shadow-glow-cyan"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Box className="h-3.5 w-3.5" />
+                <span>3D</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Main Studio Workspace: 2 Columns on Desktop */}
-      {/* Left (65-70%): Big Design Canvas. Right (30-35%): Live Preview + Tools + CTA */}
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
-        {/* LEFT: Big Design Workspace Canvas */}
-        <div className="flex min-w-0 flex-col lg:sticky lg:top-24">
-          <div
-            onDragOver={(event) => {
-              event.preventDefault();
-              setIsDraggingFile(true);
-            }}
-            onDragLeave={() => setIsDraggingFile(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setIsDraggingFile(false);
+      {/* 2. NOVO LAYOUT PREMIUM (70% PRODUTO / 30% CONTROLOS):
+             ESQUERDA: PRODUTO GRANDE COM ARTE APLICADA (2D ou 3D INTERATIVO)
+             DIREITA: PAINEL DE CONTROLO COMERCIAL LIMPO
+      */}
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
+        {/* COLUNA: O PRODUTO É O PREVIEW PRINCIPAL */}
+        <div className="order-1 lg:order-1 relative overflow-hidden border border-border/80 bg-[#06080b] p-2 sm:p-6 flex flex-col items-center justify-center min-h-[480px]">
+          {/* Subtitle discreto */}
+          <div className="mb-2 flex w-full items-center justify-between font-mono text-[0.68rem] text-muted-foreground">
+            <span className="uppercase tracking-wider text-cyan font-semibold">
+              {activeSurface.label}
+            </span>
+            <span className="hidden sm:inline">
+              {viewDimension === "3D" ? "Arrasta para rodar em 3D" : "Arrasta para mover · Clica e ajusta"}
+            </span>
+          </div>
 
-              if (event.dataTransfer.files.length > 0) {
-                customizer.addImagesFromFiles(
-                  event.dataTransfer.files,
-                );
-              }
-            }}
-            className={cn(
-              "relative flex min-w-0 flex-1 flex-col overflow-hidden border bg-black/95 shadow-inner transition-colors",
-              isDraggingFile
-                ? "border-magenta"
-                : "border-border",
-            )}
-          >
-            {/* Top Workspace Header */}
-            <div className="flex items-center justify-between border-b border-border/60 bg-surface/80 px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-cyan" />
-                <span className="font-display text-[0.65rem] uppercase tracking-widest text-foreground">
-                  Área de Design // {activeSurface.label}
-                </span>
-              </div>
-              <span className="hidden font-mono text-[0.55rem] uppercase tracking-wider text-muted-foreground sm:inline">
-                Arrasta imagens para aqui · setas movem · Del apaga
-              </span>
-            </div>
-
-            {/* Design Canvas Viewport */}
-            <div className="relative flex w-full min-w-0 items-center justify-center p-2 sm:p-3">
-              {/* Stage keeps the product proportions so there is no dead space */}
-              <div
-                className="relative mx-auto w-full min-w-0"
-                style={{
-                  aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
-                  maxHeight: "min(66vh, 620px)",
-                  maxWidth: `calc(min(66vh, 620px) * ${config.canvasWidth / config.canvasHeight})`,
-                }}
-              >
-                <CanvasEditor config={config} customizer={customizer} />
-              </div>
-
-              {isDraggingFile && (
-                <div className="pointer-events-none absolute inset-2 flex items-center justify-center border-2 border-dashed border-magenta bg-magenta/10">
-                  <span className="font-display text-xs uppercase tracking-widest text-magenta">
-                    Larga a imagem para adicionar
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Quick gizmo actions for the selected artwork */}
+          {/* O PRODUTO EM 2D (Konva) OU EM 3D (Three.js PBR) */}
+          {supports3D && (
             <div
-              className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] px-3 py-2"
-              style={{ background: "#121214" }}
+              className={cn(
+                "relative h-[540px] w-full items-center justify-center",
+                viewDimension === "3D" ? "flex" : "hidden",
+              )}
             >
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  disabled={!customizer.selectedLayer}
-                  onClick={() => customizer.alignSelected("horizontal")}
-                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
-                >
-                  Centrar H
-                </button>
-
-                <button
-                  type="button"
-                  disabled={!customizer.selectedLayer}
-                  onClick={() => customizer.alignSelected("vertical")}
-                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
-                >
-                  Centrar V
-                </button>
-
-                <button
-                  type="button"
-                  disabled={!customizer.selectedLayer}
-                  onClick={() => {
-                    if (customizer.selectedLayer) {
-                      customizer.deleteLayer(customizer.selectedLayer.id);
-                    }
-                  }}
-                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-destructive hover:text-destructive disabled:opacity-30"
-                >
-                  Limpar camada
-                </button>
-              </div>
-
-              <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-                {activeSurface.label}
-              </span>
+              <Suspense
+                fallback={
+                  <div className="flex h-full w-full items-center justify-center text-xs font-mono text-muted-foreground uppercase">
+                    A inicializar estúdio 3D…
+                  </div>
+                }
+              >
+                <Product3DViewer
+                  config={config}
+                  customizer={customizer}
+                  className="h-full w-full"
+                  onFallbackTo2D={() => setViewDimension("2D")}
+                />
+              </Suspense>
             </div>
+          )}
+
+          <div
+            className={cn(
+              "relative flex w-full items-center justify-center",
+              viewDimension === "3D" && supports3D && "hidden",
+            )}
+            style={{
+              aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
+              maxHeight: "min(75vh, 660px)",
+            }}
+          >
+            <CanvasEditor config={config} customizer={customizer} />
           </div>
         </div>
 
-        {/* RIGHT: Live Preview (Top) + Tooling & Layers (Middle) + Action (Bottom) */}
-        <div className="flex min-w-0 flex-col gap-5">
-          {/* 1. Live 2.5D Mockup Preview */}
-          <ProductLivePreview
-            config={config}
-            customizer={customizer}
-            onOpenPresentation={() => setIsPresentationOpen(true)}
-          />
+        {/* COLUNA: PAINEL DE CONTROLO + CTAS */}
+        <div className="order-2 lg:order-2 flex flex-col gap-5">
+          <CustomizerControlPanel customizer={customizer} />
 
-          {/* 2. Simplified Tools & Layer Management */}
-          <div
-            className="rounded-md border border-white/[0.07] p-4"
-            style={{ background: "#1a1a1e" }}
-          >
-            <CustomizerToolbar customizer={customizer} />
-          </div>
+          {/* AÇÕES FINAIS: VER RESULTADO + ADICIONAR AO PEDIDO */}
+          <div className="flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsPresentationOpen(true)}
+              className="flex h-12 w-full items-center justify-center gap-2 border border-magenta bg-magenta/10 font-display text-xs uppercase tracking-wider text-magenta font-bold hover:bg-magenta hover:text-white transition-colors"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Ver Resultado Final</span>
+            </button>
 
-          {/* 3. Primary CTA: Add to Order / Update */}
-          <div className="mt-1">
-            <SportButton
-              size="lg"
+            <button
+              type="button"
               onClick={handleAddToCart}
               className={cn(
-                "w-full justify-center shadow-lg",
-                savedToCart && "border-green-500 bg-green-500/15 text-green-400",
+                "flex h-14 w-full items-center justify-center gap-2 font-display text-sm uppercase tracking-wider font-bold transition-all shadow-lg",
+                savedToCart
+                  ? "bg-green-600 text-white"
+                  : "bg-cyan text-black hover:bg-cyan/90 shadow-glow-cyan",
               )}
             >
               {savedToCart ? (
                 <>
-                  <CheckCircle className="h-4 w-4" />
-                  <span>
-                    {cartItemId ? "Personalização atualizada" : "Guardado no pedido"}
-                  </span>
+                  <CheckCircle className="h-5 w-5" />
+                  <span>{cartItemId ? "Alterações Guardadas" : "Guardado no Pedido"}</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="h-4 w-4" />
-                  <span>
-                    {cartItemId ? "Guardar alterações" : "Adicionar ao pedido"}
-                  </span>
+                  <ShoppingBag className="h-5 w-5" />
+                  <span>{cartItemId ? "Guardar Alterações" : "Adicionar ao Pedido"}</span>
                 </>
               )}
-            </SportButton>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Presentation Preview Modal */}
+      {/* Modal de Apresentação / Preview Final Limpo */}
       <ProductPresentationModal
         isOpen={isPresentationOpen}
         onClose={() => setIsPresentationOpen(false)}

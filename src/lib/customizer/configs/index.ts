@@ -81,12 +81,12 @@ export const equipamentoConfig = buildConfig(
       },
       printArea: {
         xFraction: 0.33,
-        yFraction: 0.23,
+        yFraction: 0.22,
         widthFraction: 0.34,
-        heightFraction: 0.58,
+        heightFraction: 0.60,
         shape: {
           type: "rounded",
-          cornerRadius: 16,
+          cornerRadius: 12,
         },
       },
     },
@@ -99,17 +99,31 @@ export const equipamentoConfig = buildConfig(
       },
       printArea: {
         xFraction: 0.33,
-        yFraction: 0.23,
+        yFraction: 0.22,
         widthFraction: 0.34,
-        heightFraction: 0.58,
+        heightFraction: 0.60,
         shape: {
           type: "rounded",
-          cornerRadius: 16,
+          cornerRadius: 12,
         },
       },
     },
   ],
 );
+
+export const FLAG_CONTOUR_POINTS: number[] = [
+  0,0.0288,0.04,0.0133,0.0796,0.004,0.1187,0,0.1575,0.0004,0.1959,0.0044,0.2341,0.0111,
+  0.2722,0.0195,0.3101,0.0288,0.3479,0.0382,0.3857,0.0466,0.4236,0.0532,0.4615,0.0572,
+  0.4996,0.0577,0.5379,0.0537,0.5765,0.0444,0.6154,0.0288,0.6452,0.0163,0.6746,0.0077,
+  0.7035,0.0026,0.7318,0.0004,0.7595,0.0008,0.7864,0.0032,0.8125,0.0071,0.8377,0.012,
+  0.862,0.0175,0.8853,0.0229,0.9076,0.0279,0.9286,0.032,0.9485,0.0346,0.967,0.0353,
+  0.9842,0.0335,1,0.0288,1,0.9712,0.9842,0.9758,0.967,0.9776,0.9485,0.9769,0.9286,0.9743,
+  0.9076,0.9703,0.8853,0.9652,0.862,0.9598,0.8377,0.9543,0.8125,0.9494,0.7864,0.9455,
+  0.7595,0.9431,0.7318,0.9428,0.7035,0.9449,0.6746,0.95,0.6452,0.9586,0.6154,0.9712,
+  0.5765,0.9867,0.5379,0.996,0.4996,1,0.4615,0.9996,0.4236,0.9956,0.3857,0.9889,
+  0.3479,0.9805,0.3101,0.9712,0.2722,0.9618,0.2341,0.9534,0.1959,0.9468,0.1575,0.9428,
+  0.1187,0.9423,0.0796,0.9463,0.04,0.9556,0,0.9712
+];
 
 export const bandeiraConfig = buildConfig(
   "bandeira-personalizada",
@@ -123,13 +137,13 @@ export const bandeiraConfig = buildConfig(
         baseSrc: flagWhite,
       },
       printArea: {
-        xFraction: 0.165,
-        yFraction: 0.16,
-        widthFraction: 0.69,
-        heightFraction: 0.58,
+        xFraction: 0.1325,
+        yFraction: 0.1464,
+        widthFraction: 0.78,
+        heightFraction: 0.5571,
         shape: {
-          type: "rounded",
-          cornerRadius: 10,
+          type: "contour",
+          points: FLAG_CONTOUR_POINTS,
         },
       },
     },

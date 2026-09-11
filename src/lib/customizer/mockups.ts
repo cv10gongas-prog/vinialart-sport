@@ -12,105 +12,141 @@ function svgData(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-const darkBackground = `
+const studioGradientsAndFilters = `
   <defs>
-    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
-      <stop offset="0%" stop-color="#171b22"/>
-      <stop offset="60%" stop-color="#090b0f"/>
-      <stop offset="100%" stop-color="#030405"/>
+    <!-- Deep premium studio background -->
+    <radialGradient id="bg" cx="50%" cy="48%" r="68%">
+      <stop offset="0%" stop-color="#151922"/>
+      <stop offset="55%" stop-color="#0b0e13"/>
+      <stop offset="100%" stop-color="#030406"/>
     </radialGradient>
 
-    <linearGradient id="whiteShell" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Shell white surface with subtle anatomical 3D depth and rim lighting -->
+    <linearGradient id="whiteShell" x1="12%" y1="0%" x2="88%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="42%" stop-color="#f9fafb"/>
-      <stop offset="72%" stop-color="#e9edf1"/>
-      <stop offset="100%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#fafbfd"/>
+      <stop offset="65%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
     </linearGradient>
 
-    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="0%">
+    <!-- Physical edge bevel and thickness rim (3D injection molded border) -->
+    <linearGradient id="edgeBevel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#cbd5e1" stop-opacity="0.6"/>
+      <stop offset="75%" stop-color="#94a3b8" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#475569" stop-opacity="0.7"/>
+    </linearGradient>
+
+    <!-- Subtle specular surface reflection (gloss) -->
+    <linearGradient id="specularGloss" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
-      <stop offset="45%" stop-color="#ffffff" stop-opacity=".42"/>
-      <stop offset="58%" stop-color="#ffffff" stop-opacity=".08"/>
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.32"/>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
 
-    <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="18"/>
-      <feOffset dy="18"/>
-      <feColorMatrix
-        type="matrix"
-        values="0 0 0 0 0
-                0 0 0 0 0
-                0 0 0 0 0
-                0 0 0 .65 0"
-      />
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <!-- Jersey athletic knit texture simulation -->
+    <linearGradient id="jerseyShade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#f8fafc"/>
+      <stop offset="85%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+
+    <!-- Jersey side panel shadow -->
+    <linearGradient id="jerseySideShadowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="jerseySideShadowRight" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Realistic physical drop shadow with ambient occlusion -->
+    <filter id="physicalShadow" x="-30%" y="-20%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#000000" flood-opacity="0.88"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
     </filter>
   </defs>
 `;
 
 export const shinGuardSingleWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
 
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <ellipse
-    cx="400"
-    cy="730"
-    rx="165"
-    ry="22"
-    fill="#000"
-    opacity=".55"
-  />
+  <!-- Physical ground shadow / ambient contact shadow -->
+  <ellipse cx="400" cy="740" rx="180" ry="26" fill="#000000" opacity="0.85" filter="blur(12px)"/>
+  <ellipse cx="400" cy="735" rx="130" ry="15" fill="#000000" opacity="0.95"/>
 
-  <g filter="url(#shadow)">
+  <!-- Shin Guard Body -->
+  <g filter="url(#physicalShadow)">
+    <!-- Outer rear backing edge (subtle dark contour peeking through) -->
     <path
       d="
-        M400 82
-        C510 82 568 145 565 260
-        L548 555
-        C543 650 490 704 400 719
-        C310 704 257 650 252 555
-        L235 260
-        C232 145 290 82 400 82
+        M400 42
+        C498 42 584 82 589 190
+        C594 280 579 420 559 560
+        C544 657 488 729 400 739
+        C312 729 256 657 241 560
+        C221 420 206 280 211 190
+        C216 82 302 42 400 42
+        Z
+      "
+      fill="#1e242d"
+      opacity="0.9"
+    />
+
+    <!-- Base Shell: Anatomical contour (exact approved single source of truth contour) -->
+    <path
+      d="
+        M400 45
+        C495 45 580 85 585 190
+        C590 280 575 420 555 560
+        C540 655 485 725 400 735
+        C315 725 260 655 245 560
+        C225 420 210 280 215 190
+        C220 85 305 45 400 45
         Z
       "
       fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="7"
+      stroke="url(#edgeBevel)"
+      stroke-width="3.5"
     />
 
+    <!-- Subtle inner rim highlight -->
     <path
       d="
-        M400 102
-        C485 102 535 151 532 256
-        L517 548
-        C513 624 470 674 400 688
-        C330 674 287 624 283 548
-        L268 256
-        C265 151 315 102 400 102
+        M400 52
+        C488 52 570 90 575 192
+        C580 278 566 415 547 552
+        C533 644 480 714 400 724
+        C320 714 267 644 253 552
+        C234 415 220 278 225 192
+        C230 90 312 52 400 52
         Z
       "
       fill="none"
       stroke="#ffffff"
-      stroke-opacity=".72"
-      stroke-width="3"
+      stroke-opacity="0.75"
+      stroke-width="2"
     />
 
+    <!-- Anatomical ridge / subtle longitudinal gloss sheen -->
     <path
       d="
-        M310 125
-        C365 95 420 102 458 116
-        C419 210 402 344 395 640
-        C349 570 325 450 310 125
+        M320 70
+        C365 52 435 52 480 70
+        C445 220 430 420 415 710
+        C385 710 365 420 320 70
         Z
       "
-      fill="url(#shine)"
-      opacity=".7"
+      fill="url(#specularGloss)"
+      opacity="0.8"
     />
   </g>
 </svg>
@@ -118,164 +154,169 @@ export const shinGuardSingleWhite = svgData(`
 
 export const shinGuardPairWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
 
   <rect width="1200" height="900" fill="url(#bg)"/>
 
-  <ellipse cx="405" cy="808" rx="205" ry="28" fill="#000" opacity=".6"/>
-  <ellipse cx="795" cy="808" rx="205" ry="28" fill="#000" opacity=".6"/>
+  <!-- Contact Shadows -->
+  <ellipse cx="380" cy="815" rx="185" ry="26" fill="#000000" opacity="0.85" filter="blur(14px)"/>
+  <ellipse cx="820" cy="815" rx="185" ry="26" fill="#000000" opacity="0.85" filter="blur(14px)"/>
+  <ellipse cx="380" cy="810" rx="125" ry="15" fill="#000000" opacity="0.95"/>
+  <ellipse cx="820" cy="810" rx="125" ry="15" fill="#000000" opacity="0.95"/>
 
-  <g filter="url(#shadow)" transform="translate(-20 0)">
+  <!-- Left Shin Guard -->
+  <g filter="url(#physicalShadow)" transform="translate(380 435) rotate(-3) translate(-400 -390)">
     <path
       d="
-        M420 100
-        C530 100 588 160 585 270
-        L568 615
-        C563 700 510 755 420 770
-        C330 755 277 700 272 615
-        L255 270
-        C252 160 310 100 420 100
+        M400 42
+        C498 42 584 82 589 190
+        C594 280 579 420 559 560
+        C544 657 488 729 400 739
+        C312 729 256 657 241 560
+        C221 420 206 280 211 190
+        C216 82 302 42 400 42
+        Z
+      "
+      fill="#1e242d"
+      opacity="0.9"
+    />
+    <path
+      d="
+        M400 45
+        C495 45 580 85 585 190
+        C590 280 575 420 555 560
+        C540 655 485 725 400 735
+        C315 725 260 655 245 560
+        C225 420 210 280 215 190
+        C220 85 305 45 400 45
         Z
       "
       fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="7"
+      stroke="url(#edgeBevel)"
+      stroke-width="3.5"
     />
-
     <path
       d="
-        M335 145
-        C390 112 450 118 485 132
-        C442 244 424 403 418 688
-        C370 610 345 455 335 145
+        M320 70
+        C365 52 435 52 480 70
+        C445 220 430 420 415 710
+        C385 710 365 420 320 70
         Z
       "
-      fill="url(#shine)"
-      opacity=".72"
+      fill="url(#specularGloss)"
+      opacity="0.8"
     />
   </g>
 
-  <g filter="url(#shadow)" transform="translate(380 0)">
+  <!-- Right Shin Guard -->
+  <g filter="url(#physicalShadow)" transform="translate(820 435) rotate(3) translate(-400 -390)">
     <path
       d="
-        M420 100
-        C530 100 588 160 585 270
-        L568 615
-        C563 700 510 755 420 770
-        C330 755 277 700 272 615
-        L255 270
-        C252 160 310 100 420 100
+        M400 42
+        C498 42 584 82 589 190
+        C594 280 579 420 559 560
+        C544 657 488 729 400 739
+        C312 729 256 657 241 560
+        C221 420 206 280 211 190
+        C216 82 302 42 400 42
+        Z
+      "
+      fill="#1e242d"
+      opacity="0.9"
+    />
+    <path
+      d="
+        M400 45
+        C495 45 580 85 585 190
+        C590 280 575 420 555 560
+        C540 655 485 725 400 735
+        C315 725 260 655 245 560
+        C225 420 210 280 215 190
+        C220 85 305 45 400 45
         Z
       "
       fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="7"
+      stroke="url(#edgeBevel)"
+      stroke-width="3.5"
     />
-
     <path
       d="
-        M335 145
-        C390 112 450 118 485 132
-        C442 244 424 403 418 688
-        C370 610 345 455 335 145
+        M320 70
+        C365 52 435 52 480 70
+        C445 220 430 420 415 710
+        C385 710 365 420 320 70
         Z
       "
-      fill="url(#shine)"
-      opacity=".72"
-    />
-  </g>
-</svg>
-`);
-
-export const shinGuardDetailWhite = svgData(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
-  <rect width="800" height="800" fill="url(#bg)"/>
-
-  <g transform="translate(-40 -85) scale(1.18)" filter="url(#shadow)">
-    <path
-      d="
-        M400 82
-        C510 82 568 145 565 260
-        L548 555
-        C543 650 490 704 400 719
-        C310 704 257 650 252 555
-        L235 260
-        C232 145 290 82 400 82
-        Z
-      "
-      fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="7"
-    />
-
-    <path
-      d="
-        M315 120
-        C365 93 430 101 470 120
-        C420 255 405 420 400 660
-        C355 575 328 415 315 120
-        Z
-      "
-      fill="url(#shine)"
-      opacity=".78"
+      fill="url(#specularGloss)"
+      opacity="0.8"
     />
   </g>
 </svg>
 `);
+
+export const shinGuardDetailWhite = shinGuardSingleWhite;
 
 export const shinGuardBackWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
+
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <ellipse cx="400" cy="730" rx="165" ry="22" fill="#000" opacity=".55"/>
+  <ellipse cx="400" cy="740" rx="170" ry="24" fill="#000000" opacity="0.8" filter="blur(10px)"/>
 
-  <g filter="url(#shadow)">
+  <g filter="url(#physicalShadow)">
+    <!-- Rear Lining / Back contour -->
     <path
       d="
-        M400 82
-        C510 82 568 145 565 260
-        L548 555
-        C543 650 490 704 400 719
-        C310 704 257 650 252 555
-        L235 260
-        C232 145 290 82 400 82
+        M400 45
+        C495 45 580 85 585 190
+        C590 280 575 420 555 560
+        C540 655 485 725 400 735
+        C315 725 260 655 245 560
+        C225 420 210 280 215 190
+        C220 85 305 45 400 45
         Z
       "
-      fill="#f7f8fa"
-      stroke="#d4d9df"
-      stroke-width="7"
+      fill="#1c222b"
+      stroke="#2e3846"
+      stroke-width="4"
     />
 
+    <!-- Rear geometric pattern -->
+    <circle cx="400" cy="220" r="10" fill="#12161c"/>
+    <circle cx="360" cy="250" r="10" fill="#12161c"/>
+    <circle cx="440" cy="250" r="10" fill="#12161c"/>
+    <circle cx="400" cy="280" r="10" fill="#12161c"/>
+    <circle cx="360" cy="310" r="10" fill="#12161c"/>
+    <circle cx="440" cy="310" r="10" fill="#12161c"/>
+    <circle cx="400" cy="340" r="10" fill="#12161c"/>
+    <circle cx="360" cy="370" r="10" fill="#12161c"/>
+    <circle cx="440" cy="370" r="10" fill="#12161c"/>
+    <circle cx="400" cy="400" r="10" fill="#12161c"/>
+    <circle cx="370" cy="430" r="10" fill="#12161c"/>
+    <circle cx="430" cy="430" r="10" fill="#12161c"/>
+    <circle cx="400" cy="460" r="10" fill="#12161c"/>
+    <circle cx="380" cy="490" r="10" fill="#12161c"/>
+    <circle cx="420" cy="490" r="10" fill="#12161c"/>
+    <circle cx="400" cy="520" r="10" fill="#12161c"/>
+    <circle cx="400" cy="550" r="8" fill="#12161c"/>
+
+    <!-- Comfort Foam Border Stitching -->
     <path
       d="
-        M400 112
-        C480 112 525 160 522 260
-        L507 548
-        C503 615 462 664 400 676
-        C338 664 297 615 293 548
-        L278 260
-        C275 160 320 112 400 112
+        M400 65
+        C475 65 550 100 555 190
+        C560 270 545 405 528 540
+        C515 628 470 695 400 708
+        C330 695 285 628 272 540
+        C255 405 240 270 245 190
+        C250 100 325 65 400 65
         Z
       "
-      fill="#e9edf1"
-      stroke="#d9dde2"
-      stroke-width="3"
-    />
-
-    <path
-      d="M245 330 H555"
-      stroke="#bcc3ca"
-      stroke-width="18"
-      stroke-linecap="round"
-    />
-
-    <path
-      d="M255 490 H545"
-      stroke="#bcc3ca"
-      stroke-width="18"
-      stroke-linecap="round"
+      fill="none"
+      stroke="#3b4859"
+      stroke-dasharray="6,6"
+      stroke-width="2"
     />
   </g>
 </svg>
@@ -283,45 +324,70 @@ export const shinGuardBackWhite = svgData(`
 
 export const jerseyFrontWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
+
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <ellipse cx="400" cy="710" rx="225" ry="24" fill="#000" opacity=".5"/>
+  <!-- Ambient shadow under shirt -->
+  <ellipse cx="400" cy="740" rx="250" ry="26" fill="#000000" opacity="0.85" filter="blur(16px)"/>
 
-  <g filter="url(#shadow)">
+  <g filter="url(#physicalShadow)">
+    <!-- Realistic Jersey Silhouette: Shoulders, Collar, Sleeves, Torso -->
     <path
       d="
-        M280 175
-        L355 125
-        C370 155 430 155 445 125
-        L520 175
-        L655 245
-        L590 365
-        L535 330
-        L535 680
-        L265 680
-        L265 330
-        L210 365
-        L145 245
+        M275 145
+        L350 115
+        C370 145 430 145 450 115
+        L525 145
+        L670 220
+        L615 350
+        L545 315
+        L550 710
+        C550 715 480 725 400 725
+        C320 725 250 715 250 710
+        L255 315
+        L185 350
+        L130 220
         Z
       "
-      fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="6"
+      fill="url(#jerseyShade)"
+      stroke="#cbd5e1"
+      stroke-width="2"
       stroke-linejoin="round"
     />
 
-    <path
-      d="M355 125 C370 205 430 205 445 125"
-      fill="none"
-      stroke="#d6dbe0"
-      stroke-width="12"
-    />
+    <!-- Side panel depth shading -->
+    <path d="M255 315 L250 710 L275 710 L280 315 Z" fill="url(#jerseySideShadowLeft)" />
+    <path d="M545 315 L550 710 L525 710 L520 315 Z" fill="url(#jerseySideShadowRight)" />
 
+    <!-- Athletic Ribbed V-Collar with inner shadow -->
     <path
-      d="M305 190 C345 168 392 170 430 182 L405 630 C355 575 325 435 305 190 Z"
-      fill="url(#shine)"
-      opacity=".6"
+      d="M350 115 C370 155 430 155 450 115 C435 170 365 170 350 115 Z"
+      fill="#f8fafc"
+      stroke="#94a3b8"
+      stroke-width="2"
+    />
+    <path d="M360 120 C375 145 425 145 440 120" fill="none" stroke="#64748b" stroke-width="1.5"/>
+
+    <!-- Subtle raglan sleeve seams -->
+    <path d="M275 145 L255 315" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+    <path d="M525 145 L550 315" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+
+    <!-- Athletic sleeve cuff hem -->
+    <line x1="130" y1="220" x2="185" y2="350" stroke="#cbd5e1" stroke-width="2.5"/>
+    <line x1="670" y1="220" x2="615" y2="350" stroke="#cbd5e1" stroke-width="2.5"/>
+
+    <!-- Gentle body drape wave / specular sheen -->
+    <path
+      d="
+        M310 160
+        C370 140 430 140 490 160
+        C460 380 440 550 420 720
+        C380 720 350 550 310 160
+        Z
+      "
+      fill="url(#specularGloss)"
+      opacity="0.3"
     />
   </g>
 </svg>
@@ -329,70 +395,106 @@ export const jerseyFrontWhite = svgData(`
 
 export const jerseyBackWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
+
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <ellipse cx="400" cy="710" rx="225" ry="24" fill="#000" opacity=".5"/>
+  <ellipse cx="400" cy="740" rx="250" ry="26" fill="#000000" opacity="0.85" filter="blur(16px)"/>
 
-  <g filter="url(#shadow)">
+  <g filter="url(#physicalShadow)">
     <path
       d="
-        M280 175
-        L350 135
-        C375 155 425 155 450 135
-        L520 175
-        L655 245
-        L590 365
-        L535 330
-        L535 680
-        L265 680
-        L265 330
-        L210 365
-        L145 245
+        M275 145
+        L345 125
+        C375 140 425 140 455 125
+        L525 145
+        L670 220
+        L615 350
+        L545 315
+        L550 710
+        C550 715 480 725 400 725
+        C320 725 250 715 250 710
+        L255 315
+        L185 350
+        L130 220
         Z
       "
-      fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="6"
+      fill="url(#jerseyShade)"
+      stroke="#cbd5e1"
+      stroke-width="2"
       stroke-linejoin="round"
     />
+
+    <!-- Side panel depth shading -->
+    <path d="M255 315 L250 710 L275 710 L280 315 Z" fill="url(#jerseySideShadowLeft)" />
+    <path d="M545 315 L550 710 L525 710 L520 315 Z" fill="url(#jerseySideShadowRight)" />
+
+    <!-- Back Collar Trim with athletic neckline tape -->
+    <path
+      d="M345 125 C375 140 425 140 455 125"
+      fill="none"
+      stroke="#94a3b8"
+      stroke-width="3"
+    />
+
+    <!-- Sleeve seams -->
+    <path d="M275 145 L255 315" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+    <path d="M525 145 L550 315" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+
+    <!-- Sleeve hems -->
+    <line x1="130" y1="220" x2="185" y2="350" stroke="#cbd5e1" stroke-width="2.5"/>
+    <line x1="670" y1="220" x2="615" y2="350" stroke="#cbd5e1" stroke-width="2.5"/>
   </g>
 </svg>
 `);
 
 export const flagWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
+
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <g filter="url(#shadow)">
-    <rect x="112" y="120" width="18" height="585" rx="9" fill="#aeb5bd"/>
+  <!-- Flag and Mast -->
+  <g filter="url(#physicalShadow)">
+    <!-- Flagpole (Mast) with brushed aluminum look -->
+    <rect x="90" y="100" width="16" height="630" rx="8" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+    <circle cx="98" cy="100" r="14" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+    <!-- Pole highlight reflection -->
+    <line x1="94" y1="105" x2="94" y2="720" stroke="#f1f5f9" stroke-width="2" opacity="0.6"/>
 
+    <!-- Flowing wavy flag cloth with organic ripple curves (Exact approved FLAG_CONTOUR_POINTS) -->
     <path
       d="
-        M130 150
-        C245 105 345 195 455 150
-        C565 105 650 175 690 160
-        L690 555
-        C575 600 500 505 390 550
-        C275 598 205 520 130 555
+        M106 130
+        C240 85 360 175 490 130
+        C590 95 680 145 730 130
+        L730 550
+        C680 565 590 515 490 550
+        C360 595 240 505 106 550
         Z
       "
       fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="5"
+      stroke="#cbd5e1"
+      stroke-width="2"
     />
 
+    <!-- Mast attachment grommets -->
+    <circle cx="118" cy="160" r="6" fill="#64748b" stroke="#e2e8f0" stroke-width="2"/>
+    <circle cx="118" cy="340" r="6" fill="#64748b" stroke="#e2e8f0" stroke-width="2"/>
+    <circle cx="118" cy="520" r="6" fill="#64748b" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Subtle wave ripples / highlights -->
     <path
       d="
-        M155 175
-        C280 145 355 215 465 172
-        C555 138 620 185 660 180
+        M220 105
+        C310 140 330 350 320 575
+        M470 135
+        C560 170 580 370 570 540
       "
       fill="none"
-      stroke="#fff"
-      stroke-width="9"
-      opacity=".65"
+      stroke="#ffffff"
+      stroke-width="8"
+      opacity="0.35"
     />
   </g>
 </svg>
@@ -400,42 +502,25 @@ export const flagWhite = svgData(`
 
 export const supporterItemWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
   <rect width="800" height="800" fill="url(#bg)"/>
-
-  <g filter="url(#shadow)">
-    <path
-      d="
-        M105 315
-        Q120 275 165 285
-        H635
-        Q680 275 695 315
-        L675 485
-        Q670 520 625 515
-        H175
-        Q130 520 125 485
-        Z
-      "
-      fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="6"
-    />
-
-    <path d="M125 330 L75 305 M125 365 L70 350 M125 400 L70 400 M125 435 L70 450 M675 330 L725 305 M675 365 L730 350 M675 400 L730 400 M675 435 L730 450"
-      stroke="#eef0f3"
-      stroke-width="9"
-      stroke-linecap="round"
-    />
+  <g filter="url(#physicalShadow)">
+    <rect x="180" y="200" width="440" height="400" rx="16" fill="url(#whiteShell)" stroke="#cbd5e1" stroke-width="2"/>
+    <!-- Clean merchandise / quote placeholder icon -->
+    <circle cx="400" cy="350" r="50" fill="#00c8ff" opacity="0.15"/>
+    <path d="M380 350 L395 365 L425 335" fill="none" stroke="#00c8ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="400" y="450" font-family="Arial, sans-serif" font-size="22" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="3">ARTIGO SOB MEDIDA</text>
+    <text x="400" y="485" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#64748b" text-anchor="middle" letter-spacing="1">PEDIDO PERSONALIZADO</text>
   </g>
 </svg>
 `);
 
 export const printSurfaceWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-  ${darkBackground}
+  ${studioGradientsAndFilters}
   <rect width="800" height="800" fill="url(#bg)"/>
 
-  <g filter="url(#shadow)">
+  <g filter="url(#physicalShadow)">
     <rect
       x="175"
       y="100"
@@ -443,8 +528,8 @@ export const printSurfaceWhite = svgData(`
       height="600"
       rx="10"
       fill="url(#whiteShell)"
-      stroke="#d5dae0"
-      stroke-width="6"
+      stroke="#cbd5e1"
+      stroke-width="4"
     />
 
     <rect
@@ -453,9 +538,9 @@ export const printSurfaceWhite = svgData(`
       width="390"
       height="540"
       rx="4"
-      fill="#fff"
-      stroke="#edf0f2"
-      stroke-width="3"
+      fill="#ffffff"
+      stroke="#e2e8f0"
+      stroke-width="2"
     />
   </g>
 </svg>

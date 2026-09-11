@@ -1,16 +1,13 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Menu, ShoppingBag, X } from "lucide-react";
-import { SportLink } from "./SportButton";
 import { useCart } from "@/lib/cart/store";
 import { VINILART_MAIN_URL } from "@/lib/config";
 
 const nav = [
   { label: "Início", to: "/" },
   { label: "Loja", to: "/loja" },
-  { label: "Personalizar", to: "/personalizar" },
-  { label: "Equipamentos", to: "/equipamentos" },
-  { label: "Adeptos", to: "/adeptos" },
+  { label: "Portfólio", to: "/portfolio" },
   { label: "Contactos", to: "/contactos" },
 ];
 
@@ -58,12 +55,13 @@ export function Header() {
   const { totalItems } = useCart();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md bg-tech-grid">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur-md">
       <div className="brush-rule" aria-hidden="true" />
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Wordmark />
 
-        <nav aria-label="Navegação principal" className="hidden items-center justify-center gap-7 lg:flex">
+        {/* Desktop Nav: INÍCIO | LOJA | PORTFÓLIO | CONTACTOS */}
+        <nav aria-label="Navegação principal" className="hidden items-center justify-center gap-8 md:flex">
           {nav.map((item) => (
             <Link
               key={item.to}
@@ -74,23 +72,26 @@ export function Header() {
               inactiveProps={{
                 className: "text-muted-foreground hover:text-cyan pb-1 border-b-2 border-transparent",
               }}
-              className="font-display text-[0.7rem] uppercase tracking-[0.18em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+              className="font-display text-[0.75rem] uppercase tracking-[0.16em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
-          {VINILART_MAIN_URL !== "#" && (
-            <a
-              href={VINILART_MAIN_URL || undefined}
-              className="hidden items-center gap-1 font-display text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/80 transition-colors hover:text-foreground xl:flex"
-              rel="noopener noreferrer"
-            >
-              VinilArt Principal <ArrowUpRight className="h-3 w-3 text-cyan" aria-hidden="true" />
-            </a>
-          )}
+        {/* Right side actions: Voltar à VinilArt + Carrinho + Menu Mobile */}
+        <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+          {/* Voltar à VinilArt - External Link */}
+          <a
+            href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+            className="hidden items-center gap-1.5 border border-border/80 bg-surface/70 px-3 py-1.5 font-display text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground transition-all hover:border-cyan hover:text-foreground sm:inline-flex"
+            rel="noopener noreferrer"
+          >
+            <span>Voltar à VinilArt</span>
+            <ArrowUpRight className="h-3.5 w-3.5 text-cyan" aria-hidden="true" />
+          </a>
+
+          {/* Carrinho */}
           <Link
             to="/carrinho"
             aria-label={totalItems > 0 ? `Carrinho — ${totalItems} ${totalItems === 1 ? "artigo" : "artigos"}` : "Carrinho — vazio"}
@@ -100,59 +101,51 @@ export function Header() {
             {totalItems > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-magenta text-[0.6rem] font-bold text-primary-foreground shadow-glow-magenta"
+                className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-magenta text-[0.6rem] font-bold text-white shadow-glow-magenta"
               >
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
           </Link>
-          <SportLink
-            to="/personalizar"
-            size="sm"
-            variant="primary"
-            shape="slant"
-            className="hidden sm:inline-flex shadow-glow-magenta"
-          >
-            Personalizar
-          </SportLink>
+
+          {/* Botão Menu Mobile */}
           <button
             aria-label={open ? "Fechar menu" : "Abrir menu"}
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center border border-border bg-surface lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+            className="grid h-10 w-10 place-items-center border border-border bg-surface md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
           >
             {open ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
           </button>
         </div>
       </div>
 
+      {/* Mobile Drawer Menu */}
       {open && (
-        <div id="mobile-nav" className="border-t border-border bg-surface lg:hidden">
-          <nav aria-label="Menu móvel" className="mx-auto flex max-w-7xl flex-col px-4 py-2 sm:px-6">
+        <div id="mobile-nav" className="border-t border-border bg-surface md:hidden">
+          <nav aria-label="Menu móvel" className="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6">
             {nav.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
-                className="border-b border-border py-3 font-display text-xs uppercase tracking-[0.16em] text-muted-foreground last:border-0 hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                className="border-b border-border/60 py-3.5 font-display text-xs uppercase tracking-[0.16em] text-muted-foreground last:border-0 hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
               >
                 {item.label}
               </Link>
             ))}
-            {VINILART_MAIN_URL !== "#" && (
-              <a
-                href={VINILART_MAIN_URL || undefined}
-                className="py-3 text-xs uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground"
-                rel="noopener noreferrer"
-              >
-                Voltar à VinilArt
-              </a>
-            )}
+            <a
+              href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+              className="flex items-center justify-between py-3.5 font-display text-xs uppercase tracking-[0.14em] text-cyan hover:text-white"
+              rel="noopener noreferrer"
+            >
+              <span>Voltar à VinilArt</span>
+              <ArrowUpRight className="h-4 w-4 text-cyan" aria-hidden="true" />
+            </a>
           </nav>
         </div>
       )}
     </header>
   );
 }
-

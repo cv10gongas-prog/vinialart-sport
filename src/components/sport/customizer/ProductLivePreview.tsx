@@ -3,6 +3,8 @@ import {
   useEffect,
   useRef,
   useState,
+  lazy,
+  Suspense,
 } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -20,6 +22,10 @@ import type {
 
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 import { SportButton } from "@/components/sport/SportButton";
+
+const Product3DViewer = lazy(() =>
+  import("./Product3DViewer").then((mod) => ({ default: mod.Product3DViewer }))
+);
 import { cn } from "@/lib/utils";
 
 interface ProductLivePreviewProps {
@@ -156,6 +162,7 @@ export function ProductPresentationModal({
 }: ProductPresentationModalProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [KonvaLib, setKonvaLib] = useState<any>(null);
+  const [modalDimension, setModalDimension] = useState<"2D" | "3D">("2D");
 
   useEffect(() => {
     if (isOpen) {
@@ -171,6 +178,7 @@ export function ProductPresentationModal({
   const isShinGuard = config.id === "caneleiras-personalizadas";
   const isJersey = config.id === "equipamento-personalizado";
   const isFlag = config.id === "bandeira-personalizada";
+  const supports3D = isShinGuard || isFlag;
   const primarySurface = config.surfaces[0];
 
   return createPortal(
@@ -193,19 +201,68 @@ export function ProductPresentationModal({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 z-10 flex items-center gap-1 border border-border px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:border-cyan hover:text-cyan transition-colors"
-          >
-            <Minimize2 className="h-3.5 w-3.5" />
-            <span>Fechar</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {/* 2D / 3D Toggle in Modal */}
+            {supports3D && (
+              <div className="flex items-center gap-1 bg-surface p-1 border border-border">
+                <button
+                  type="button"
+                  onClick={() => setModalDimension("2D")}
+                  className={cn(
+                    "px-3 py-1 font-display text-xs uppercase tracking-wider font-bold transition-all",
+                    modalDimension === "2D"
+                      ? "bg-white text-black"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  2D
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalDimension("3D")}
+                  className={cn(
+                    "px-3 py-1 font-display text-xs uppercase tracking-wider font-bold transition-all",
+                    modalDimension === "3D"
+                      ? "bg-cyan text-black shadow-glow-cyan"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  3D
+                </button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 z-10 flex items-center gap-1 border border-border px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:border-cyan hover:text-cyan transition-colors"
+            >
+              <Minimize2 className="h-3.5 w-3.5" />
+              <span>Fechar</span>
+            </button>
+          </div>
         </div>
 
         {/* Modal Body: Products Presentation on single dark clean canvas */}
         <div className="overflow-y-auto p-3 sm:p-8 bg-[#090b0f]">
-          {KonvaLib ? (
+          {modalDimension === "3D" && supports3D ? (
+            <div className="flex h-[520px] w-full items-center justify-center">
+              <Suspense
+                fallback={
+                  <div className="flex h-full w-full items-center justify-center text-xs font-mono text-muted-foreground uppercase">
+                    A inicializar estúdio 3D…
+                  </div>
+                }
+              >
+                <Product3DViewer
+                  config={config}
+                  customizer={customizer}
+                  className="h-full w-full"
+                  onFallbackTo2D={() => setModalDimension("2D")}
+                />
+              </Suspense>
+            </div>
+          ) : KonvaLib ? (
             <div>
               {isShinGuard && (
                 <div>
@@ -524,9 +581,9 @@ export function LiveSurfaceRenderer({
                       rotation={layer.rotation}
                       opacity={layer.opacity ?? 1}
                       globalCompositeOperation={
-                        layer.blendMode === "normal"
-                          ? "source-over"
-                          : (layer.blendMode ?? "multiply")
+                        layer.blendMode === "multiply"
+                          ? "multiply"
+                          : "source-over"
                       }
                     />
                   );
@@ -558,31 +615,23 @@ export function LiveSurfaceRenderer({
 
           {/* Realistic Surface Shading/Highlight */}
           <Layer listening={false}>
-            {mockupImg && (
-              <Group clipFunc={clipFunc}>
-                <KonvaImage
-                  image={mockupImg}
-                  width={config.canvasWidth}
-                  height={config.canvasHeight}
-                  opacity={0.55}
-                  globalCompositeOperation="multiply"
-                />
-              </Group>
-            )}
-
             <Group clipFunc={clipFunc}>
               <Rect
                 x={paX}
                 y={paY}
                 width={paW}
-                height={paH * 0.45}
+                height={paH}
                 fillLinearGradientStartPoint={{ x: 0, y: 0 }}
-                fillLinearGradientEndPoint={{ x: paW, y: paH * 0.45 }}
+                fillLinearGradientEndPoint={{ x: paW, y: 0 }}
                 fillLinearGradientColorStops={[
                   0,
-                  "rgba(255,255,255,0.18)",
-                  0.4,
-                  "rgba(255,255,255,0.06)",
+                  "rgba(255,255,255,0)",
+                  0.35,
+                  "rgba(255,255,255,0.04)",
+                  0.5,
+                  "rgba(255,255,255,0.12)",
+                  0.65,
+                  "rgba(255,255,255,0.03)",
                   1,
                   "rgba(255,255,255,0)",
                 ]}

@@ -1,216 +1,124 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { PageHero, PageShell } from "@/components/sport/PageShell";
+﻿import { createFileRoute } from "@tanstack/react-router";
+import { PageShell } from "@/components/sport/PageShell";
 import { ProductCard } from "@/components/sport/ProductCard";
-import { categories, products } from "@/lib/sport-data";
-import { cn } from "@/lib/utils";
-
-type LojaSearch = { categoria?: string | undefined };
+import { products } from "@/lib/sport-data";
+import { Sparkles, FileText, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/loja")({
   component: Loja,
-  validateSearch: (search: Record<string, unknown>): LojaSearch => ({
-    categoria: typeof search["categoria"] === "string" ? search["categoria"] : undefined,
-  }),
-
   head: () => ({
     meta: [
-      { title: "Loja — VinilArt Sport" },
+      { title: "Loja Oficial — VinilArt Sport" },
       {
         name: "description",
         content:
-          "Explora a loja VinilArt Sport: caneleiras, equipamentos, bandeiras, artigos para adeptos, estampagem e impressão personalizados.",
+          "Explora a loja VinilArt Sport: caneleiras personalizadas, equipamentos, bandeiras, artigos para adeptos, estampagem e impressão gráfica.",
       },
-      { property: "og:title", content: "Loja — VinilArt Sport" },
-      {
-        property: "og:description",
-        content: "Artigos desportivos personalizáveis: caneleiras, equipamentos, bandeiras e mais.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "/loja" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/loja" }],
   }),
 });
 
-const badgeFilters = ["Personalizável", "Novo", "Mais popular"] as const;
-
 function Loja() {
-  const { categoria } = Route.useSearch();
-  const [query, setQuery] = useState("");
-  const [cat, setCat] = useState<string | undefined>(categoria);
-  const [modeFilter, setModeFilter] = useState<"all" | "product" | "service">("all");
-  const [badge, setBadge] = useState<string | undefined>(undefined);
-  const [sort, setSort] = useState("relevancia");
+  const customizableProducts = products.filter(
+    (p) => p.isCustomizable && p.customizationMode === "product",
+  );
 
-  const list = useMemo(() => {
-    let out = products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query.toLowerCase()) &&
-        (!cat || p.category === cat) &&
-        (modeFilter === "all" || (modeFilter === "product" ? p.customizationMode === "product" : p.customizationMode !== "product")) &&
-        (!badge || p.badges.includes(badge as never)),
-    );
-    if (sort === "az") out = [...out].sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "za") out = [...out].sort((a, b) => b.name.localeCompare(a.name));
-    return out;
-  }, [query, cat, modeFilter, badge, sort]);
+  const otherProducts = products.filter(
+    (p) => !p.isCustomizable || p.customizationMode !== "product",
+  );
 
   return (
     <PageShell>
-      <PageHero
-        eyebrow="Catálogo Desportivo"
-        title="Artigos & Equipamentos Personalizáveis"
-        text="Caneleiras, equipamentos, bandeiras, artigos para adeptos, estampagem e impressão gráfica à tua medida."
-      />
-
-      <div className="mx-auto max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-        {/* Filtros */}
-        <aside className="mb-8 lg:mb-0">
-          <div className="card-sport hover:!translate-y-0 p-5 border border-border/80 bg-surface">
-            <p className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-foreground">
-              <SlidersHorizontal className="h-4 w-4 text-cyan" /> Tipo & Categorias
-            </p>
-
-            <p className="mt-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Tipo de Artigo
-            </p>
-            <div className="mt-2 flex flex-col gap-1.5">
-              <button
-                onClick={() => setModeFilter("all")}
-                className={cn(
-                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
-                  modeFilter === "all" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-                )}
-              >
-                <span>Todos os Artigos</span>
-              </button>
-              <button
-                onClick={() => setModeFilter("product")}
-                className={cn(
-                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
-                  modeFilter === "product" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-                )}
-              >
-                <span>Produtos Online</span>
-              </button>
-              <button
-                onClick={() => setModeFilter("service")}
-                className={cn(
-                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
-                  modeFilter === "service" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-                )}
-              >
-                <span>Serviços Sob Medida</span>
-              </button>
-            </div>
-
-            <p className="mt-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Categorias
-            </p>
-            <div className="mt-2 flex flex-wrap gap-1.5 lg:flex-col lg:items-stretch">
-              <button
-                onClick={() => setCat(undefined)}
-                className={cn(
-                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
-                  !cat ? "bg-magenta text-white shadow-glow-magenta" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-                )}
-              >
-                <span>Todas</span>
-                <span className="font-mono text-[0.65rem] opacity-70">({products.length})</span>
-              </button>
-              {categories.map((c) => {
-                const count = products.filter((p) => p.category === c.name).length;
-                return (
-                  <button
-                    key={c.slug}
-                    onClick={() => setCat(c.name)}
-                    className={cn(
-                      "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
-                      cat === c.name
-                        ? "bg-magenta text-white shadow-glow-magenta"
-                        : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
-                    )}
-                  >
-                    <span>{c.name}</span>
-                    <span className="font-mono text-[0.65rem] opacity-70">({count})</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <p className="mt-6 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Etiquetas
-            </p>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {badgeFilters.map((b) => (
-                <button
-                  key={b}
-                  onClick={() => setBadge(badge === b ? undefined : b)}
-                  className={cn(
-                    "skew-tag border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider transition-all",
-                    badge === b
-                      ? "border-cyan bg-cyan text-black"
-                      : "border-border text-muted-foreground hover:border-cyan hover:text-cyan",
-                  )}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-6 border-t border-border/60 pt-4">
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-                Tabela de Preços
-              </p>
-              <p className="mt-1.5 text-xs text-muted-foreground/80 leading-relaxed">
-                Preços sob consulta. Fornecemos orçamento imediato para unidades avulsas ou encomendas de equipa completa.
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        {/* Grelha */}
-        <div>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:justify-between">
-            <div className="relative min-w-0">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Pesquisar produtos…"
-                className="h-11 w-full border border-input bg-surface pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-cyan sm:w-72"
-              />
-            </div>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="h-11 shrink-0 border border-input bg-surface px-3 text-xs uppercase tracking-[0.1em] outline-none focus:border-cyan"
-            >
-              <option value="relevancia">Relevância</option>
-              <option value="az">Nome A–Z</option>
-              <option value="za">Nome Z–A</option>
-            </select>
-          </div>
-
-          <p className="mt-4 text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            {list.length} artigo{list.length === 1 ? "" : "s"}
+      {/* Loja Hero Header */}
+      <section className="grain relative border-b border-border bg-tech-grid py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <span className="bg-magenta px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-widest text-white">
+            Catálogo Oficial
+          </span>
+          <h1 className="mt-4 font-display text-3xl font-black uppercase tracking-tight sm:text-5xl md:text-6xl">
+            Loja VinilArt Sport
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Equipamentos e caneleiras à tua medida, artigos para adeptos, estampagem e impressão gráfica desportiva.
           </p>
+        </div>
+      </section>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {list.map((p) => (
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 space-y-16">
+        {/* SECÇÃO 1: PRODUTOS PERSONALIZÁVEIS */}
+        <section>
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border/80 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-cyan" />
+                <span className="font-mono text-xs uppercase tracking-widest text-cyan font-bold">
+                  Personalização Online
+                </span>
+              </div>
+              <h2 className="mt-1 font-display text-2xl font-black uppercase tracking-tight sm:text-3xl">
+                Produtos Personalizáveis
+              </h2>
+            </div>
+            <p className="max-w-md text-xs text-muted-foreground">
+              Carrega o teu ficheiro pronto para pré-visualizar no produto ou solicita apoio à nossa equipa.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {customizableProducts.map((p) => (
               <ProductCard key={p.slug} product={p} />
             ))}
           </div>
+        </section>
 
-          {list.length === 0 && (
-            <p className="mt-10 text-sm text-muted-foreground">
-              Sem resultados para esta combinação de filtros.
+        {/* SECÇÃO 2: OUTROS PEDIDOS & SERVIÇOS */}
+        <section>
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border/80 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-yellow" />
+                <span className="font-mono text-xs uppercase tracking-widest text-yellow font-bold">
+                  Serviços & Merchandising
+                </span>
+              </div>
+              <h2 className="mt-1 font-display text-2xl font-black uppercase tracking-tight sm:text-3xl">
+                Outros Pedidos
+              </h2>
+            </div>
+            <p className="max-w-md text-xs text-muted-foreground">
+              Pedidos à medida para clubes, adeptos e eventos desportivos com envio de ficheiro e orçamento sob medida.
             </p>
-          )}
-        </div>
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {otherProducts.map((p) => (
+              <ProductCard key={p.slug} product={p} />
+            ))}
+          </div>
+        </section>
+
+        {/* Banner Pedido Especial */}
+        <section className="card-sport flex flex-col items-start justify-between gap-6 border-2 border-border bg-surface p-8 sm:flex-row sm:items-center">
+          <div>
+            <span className="font-mono text-xs uppercase tracking-widest text-cyan font-bold">
+              Tens um projeto específico?
+            </span>
+            <h3 className="mt-2 font-display text-xl sm:text-2xl font-black uppercase text-foreground">
+              Equipamento para a tua equipa ou clube desportivo
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground max-w-xl">
+              Trabalhamos com atletas individuais, claques e clubes desportivos com propostas gráficas personalizadas.
+            </p>
+          </div>
+          <Link
+            to="/contactos"
+            className="inline-flex items-center gap-2 border border-cyan bg-cyan px-6 py-3 font-display text-xs uppercase tracking-wider text-black font-bold hover:bg-cyan/90 transition-colors"
+          >
+            <span>Falar com a VinilArt</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
       </div>
     </PageShell>
   );

@@ -241,6 +241,12 @@ function SingleSurfacePreviewCanvas({
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}
+                      opacity={layer.opacity ?? 1}
+                      globalCompositeOperation={
+                        layer.blendMode === "multiply"
+                          ? "multiply"
+                          : "source-over"
+                      }
                     />
                   );
                 }
@@ -276,14 +282,18 @@ function SingleSurfacePreviewCanvas({
                 x={paX}
                 y={paY}
                 width={paW}
-                height={paH * 0.45}
+                height={paH}
                 fillLinearGradientStartPoint={{ x: 0, y: 0 }}
-                fillLinearGradientEndPoint={{ x: paW, y: paH * 0.45 }}
+                fillLinearGradientEndPoint={{ x: paW, y: 0 }}
                 fillLinearGradientColorStops={[
                   0,
-                  "rgba(255,255,255,0.18)",
-                  0.4,
-                  "rgba(255,255,255,0.06)",
+                  "rgba(255,255,255,0)",
+                  0.35,
+                  "rgba(255,255,255,0.04)",
+                  0.5,
+                  "rgba(255,255,255,0.12)",
+                  0.65,
+                  "rgba(255,255,255,0.03)",
                   1,
                   "rgba(255,255,255,0)",
                 ]}

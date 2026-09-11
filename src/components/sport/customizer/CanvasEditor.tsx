@@ -528,9 +528,9 @@ function KonvaStageInner({
                   rotation={layer.rotation}
                   opacity={layer.opacity ?? 1}
                   globalCompositeOperation={
-                    layer.blendMode === "normal"
-                      ? "source-over"
-                      : (layer.blendMode ?? "multiply")
+                    layer.blendMode === "multiply"
+                      ? "multiply"
+                      : "source-over"
                   }
                   draggable={
                     !layer.locked && isEditMode
@@ -646,39 +646,31 @@ function KonvaStageInner({
         )}
       </Layer>
 
+      {/* Realistic subtle glossy reflection overlay (does NOT darken or wash out colors) */}
       <Layer name="overlay-layer" listening={false}>
-        {/* Fabric texture, seams and product shadows re-projected over the art */}
-        {mockupImg && (
-          <Group clipFunc={clipFunc}>
-            <KonvaImage
-              image={mockupImg}
-              width={config.canvasWidth}
-              height={config.canvasHeight}
-              opacity={0.55}
-              globalCompositeOperation="multiply"
-            />
-          </Group>
-        )}
-
         <Group clipFunc={clipFunc}>
           <Rect
             x={paX}
             y={paY}
             width={paW}
-            height={paH * 0.45}
+            height={paH}
             fillLinearGradientStartPoint={{
               x: 0,
               y: 0,
             }}
             fillLinearGradientEndPoint={{
               x: paW,
-              y: paH * 0.45,
+              y: 0,
             }}
             fillLinearGradientColorStops={[
               0,
-              "rgba(255,255,255,0.17)",
-              0.4,
-              "rgba(255,255,255,0.05)",
+              "rgba(255,255,255,0)",
+              0.35,
+              "rgba(255,255,255,0.04)",
+              0.5,
+              "rgba(255,255,255,0.12)",
+              0.65,
+              "rgba(255,255,255,0.03)",
               1,
               "rgba(255,255,255,0)",
             ]}

@@ -145,8 +145,8 @@ export function smartFitLayer(
   const natW = layer.naturalWidth > 0 ? layer.naturalWidth : layer.width;
   const natH = layer.naturalHeight > 0 ? layer.naturalHeight : layer.height;
 
-  // Fit inside full print area with 5% safety margin
-  const fitScale = Math.min((areaW * 0.92) / natW, (areaH * 0.92) / natH);
+  // Fit inside full print area preserving aspect ratio
+  const fitScale = Math.min(areaW / natW, areaH / natH);
   const fittedW = natW * fitScale;
   const fittedH = natH * fitScale;
 

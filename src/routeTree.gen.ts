@@ -16,6 +16,7 @@ import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as EquipamentosRouteImport } from './routes/equipamentos'
 import { Route as LojaRouteImport } from './routes/loja'
 import { Route as PersonalizarRouteImport } from './routes/personalizar'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const PersonalizarRoute = PersonalizarRouteImport.update({
   path: '/personalizar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
   id: '/produto/$slug',
   path: '/produto/$slug',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/equipamentos': typeof EquipamentosRoute
   '/loja': typeof LojaRoute
   '/personalizar': typeof PersonalizarRoute
+  '/portfolio': typeof PortfolioRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/equipamentos': typeof EquipamentosRoute
   '/loja': typeof LojaRoute
   '/personalizar': typeof PersonalizarRoute
+  '/portfolio': typeof PortfolioRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/equipamentos': typeof EquipamentosRoute
   '/loja': typeof LojaRoute
   '/personalizar': typeof PersonalizarRoute
+  '/portfolio': typeof PortfolioRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/loja'
     | '/personalizar'
+    | '/portfolio'
     | '/produto/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/loja'
     | '/personalizar'
+    | '/portfolio'
     | '/produto/$slug'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/equipamentos'
     | '/loja'
     | '/personalizar'
+    | '/portfolio'
     | '/produto/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   EquipamentosRoute: typeof EquipamentosRoute
   LojaRoute: typeof LojaRoute
   PersonalizarRoute: typeof PersonalizarRoute
+  PortfolioRoute: typeof PortfolioRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
 }
 
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PersonalizarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produto/$slug': {
       id: '/produto/$slug'
       path: '/produto/$slug'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipamentosRoute: EquipamentosRoute,
   LojaRoute: LojaRoute,
   PersonalizarRoute: PersonalizarRoute,
+  PortfolioRoute: PortfolioRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
 }
 export const routeTree = rootRouteImport

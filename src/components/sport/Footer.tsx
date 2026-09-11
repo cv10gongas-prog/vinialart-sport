@@ -1,9 +1,10 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 import { VINILART_MAIN_URL } from "@/lib/config";
+import { ArrowUpRight } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-surface bg-tech-grid">
+    <footer className="border-t border-border bg-surface">
       <div className="brush-rule" />
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div className="max-w-sm">
@@ -16,78 +17,71 @@ export function Footer() {
             </span>
           </div>
           <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-            Divisão desportiva da VinilArt. Personalização técnica de caneleiras, equipamentos de jogo, bandeiras e merchandising desportivo.
+            Divisão desportiva da VinilArt. Equipamentos e caneleiras à tua medida, artigos para adeptos, estampagem e impressão gráfica.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="skew-tag border border-border bg-background px-2 py-0.5 font-mono text-[0.6rem] text-cyan">
-              PERSONALIZAÇÃO À TUA MEDIDA
-            </span>
-            <span className="skew-tag border border-border bg-background px-2 py-0.5 font-mono text-[0.6rem] text-muted-foreground">
-              ENCOMENDAS SOB CONSULTA
-            </span>
-          </div>
-          {VINILART_MAIN_URL !== "#" && (
+          <div className="mt-4">
             <a
-              href={VINILART_MAIN_URL || undefined}
-              className="mt-4 inline-block font-display text-[0.65rem] uppercase tracking-[0.14em] text-cyan hover:underline"
+              href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+              className="inline-flex items-center gap-1.5 font-display text-[0.68rem] uppercase tracking-[0.14em] text-cyan hover:underline"
               rel="noopener noreferrer"
             >
-              ← Voltar ao portal principal VinilArt
+              <span>Voltar ao portal principal VinilArt</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-8 text-xs sm:grid-cols-3">
           <div>
             <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
-              Navegar
+              Loja
             </p>
             <ul className="mt-3 space-y-2.5">
               <li>
                 <Link to="/loja" className="text-muted-foreground hover:text-cyan transition-colors">
-                  Loja de Artigos
+                  Catálogo Completo
                 </Link>
               </li>
               <li>
-                <Link to="/personalizar" className="text-magenta font-semibold hover:text-cyan transition-colors">
-                  ⚡ Estúdio 2D Caneleiras
+                <Link to="/personalizar" search={{ produto: "caneleiras-personalizadas" }} className="text-muted-foreground hover:text-cyan transition-colors">
+                  Caneleiras Personalizadas
                 </Link>
               </li>
               <li>
-                <Link to="/equipamentos" className="text-muted-foreground hover:text-cyan transition-colors">
-                  Equipamentos de Jogo
+                <Link to="/personalizar" search={{ produto: "equipamento-personalizado" }} className="text-muted-foreground hover:text-cyan transition-colors">
+                  Equipamento Personalizado
                 </Link>
               </li>
             </ul>
           </div>
           <div>
             <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
-              Modalidades
+              VinilArt Sport
             </p>
             <ul className="mt-3 space-y-2.5">
               <li>
-                <Link to="/adeptos" className="text-muted-foreground hover:text-cyan transition-colors">
-                  Artigos para Adeptos
+                <Link to="/portfolio" className="text-muted-foreground hover:text-cyan transition-colors">
+                  Portfólio de Trabalhos
                 </Link>
               </li>
               <li>
                 <Link to="/carrinho" className="text-muted-foreground hover:text-cyan transition-colors">
-                  Carrinho de Compras
+                  Carrinho de Pedidos
                 </Link>
               </li>
               <li>
                 <Link to="/contactos" className="text-muted-foreground hover:text-cyan transition-colors">
-                  Contactos & Suporte
+                  Contactos & Apoio
                 </Link>
               </li>
             </ul>
           </div>
           <div>
             <p className="font-display text-[0.7rem] uppercase tracking-[0.16em] text-foreground">
-              Produção & Apoio
+              Atendimento
             </p>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Atendimento especializado para pedidos individuais e clubes desportivos.
+              Atendimento personalizado para atletas individuais, claques e clubes desportivos.
             </p>
           </div>
         </div>
@@ -96,10 +90,9 @@ export function Footer() {
       <div className="border-t border-border/60 py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 text-[0.65rem] font-mono text-muted-foreground sm:px-6">
           <span>© {new Date().getFullYear()} VinilArt Sport. Todos os direitos reservados.</span>
-          <span className="text-muted-foreground/60">PERSONALIZAÇÃO GRÁFICA DESPORTIVA</span>
+          <span className="text-muted-foreground/60">EQUIPAMENTOS & CANELEIRAS À TUA MEDIDA</span>
         </div>
       </div>
     </footer>
   );
 }
-

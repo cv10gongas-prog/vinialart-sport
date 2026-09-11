@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import type { Product } from "@/lib/sport-data";
 import { cn } from "@/lib/utils";
@@ -10,26 +10,22 @@ const badgeStyle: Record<string, string> = {
 };
 
 export function ProductCard({ product }: { product: Product }) {
+  const isCustomizable = product.customizationMode === "product";
+
   return (
     <Link
       to="/produto/$slug"
       params={{ slug: product.slug }}
-      className="card-sport group relative flex flex-col overflow-hidden border border-border/80 bg-surface transition-all duration-300 hover:border-magenta hover:shadow-glow-magenta"
+      className="card-sport group relative flex flex-col overflow-hidden border border-border bg-surface transition-all duration-300 hover:border-cyan hover:shadow-lg hover:shadow-cyan/5"
     >
-      {/* Corner technical accents */}
-      <span className="pointer-events-none absolute right-2 top-2 z-10 font-mono text-[0.55rem] text-muted-foreground/40 group-hover:text-cyan transition-colors">
-        REF//{product.slug.slice(0, 4).toUpperCase()}
-      </span>
-
       <div className="relative aspect-square overflow-hidden bg-black/40">
         <img
           src={product.image}
           alt={product.name}
           width={1024}
           height={1024}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {/* Subtle dark gradient overlay at bottom of image */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface to-transparent" />
 
         {/* Badges */}
@@ -38,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
             <span
               key={b}
               className={cn(
-                "skew-tag px-2 py-0.5 text-[0.6rem] uppercase tracking-wider",
+                "px-2 py-0.5 font-display text-[0.6rem] uppercase tracking-wider",
                 badgeStyle[b],
               )}
             >
@@ -47,42 +43,40 @@ export function ProductCard({ product }: { product: Product }) {
           ))}
         </div>
 
-        {product.customizationMode === "product" && (
-          <div className="absolute bottom-2 left-2.5 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 backdrop-blur-sm">
-            <Sparkles className="h-3 w-3 text-cyan" />
-            <span className="font-display text-[0.55rem] uppercase tracking-wider text-cyan">
-              Personalização Online
-            </span>
-          </div>
-        )}
-        {product.customizationMode === "service" && (
-          <div className="absolute bottom-2 left-2.5 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 backdrop-blur-sm">
-            <span className="font-display text-[0.55rem] uppercase tracking-wider text-yellow">
-              Serviço Sob Medida
-            </span>
+        {isCustomizable && (
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-black/80 px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-wider text-cyan backdrop-blur-sm border border-cyan/30">
+            <Sparkles className="h-3 w-3" />
+            <span>Personalizável</span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-4">
-        <div className="flex items-center justify-between">
-          <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground/80">
-            {product.category}
-          </p>
-        </div>
-        <h3 className="font-display text-sm leading-snug group-hover:text-cyan transition-colors">
+      <div className="flex flex-1 flex-col p-5">
+        <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">
+          {product.category}
+        </span>
+        <h3 className="mt-1 font-display text-base font-bold text-foreground group-hover:text-cyan transition-colors">
           {product.name}
         </h3>
-        <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-3">
-          <span className="font-display text-xs text-muted-foreground">
+        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+          {product.description}
+        </p>
+
+        <div className="mt-auto flex items-center justify-between border-t border-border/60 pt-4">
+          <span className="font-mono text-xs uppercase tracking-wider text-foreground">
             {product.priceLabel}
           </span>
-          <span className="flex items-center gap-1 font-display text-[0.65rem] uppercase tracking-[0.14em] text-magenta transition-transform duration-200 group-hover:translate-x-1">
-            {product.customizationMode === "product" ? "Personalizar" : "Configurar Pedido"} <ArrowRight className="h-3 w-3" />
+          <span
+            className={cn(
+              "flex items-center gap-1.5 font-display text-xs uppercase tracking-wider font-bold transition-transform duration-200 group-hover:translate-x-1",
+              isCustomizable ? "text-cyan" : "text-magenta",
+            )}
+          >
+            {isCustomizable ? "Personalizar" : "Pedir Orçamento"}
+            <ArrowRight className="h-3.5 w-3.5" />
           </span>
         </div>
       </div>
     </Link>
   );
 }
-
