@@ -6,6 +6,15 @@
  * Order completion goes through the quote/contact flow.
  */
 
+export type ServiceQuoteDetails = {
+  itemOrServiceType: string;
+  quantity?: string | number | undefined;
+  approxDimensions?: string | undefined;
+  notes?: string | undefined;
+  fileName?: string | undefined;
+  fileDataUrl?: string | undefined;
+};
+
 export type CartItem = {
   /** Unique cart item ID (nanoid) */
   id: string;
@@ -28,6 +37,10 @@ export type CartItem = {
    * Optional — only present if a preview was generated.
    */
   previewDataUrl?: string | undefined;
+  /**
+   * Structured details for service quote requests (Estampagem, Impressão, Pedidos Especiais).
+   */
+  serviceDetails?: ServiceQuoteDetails | undefined;
   /** Unix timestamp (ms) when the item was added */
   addedAt: number;
 };

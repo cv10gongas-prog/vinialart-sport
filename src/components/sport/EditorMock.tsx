@@ -1,12 +1,11 @@
 import {
-  Eye,
-  ImagePlus,
+  ArrowRight,
   Layers,
-  Move,
+  Sparkles,
+  Upload,
 } from "lucide-react";
 
 import { SportLink } from "./SportButton";
-
 import { shinGuardPairWhite } from "@/lib/customizer/mockups";
 import { cn } from "@/lib/utils";
 
@@ -15,33 +14,6 @@ export function EditorMock({
 }: {
   className?: string;
 }) {
-  const features = [
-    {
-      icon: ImagePlus,
-      title: "Carrega as tuas imagens",
-      text: "Fotografias, logótipos e outros grafismos.",
-      color: "text-magenta",
-    },
-    {
-      icon: Move,
-      title: "Move e redimensiona",
-      text: "Posiciona cada elemento diretamente sobre o produto.",
-      color: "text-cyan",
-    },
-    {
-      icon: Layers,
-      title: "Trabalha por camadas",
-      text: "Organiza imagens e texto sem perder o controlo do design.",
-      color: "text-yellow",
-    },
-    {
-      icon: Eye,
-      title: "Pré-visualiza no site",
-      text: "Vê o resultado limpo antes de guardares no carrinho.",
-      color: "text-magenta",
-    },
-  ];
-
   return (
     <div
       className={cn(
@@ -49,89 +21,111 @@ export function EditorMock({
         className,
       )}
     >
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="bg-magenta px-3 py-1 font-mono text-[0.58rem] font-bold uppercase tracking-widest text-white">
-              Caneleira base branca
-            </span>
-
-            <span className="font-mono text-[0.58rem] uppercase tracking-widest text-cyan">
-              Personalização adicionada
-              pelo cliente
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+        {/* Visual: [ DESIGN PLANO ] -> [ PRODUTO FINAL ] */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="bg-magenta px-2.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-white">
+                Design Plano
+              </span>
+              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="bg-cyan px-2.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-black">
+                Produto Final
+              </span>
+            </div>
+            <span className="font-mono text-[0.58rem] uppercase tracking-wider text-muted-foreground">
+              Preview em Tempo Real
             </span>
           </div>
 
-          <div className="mt-5 overflow-hidden border border-border bg-black">
+          <div className="relative overflow-hidden border border-border bg-black">
             <img
               src={shinGuardPairWhite}
-              alt="Par de caneleiras brancas preparado para personalização"
-              className="aspect-[4/3] w-full object-cover"
+              alt="Design aplicado ao produto final em tempo real"
+              className="aspect-[16/10] w-full object-cover"
             />
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between border border-border/60 bg-black/80 px-3 py-2 backdrop-blur-sm">
+              <div className="flex items-center gap-2 font-mono text-[0.6rem] text-cyan">
+                <span className="h-2 w-2 rounded-full bg-cyan animate-pulse" />
+                <span>DESIGN = CRIAÇÃO LIVRE</span>
+              </div>
+              <span className="font-mono text-[0.58rem] text-muted-foreground">
+                PREVIEW = PRODUTO LIMPO
+              </span>
+            </div>
           </div>
 
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            O produto começa neutro.
-            Fotografias, nomes, números e
-            logótipos só aparecem quando
-            o utilizador os adiciona no
-            personalizador.
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            O espaço de design dá-te controlo total sobre imagens, números e fotografias. A área de preview mostra o produto final renderizado sem marcas ou grelhas.
           </p>
         </div>
 
+        {/* Copy & CTA */}
         <div>
-          <p className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-cyan">
-            Personalizador real
-          </p>
+          <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-cyan">
+            VinilArt Sport Studio
+          </span>
 
-          <h3 className="mt-2 font-display text-2xl sm:text-3xl">
-            Tu crias. O site mostra.
+          <h3 className="mt-2 font-display text-2xl uppercase sm:text-3xl">
+            Do teu design para o produto.
           </h3>
 
-          <div className="mt-6 grid gap-3">
-            {features.map(
-              ({
-                icon: Icon,
-                title,
-                text,
-                color,
-              }) => (
-                <div
-                  key={title}
-                  className="flex gap-3 border border-border bg-background/60 p-3"
-                >
-                  <Icon
-                    className={cn(
-                      "mt-0.5 h-4 w-4 shrink-0",
-                      color,
-                    )}
-                  />
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Carrega imagens, adiciona texto e vê o resultado diretamente no produto.
+          </p>
 
-                  <div>
-                    <p className="font-display text-xs uppercase">
-                      {title}
-                    </p>
+          <div className="mt-6 grid gap-2.5">
+            <div className="flex items-center gap-3 border border-border bg-background/60 p-3">
+              <Upload className="h-4 w-4 text-magenta shrink-0" />
+              <div>
+                <p className="font-display text-xs uppercase">Carrega logótipos ou fotos</p>
+                <p className="text-[0.7rem] text-muted-foreground">Auto-ajuste e remoção de fundo com 1 clique</p>
+              </div>
+            </div>
 
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {text}
-                    </p>
-                  </div>
-                </div>
-              ),
-            )}
+            <div className="flex items-center gap-3 border border-border bg-background/60 p-3">
+              <Layers className="h-4 w-4 text-cyan shrink-0" />
+              <div>
+                <p className="font-display text-xs uppercase">Trabalha cada área em detalhe</p>
+                <p className="text-[0.7rem] text-muted-foreground">Superfície ampla para editar esquerda/direita ou frente/costas</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border border-border bg-background/60 p-3">
+              <Sparkles className="h-4 w-4 text-yellow shrink-0" />
+              <div>
+                <p className="font-display text-xs uppercase">Pré-visualização 2.5D limpa</p>
+                <p className="text-[0.7rem] text-muted-foreground">Inspeção em tamanho grande antes de encomendar</p>
+              </div>
+            </div>
           </div>
 
-          <SportLink
-            to="/personalizar"
-            search={{
-              produto:
-                "caneleiras-personalizadas",
-            }}
-            size="lg"
-            className="mt-6 w-full sm:w-auto"
-          >
-            Abrir personalizador
-          </SportLink>
+          {/* Versatility chips */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted-foreground">
+              Disponível em:
+            </span>
+            <span className="border border-border bg-background px-2 py-0.5 font-mono text-[0.62rem] uppercase text-cyan">
+              Caneleiras
+            </span>
+            <span className="border border-border bg-background px-2 py-0.5 font-mono text-[0.62rem] uppercase text-magenta">
+              Equipamento
+            </span>
+            <span className="border border-border bg-background px-2 py-0.5 font-mono text-[0.62rem] uppercase text-yellow">
+              Bandeira
+            </span>
+          </div>
+
+          <div className="mt-6">
+            <SportLink
+              to="/personalizar"
+              size="lg"
+              className="w-full sm:w-auto font-display"
+            >
+              Abrir Studio
+            </SportLink>
+          </div>
         </div>
       </div>
     </div>

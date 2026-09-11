@@ -11,17 +11,20 @@ import {
 
 export type Badge = "Personalizável" | "Novo" | "Mais popular";
 
+export type CustomizationMode = "product" | "catalog" | "service";
+
 export type Product = {
   slug: string;
   name: string;
   category: string;
   image: string;
-  gallery?: string[];
+  gallery?: string[] | undefined;
   priceLabel: string;
   badges: Badge[];
   description: string;
   isCustomizable: boolean;
-  variants?: string[];
+  customizationMode: CustomizationMode;
+  variants?: string[] | undefined;
 };
 
 export const categories = [
@@ -54,6 +57,7 @@ export const products: Product[] = [
     description:
       "Cria uma proposta visual para as tuas caneleiras com fotografias, logótipos, nome, número e outros grafismos. Cada lado pode ser personalizado de forma independente.",
     isCustomizable: true,
+    customizationMode: "product",
   },
   {
     slug: "equipamento-personalizado",
@@ -65,6 +69,7 @@ export const products: Product[] = [
     description:
       "Cria uma proposta visual para um equipamento com cores, emblemas, imagens, nomes, números e outros elementos gráficos.",
     isCustomizable: true,
+    customizationMode: "product",
   },
   {
     slug: "bandeira-personalizada",
@@ -76,6 +81,7 @@ export const products: Product[] = [
     description:
       "Cria uma proposta visual para uma bandeira utilizando as tuas cores, imagens, logótipos e texto.",
     isCustomizable: true,
+    customizationMode: "product",
   },
   {
     slug: "artigos-adeptos",
@@ -86,7 +92,8 @@ export const products: Product[] = [
     badges: ["Personalizável"],
     description:
       "Prepara uma ideia visual para artigos de apoio através das tuas imagens, cores, símbolos e mensagens.",
-    isCustomizable: true,
+    isCustomizable: false,
+    customizationMode: "catalog",
   },
   {
     slug: "estampagem",
@@ -96,8 +103,9 @@ export const products: Product[] = [
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Prepara visualmente nomes, números, logótipos ou outros grafismos antes de enviares o pedido de estampagem.",
-    isCustomizable: true,
+      "Prepara nomes, números, logótipos ou outros grafismos para a estampagem de equipamentos ou peças desportivas.",
+    isCustomizable: false,
+    customizationMode: "service",
   },
   {
     slug: "impressao",
@@ -107,8 +115,9 @@ export const products: Product[] = [
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
-      "Monta uma proposta gráfica com imagens, texto e logótipos para enviares junto do teu pedido de impressão.",
-    isCustomizable: true,
+      "Serviço de impressão gráfica personalizada em suportes e materiais à tua medida com envio do teu ficheiro.",
+    isCustomizable: false,
+    customizationMode: "service",
   },
 ];
 

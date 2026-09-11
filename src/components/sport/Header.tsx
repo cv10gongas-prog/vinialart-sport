@@ -15,27 +15,40 @@ const nav = [
 ];
 
 function Wordmark() {
+  const [logoLoaded, setLogoLoaded] = useState(true);
+
   return (
     <Link to="/" className="group flex min-w-0 items-center gap-3" aria-label="VinilArt Sport — Início">
-      <div className="relative">
-        <span
-          className="grid h-10 w-10 shrink-0 place-items-center bg-sport-gradient slant-pill shadow-glow-magenta transition-transform duration-200 group-hover:scale-105"
-          aria-hidden="true"
-        >
-          <span className="font-display text-lg font-black text-black">V</span>
-        </span>
-        <span className="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-cyan animate-pulse" />
-      </div>
-      <div className="flex min-w-0 flex-col leading-tight">
-        <span className="font-display text-sm tracking-tighter text-foreground sm:text-base group-hover:text-cyan transition-colors">
-          VINILART
-        </span>
-        <div className="flex items-center gap-1.5">
-          <span className="skew-tag bg-magenta px-1.5 py-0.2 text-[0.6rem] font-black text-white tracking-widest">
-            SPORT
-          </span>
-        </div>
-      </div>
+      {logoLoaded ? (
+        <img
+          src="/brand/vinilart-sport-logo-horizontal.png"
+          alt="VinilArt Sport"
+          className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+          onError={() => setLogoLoaded(false)}
+        />
+      ) : (
+        <>
+          <div className="relative">
+            <span
+              className="grid h-10 w-10 shrink-0 place-items-center bg-sport-gradient slant-pill shadow-glow-magenta transition-transform duration-200 group-hover:scale-105"
+              aria-hidden="true"
+            >
+              <span className="font-display text-lg font-black text-black">V</span>
+            </span>
+            <span className="absolute -bottom-1 -right-1 h-2 w-2 rounded-full bg-cyan animate-pulse" />
+          </div>
+          <div className="flex min-w-0 flex-col leading-tight">
+            <span className="font-display text-sm tracking-tighter text-foreground sm:text-base group-hover:text-cyan transition-colors">
+              VINILART
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="skew-tag bg-magenta px-1.5 py-0.2 text-[0.6rem] font-black text-white tracking-widest">
+                SPORT
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </Link>
   );
 }

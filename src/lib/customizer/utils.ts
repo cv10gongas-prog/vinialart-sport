@@ -33,20 +33,24 @@ export function createImageLayer(
   printArea: PrintArea,
   zIndex: number,
 ): ImageLayer {
-  // Start the image at the print area centre, fitting inside the area
+  // Start the image at the print area centre, fitting comfortably inside with ~12% margin/padding
   const areaW = printArea.widthFraction * canvasWidth;
   const areaH = printArea.heightFraction * canvasHeight;
   const areaX = printArea.xFraction * canvasWidth;
   const areaY = printArea.yFraction * canvasHeight;
 
+  // Use 86% of the available printable bounding box so new uploads don't abruptly touch edges
+  const maxW = areaW * 0.86;
+  const maxH = areaH * 0.86;
+
   // Fit within print area preserving aspect ratio
-  const scale = Math.min(areaW / naturalWidth, areaH / naturalHeight, 1);
+  const scale = Math.min(maxW / naturalWidth, maxH / naturalHeight, 1);
   const w = naturalWidth * scale;
   const h = naturalHeight * scale;
 
-  // Centre in print area
-  const x = areaX + (areaW - w) / 2 + w / 2; // Konva x = centre when offsetX = w/2
-  const y = areaY + (areaH - h) / 2 + h / 2;
+  // Centre in print area (Konva x = centre when offsetX = w/2)
+  const x = areaX + areaW / 2;
+  const y = areaY + areaH / 2;
 
   return {
     id: nanoid(),
@@ -120,9 +124,12 @@ export function createTextLayer(
 }
 
 // ---------------------------------------------------------------------------
-// Smart Fit (no AI) — fit an image layer into the print area
+// Smart Fit (Contain & Cover) — pure aspect-ratio preserving transforms
 // ---------------------------------------------------------------------------
 
+/**
+ * Ajustar à área: escala e centraliza preservando a proporção para caber 100% dentro da área útil.
+ */
 export function smartFitLayer(
   layer: ImageLayer,
   printArea: PrintArea,
@@ -138,7 +145,8 @@ export function smartFitLayer(
   const natW = layer.naturalWidth > 0 ? layer.naturalWidth : layer.width;
   const natH = layer.naturalHeight > 0 ? layer.naturalHeight : layer.height;
 
-  const fitScale = Math.min(areaW / natW, areaH / natH);
+  // Fit inside full print area with 5% safety margin
+  const fitScale = Math.min((areaW * 0.92) / natW, (areaH * 0.92) / natH);
   const fittedW = natW * fitScale;
   const fittedH = natH * fitScale;
 
@@ -151,6 +159,42 @@ export function smartFitLayer(
     y: newY,
     width: fittedW,
     height: fittedH,
+    scaleX: 1,
+    scaleY: 1,
+    rotation: 0,
+  };
+}
+
+/**
+ * Preencher área: expande a imagem mantendo a proporção para cobrir toda a área imprimível.
+ */
+export function coverFitLayer(
+  layer: ImageLayer,
+  printArea: PrintArea,
+  canvasWidth: number,
+  canvasHeight: number,
+): Partial<ImageLayer> {
+  const areaW = printArea.widthFraction * canvasWidth;
+  const areaH = printArea.heightFraction * canvasHeight;
+  const areaX = printArea.xFraction * canvasWidth;
+  const areaY = printArea.yFraction * canvasHeight;
+
+  const natW = layer.naturalWidth > 0 ? layer.naturalWidth : layer.width;
+  const natH = layer.naturalHeight > 0 ? layer.naturalHeight : layer.height;
+
+  // Cover entire area: Math.max ensures entire printArea is covered
+  const coverScale = Math.max(areaW / natW, areaH / natH);
+  const coveredW = natW * coverScale;
+  const coveredH = natH * coverScale;
+
+  const newX = areaX + areaW / 2;
+  const newY = areaY + areaH / 2;
+
+  return {
+    x: newX,
+    y: newY,
+    width: coveredW,
+    height: coveredH,
     scaleX: 1,
     scaleY: 1,
     rotation: 0,

@@ -26,6 +26,7 @@ import {
   createImageLayer,
   createTextLayer,
   smartFitLayer,
+  coverFitLayer,
   nextZIndex,
 } from "@/lib/customizer/utils";
 import {
@@ -392,6 +393,22 @@ export function useProductCustomizer(
   const smartFit = useCallback(() => {
     if (!selectedLayer || selectedLayer.type !== "image") return;
     const changes = smartFitLayer(
+      selectedLayer as ImageLayer,
+      activeSurface.printArea,
+      config.canvasWidth,
+      config.canvasHeight,
+    );
+    dispatch({
+      type: "UPDATE_LAYER",
+      surfaceId: state.activeSurfaceId,
+      layerId: selectedLayer.id,
+      changes,
+    });
+  }, [selectedLayer, activeSurface, config, state.activeSurfaceId]);
+
+  const coverFit = useCallback(() => {
+    if (!selectedLayer || selectedLayer.type !== "image") return;
+    const changes = coverFitLayer(
       selectedLayer as ImageLayer,
       activeSurface.printArea,
       config.canvasWidth,
@@ -806,6 +823,7 @@ export function useProductCustomizer(
     copyDesignToOtherSurface,
     selectLayer,
     smartFit,
+    coverFit,
     smartFitIntelligent,
     removeBackground,
     restoreOriginal,

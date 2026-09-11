@@ -81,13 +81,9 @@ function Home() {
           <div className="mt-8 flex flex-wrap gap-3">
             <SportLink
               to="/personalizar"
-              search={{
-                produto:
-                  "caneleiras-personalizadas",
-              }}
               size="lg"
             >
-              Começar a personalizar
+              Abrir Studio
               <ArrowRight className="h-4 w-4" />
             </SportLink>
 
@@ -226,35 +222,12 @@ function Home() {
       <section className="grain border-y border-border bg-tech-grid py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
-            eyebrow="Editor Online"
-            title="Personaliza e vê antes de guardar"
-            text="O preview acontece dentro do próprio site. Não tens de descarregar uma imagem para perceber como ficou."
+            eyebrow="VinilArt Sport Studio"
+            title="Do teu design para o produto."
+            text="Carrega imagens, adiciona texto e vê o resultado diretamente no produto com preview limpo em tempo real."
           />
 
-          <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {steps.map(
-              (step) => (
-                <li
-                  key={step.n}
-                  className="border border-border bg-surface p-4"
-                >
-                  <span className="font-display text-3xl text-magenta">
-                    {step.n}
-                  </span>
-
-                  <p className="mt-2 font-display text-sm">
-                    {step.title}
-                  </p>
-
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {step.text}
-                  </p>
-                </li>
-              ),
-            )}
-          </ol>
-
-          <div className="mt-12">
+          <div className="mt-10">
             <EditorMock />
           </div>
         </div>

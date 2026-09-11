@@ -47,11 +47,18 @@ export function ProductCard({ product }: { product: Product }) {
           ))}
         </div>
 
-        {product.isCustomizable && (
+        {product.customizationMode === "product" && (
           <div className="absolute bottom-2 left-2.5 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 backdrop-blur-sm">
             <Sparkles className="h-3 w-3 text-cyan" />
             <span className="font-display text-[0.55rem] uppercase tracking-wider text-cyan">
-              Estúdio 2D
+              Personalização Online
+            </span>
+          </div>
+        )}
+        {product.customizationMode === "service" && (
+          <div className="absolute bottom-2 left-2.5 flex items-center gap-1 rounded bg-black/75 px-2 py-0.5 backdrop-blur-sm">
+            <span className="font-display text-[0.55rem] uppercase tracking-wider text-yellow">
+              Serviço Sob Medida
             </span>
           </div>
         )}
@@ -71,7 +78,7 @@ export function ProductCard({ product }: { product: Product }) {
             {product.priceLabel}
           </span>
           <span className="flex items-center gap-1 font-display text-[0.65rem] uppercase tracking-[0.14em] text-magenta transition-transform duration-200 group-hover:translate-x-1">
-            Ver detalhes <ArrowRight className="h-3 w-3" />
+            {product.customizationMode === "product" ? "Personalizar" : "Configurar Pedido"} <ArrowRight className="h-3 w-3" />
           </span>
         </div>
       </div>

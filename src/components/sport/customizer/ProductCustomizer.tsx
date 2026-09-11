@@ -2,12 +2,16 @@ import { useState } from "react";
 import {
   CheckCircle,
   Eye,
-  Pencil,
+  Maximize2,
+  Minus,
+  Plus,
+  RotateCcw,
   ShoppingBag,
 } from "lucide-react";
 
 import { CanvasEditor } from "./CanvasEditor";
 import { CustomizerToolbar } from "./CustomizerToolbar";
+import { ProductLivePreview, ProductPresentationModal } from "./ProductLivePreview";
 
 import { useProductCustomizer } from "@/hooks/useProductCustomizer";
 import { useCart } from "@/lib/cart/store";
@@ -18,9 +22,9 @@ import type { ProductCustomizerConfig } from "@/lib/customizer/types";
 
 interface ProductCustomizerProps {
   config: ProductCustomizerConfig;
-  className?: string;
-  initialDesignJson?: string;
-  cartItemId?: string;
+  className?: string | undefined;
+  initialDesignJson?: string | undefined;
+  cartItemId?: string | undefined;
 }
 
 export function ProductCustomizer({
@@ -29,10 +33,9 @@ export function ProductCustomizer({
   initialDesignJson,
   cartItemId,
 }: ProductCustomizerProps) {
-  const customizer =
-    useProductCustomizer(config, {
-      initialDesignJson,
-    });
+  const customizer = useProductCustomizer(config, {
+    initialDesignJson,
+  });
 
   const {
     state,
@@ -40,26 +43,20 @@ export function ProductCustomizer({
     activeSurface,
     exportCustomerPreview,
     serializeDesign,
+    zoom,
+    zoomIn,
+    zoomOut,
+    resetZoom,
   } = customizer;
 
-  const { addItem, updateItem } =
-    useCart();
+  const { addItem, updateItem } = useCart();
 
-  const [savedToCart, setSavedToCart] =
-    useState(false);
-
-  const layerCount =
-    state.surfaces[
-      state.activeSurfaceId
-    ]?.layers.length ?? 0;
+  const [savedToCart, setSavedToCart] = useState(false);
+  const [isPresentationOpen, setIsPresentationOpen] = useState(false);
 
   function handleAddToCart() {
-    const previewDataUrl =
-      exportCustomerPreview() ??
-      undefined;
-
-    const customizerDesign =
-      serializeDesign();
+    const previewDataUrl = exportCustomerPreview() ?? undefined;
+    const customizerDesign = serializeDesign();
 
     if (cartItemId) {
       updateItem(cartItemId, {
@@ -67,15 +64,11 @@ export function ProductCustomizer({
         previewDataUrl,
       });
     } else {
-      addItem(
-        config.id,
-        config.name,
-        {
-          quantity: 1,
-          customizerDesign,
-          previewDataUrl,
-        },
-      );
+      addItem(config.id, config.name, {
+        quantity: 1,
+        customizerDesign,
+        previewDataUrl,
+      });
     }
 
     setSavedToCart(true);
@@ -85,6 +78,8 @@ export function ProductCustomizer({
     }, 2500);
   }
 
+  const zoomPercent = Math.round((zoom ?? 1) * 100);
+
   return (
     <div
       className={cn(
@@ -92,73 +87,48 @@ export function ProductCustomizer({
         className,
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Top Header Bar: Product Title + Presentation Action */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4">
         <div>
-          <p className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-cyan">
-            Personalizador online
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-cyan">
+              VinilArt Sport Studio
+            </span>
+            <span className="font-mono text-[0.58rem] text-muted-foreground">
+              • Preço sob consulta
+            </span>
+          </div>
 
-          <h2 className="mt-1 font-display text-lg">
+          <h1 className="mt-1 font-display text-xl sm:text-2xl">
             {config.name}
-          </h2>
+          </h1>
         </div>
 
-        <div className="flex border border-border bg-surface p-1">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() =>
-              customizer.setViewMode(
-                "edit",
-              )
-            }
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-[0.65rem] font-bold uppercase tracking-wider transition-colors",
-              customizer.viewMode ===
-                "edit"
-                ? "bg-cyan text-black"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Editar
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              customizer.setViewMode(
-                "preview",
-              )
-            }
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-[0.65rem] font-bold uppercase tracking-wider transition-colors",
-              customizer.viewMode ===
-                "preview"
-                ? "bg-magenta text-white"
-                : "text-muted-foreground hover:text-foreground",
-            )}
+            onClick={() => setIsPresentationOpen(true)}
+            className="flex items-center gap-1.5 border border-magenta/60 bg-magenta/10 px-3.5 py-2 font-display text-xs uppercase tracking-wider text-magenta hover:bg-magenta hover:text-white transition-colors"
           >
             <Eye className="h-3.5 w-3.5" />
-            Pré-visualizar
+            <span>Ver Resultado</span>
           </button>
         </div>
       </div>
 
+      {/* Surface Switcher Tabs: Caneleira Esquerda | Caneleira Direita OR Frente | Costas */}
       <div
-        className="mt-5 flex flex-wrap gap-2 border-b border-border/80 pb-3"
+        className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3"
         role="tablist"
-        aria-label="Áreas do produto"
+        aria-label="Áreas de personalização"
       >
-        {config.surfaces.map(
-          (surface, index) => {
-            const active =
-              state.activeSurfaceId ===
-              surface.id;
-
-            const activeClass =
-              index % 3 === 0
+        <div className="flex flex-wrap gap-2">
+          {config.surfaces.map((surface, index) => {
+            const active = state.activeSurfaceId === surface.id;
+            const activeColorClass =
+              index === 0
                 ? "bg-magenta text-white"
-                : index % 3 === 1
+                : index === 1
                   ? "bg-cyan text-black"
                   : "bg-yellow text-black";
 
@@ -168,169 +138,149 @@ export function ProductCustomizer({
                 type="button"
                 role="tab"
                 aria-selected={active}
-                onClick={() =>
-                  setSurface(surface.id)
-                }
+                onClick={() => setSurface(surface.id)}
                 className={cn(
                   "border px-4 py-2 font-display text-[0.65rem] uppercase tracking-wider transition-all",
                   active
-                    ? `${activeClass} border-transparent`
+                    ? activeColorClass + " border-transparent shadow-sm"
                     : "border-border bg-surface text-muted-foreground hover:border-cyan hover:text-foreground",
                 )}
               >
                 {surface.label}
               </button>
             );
-          },
-        )}
-      </div>
+          })}
+        </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground">
-        <span>
-          {layerCount}{" "}
-          {layerCount === 1
-            ? "elemento"
-            : "elementos"}
-        </span>
-
-        <span>
-          {customizer.viewMode ===
-          "preview"
-            ? "PREVIEW LIMPO"
-            : "MODO DE EDIÇÃO"}
-        </span>
-      </div>
-
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="mx-auto w-full max-w-[560px] min-w-0 lg:mx-0">
-          <div
-            className={cn(
-              "relative overflow-hidden border bg-black p-1 transition-colors",
-              customizer.viewMode ===
-                "preview"
-                ? "border-magenta/60 shadow-glow-magenta"
-                : "border-border",
-            )}
+        {/* Zoom Controls for Design Canvas */}
+        <div className="flex items-center gap-1 border border-border/80 bg-surface px-2 py-1">
+          <span className="mr-1 font-mono text-[0.58rem] uppercase tracking-wider text-muted-foreground">
+            Zoom
+          </span>
+          <button
+            type="button"
+            onClick={zoomOut}
+            aria-label="Diminuir zoom"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <CanvasEditor
-              config={config}
-              customizer={customizer}
-            />
-          </div>
+            <Minus className="h-3 w-3" />
+          </button>
 
-          <div className="mt-2 flex items-center justify-between font-mono text-[0.58rem] uppercase tracking-widest text-muted-foreground">
-            <span>
-              {activeSurface.label}
-            </span>
+          <button
+            type="button"
+            onClick={resetZoom}
+            title="Repor zoom 100%"
+            className="min-w-10 font-mono text-[0.6rem] text-cyan hover:underline"
+          >
+            {zoomPercent}%
+          </button>
 
-            <span>
-              Zoom{" "}
-              {Math.round(
-                customizer.zoom * 100,
-              )}
-              %
-            </span>
+          <button
+            type="button"
+            onClick={zoomIn}
+            aria-label="Aumentar zoom"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+
+          <button
+            type="button"
+            onClick={resetZoom}
+            title="Repor zoom inicial"
+            aria-label="Repor zoom"
+            className="ml-1 border-l border-border/60 pl-1.5 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <RotateCcw className="h-2.5 w-2.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Studio Workspace: 2 Columns on Desktop */}
+      {/* Left (65-70%): Big Design Canvas. Right (30-35%): Live Preview + Tools + CTA */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
+        {/* LEFT: Big Design Workspace Canvas */}
+        <div className="flex flex-col">
+          <div className="relative flex flex-col overflow-hidden border border-border bg-black/95 shadow-inner">
+            {/* Top Workspace Header */}
+            <div className="flex items-center justify-between border-b border-border/60 bg-surface/80 px-3 py-2">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-cyan" />
+                <span className="font-display text-[0.65rem] uppercase tracking-widest text-foreground">
+                  Área de Design // {activeSurface.label}
+                </span>
+              </div>
+              <span className="font-mono text-[0.55rem] uppercase tracking-wider text-muted-foreground">
+                Clica nos elementos para mover e dimensionar
+              </span>
+            </div>
+
+            {/* Design Canvas Viewport */}
+            <div className="flex min-h-[500px] w-full items-center justify-center p-3 sm:min-h-[620px]">
+              <CanvasEditor config={config} customizer={customizer} />
+            </div>
+
+            {/* Bottom Surface Subtitle */}
+            <div className="flex items-center justify-between border-t border-border/60 bg-surface/50 px-3 py-1.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+              <span>{activeSurface.label}</span>
+              <span>Grelha ativa</span>
+            </div>
           </div>
         </div>
 
-        {customizer.viewMode ===
-        "edit" ? (
-          <div className="flex flex-col gap-4">
-            <CustomizerToolbar
-              customizer={customizer}
-            />
+        {/* RIGHT: Live Preview (Top) + Tooling & Layers (Middle) + Action (Bottom) */}
+        <div className="flex flex-col gap-5">
+          {/* 1. Live 2.5D Mockup Preview */}
+          <ProductLivePreview
+            config={config}
+            customizer={customizer}
+            onOpenPresentation={() => setIsPresentationOpen(true)}
+          />
 
-            <div className="border-t border-border pt-4">
-              <SportButton
-                size="lg"
-                onClick={handleAddToCart}
-                className={cn(
-                  "w-full justify-center",
-                  savedToCart &&
-                    "border-green-500 bg-green-500/10 text-green-400",
-                )}
-              >
-                {savedToCart ? (
-                  <>
-                    <CheckCircle className="h-4 w-4" />
-                    {cartItemId
-                      ? "Personalização atualizada"
-                      : "Guardado no carrinho"}
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="h-4 w-4" />
-                    {cartItemId
-                      ? "Guardar alterações"
-                      : "Adicionar ao carrinho"}
-                  </>
-                )}
-              </SportButton>
-            </div>
+          {/* 2. Simplified Tools & Layer Management */}
+          <div className="rounded-none border border-border bg-surface p-4">
+            <CustomizerToolbar customizer={customizer} />
           </div>
-        ) : (
-          <div className="flex flex-col justify-between border border-magenta/40 bg-surface p-5">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-magenta px-2.5 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-white">
-                <Eye className="h-3.5 w-3.5" />
-                Pré-visualização
-              </div>
 
-              <h3 className="mt-5 font-display text-xl">
-                Vê o resultado aqui.
-              </h3>
-
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Este modo remove as
-                linhas de edição, caixas
-                de seleção e controlos do
-                canvas. Podes alternar
-                entre as áreas do produto
-                acima sem descarregar
-                qualquer ficheiro.
-              </p>
-
-              <div className="mt-5 border-t border-border pt-4">
-                <p className="font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground">
-                  Área atual
-                </p>
-
-                <p className="mt-1 font-display text-sm text-cyan">
-                  {activeSurface.label}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 grid gap-2">
-              <SportButton
-                type="button"
-                variant="cyan"
-                shape="square"
-                onClick={() =>
-                  customizer.setViewMode(
-                    "edit",
-                  )
-                }
-                className="w-full"
-              >
-                <Pencil className="h-4 w-4" />
-                Continuar a editar
-              </SportButton>
-
-              <SportButton
-                type="button"
-                onClick={handleAddToCart}
-                className="w-full"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                {cartItemId
-                  ? "Guardar alterações"
-                  : "Guardar no carrinho"}
-              </SportButton>
-            </div>
+          {/* 3. Primary CTA: Add to Order / Update */}
+          <div className="sticky bottom-4 z-10 bg-background/95 p-2 backdrop-blur-sm sm:static sm:p-0">
+            <SportButton
+              size="lg"
+              onClick={handleAddToCart}
+              className={cn(
+                "w-full justify-center shadow-lg",
+                savedToCart && "border-green-500 bg-green-500/15 text-green-400",
+              )}
+            >
+              {savedToCart ? (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  <span>
+                    {cartItemId ? "Personalização atualizada" : "Guardado no pedido"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>
+                    {cartItemId ? "Guardar alterações" : "Adicionar ao pedido"}
+                  </span>
+                </>
+              )}
+            </SportButton>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Presentation Preview Modal */}
+      <ProductPresentationModal
+        isOpen={isPresentationOpen}
+        onClose={() => setIsPresentationOpen(false)}
+        config={config}
+        customizer={customizer}
+        onAddToCart={handleAddToCart}
+        cartItemId={cartItemId}
+      />
     </div>
   );
 }

@@ -48,17 +48,19 @@ export function SportButton({
   );
 }
 
-export function SportLink({
+import { createLink } from "@tanstack/react-router";
+
+export const SportLink = createLink(function SportLinkInner({
   className,
   variant,
   size,
   shape,
   ...props
-}: ComponentProps<typeof Link> & Variants) {
+}: ComponentProps<"a"> & Variants) {
   return (
-    <Link
+    <a
       className={cn(sportButtonVariants({ variant, size, shape }), className)}
       {...props}
     />
   );
-}
+});

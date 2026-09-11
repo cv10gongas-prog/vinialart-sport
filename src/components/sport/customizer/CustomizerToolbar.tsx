@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Sparkles,
   Target,
+  Maximize2,
   Type,
   Undo2,
   Upload,
@@ -57,6 +58,7 @@ export function CustomizerToolbar({
     copyDesignToOtherSurface,
     selectLayer,
     smartFit,
+    coverFit,
     smartFitIntelligent,
     removeBackground,
     restoreOriginal,
@@ -369,15 +371,27 @@ export function CustomizerToolbar({
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={smartFit}
-            disabled={!canEditImage}
-            className="flex items-center gap-2 border border-border px-3 py-2 text-xs uppercase tracking-wider hover:border-cyan hover:text-cyan disabled:opacity-40"
-          >
-            <Target className="h-4 w-4" />
-            Ajustar à área
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={smartFit}
+              disabled={!canEditImage}
+              className="flex items-center justify-center gap-1.5 border border-border px-2.5 py-2 text-xs uppercase tracking-wider hover:border-cyan hover:text-cyan disabled:opacity-40"
+            >
+              <Target className="h-3.5 w-3.5" />
+              Ajustar
+            </button>
+
+            <button
+              type="button"
+              onClick={coverFit}
+              disabled={!canEditImage}
+              className="flex items-center justify-center gap-1.5 border border-border px-2.5 py-2 text-xs uppercase tracking-wider hover:border-cyan hover:text-cyan disabled:opacity-40"
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+              Preencher
+            </button>
+          </div>
 
           <button
             type="button"
@@ -549,14 +563,11 @@ export function CustomizerToolbar({
 
       <div className="border-t border-border pt-3">
         <p className="text-[0.65rem] leading-relaxed text-muted-foreground">
-          Usa{" "}
+          Clica em{" "}
           <strong className="text-foreground">
-            Pré-visualizar
+            Ver Resultado
           </strong>{" "}
-          no topo para veres o resultado
-          final diretamente no site.
-          Não precisas de descarregar
-          nenhuma imagem.
+          para inspecionar o produto final em tamanho grande com acabamento limpo.
         </p>
       </div>
     </div>

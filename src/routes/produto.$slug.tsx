@@ -27,6 +27,8 @@ import { products } from "@/lib/sport-data";
 import { useCart } from "@/lib/cart/store";
 import { cn } from "@/lib/utils";
 
+import { ServiceQuoteForm } from "@/components/sport/ServiceQuoteForm";
+
 export const Route = createFileRoute(
   "/produto/$slug",
 )({
@@ -71,6 +73,8 @@ export const Route = createFileRoute(
 function Produto() {
   const { product } =
     Route.useLoaderData();
+
+  const isService = product.customizationMode === "service";
 
   const [quantity, setQuantity] =
     useState(1);
@@ -143,55 +147,57 @@ function Produto() {
         </nav>
       </div>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-8 sm:px-6 lg:grid-cols-2">
-        <div>
-          <div className="relative overflow-hidden border border-border bg-black">
-            <img
-              src={selectedImage}
-              alt={product.name}
-              className="aspect-square w-full object-cover"
-            />
+      <section className={cn("mx-auto max-w-7xl px-4 py-8 sm:px-6", isService ? "max-w-5xl" : "grid gap-10 lg:grid-cols-2")}>
+        {!isService ? (
+          <div>
+            <div className="relative overflow-hidden border border-border bg-black">
+              <img
+                src={selectedImage}
+                alt={product.name}
+                className="aspect-square w-full object-cover"
+              />
 
-            {product.isCustomizable && (
-              <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-black/80 px-3 py-1.5 font-mono text-[0.58rem] uppercase tracking-widest text-cyan backdrop-blur">
-                <Eye className="h-3.5 w-3.5" />
-                Base de pré-visualização
+              {product.isCustomizable && product.customizationMode === "product" && (
+                <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-black/80 px-3 py-1.5 font-mono text-[0.58rem] uppercase tracking-widest text-cyan backdrop-blur">
+                  <Eye className="h-3.5 w-3.5" />
+                  Base de pré-visualização
+                </div>
+              )}
+            </div>
+
+            {gallery.length > 1 && (
+              <div className="mt-3 grid grid-cols-4 gap-3">
+                {gallery.map(
+                  (image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      aria-label={`Ver imagem ${index + 1}`}
+                      onClick={() =>
+                        setSelectedImage(
+                          image,
+                        )
+                      }
+                      className={cn(
+                        "aspect-square overflow-hidden border bg-black transition-all",
+                        selectedImage ===
+                          image
+                          ? "border-cyan ring-1 ring-cyan"
+                          : "border-border opacity-70 hover:opacity-100",
+                      )}
+                    >
+                      <img
+                        src={image}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
-
-          {gallery.length > 1 && (
-            <div className="mt-3 grid grid-cols-4 gap-3">
-              {gallery.map(
-                (image, index) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    aria-label={`Ver imagem ${index + 1}`}
-                    onClick={() =>
-                      setSelectedImage(
-                        image,
-                      )
-                    }
-                    className={cn(
-                      "aspect-square overflow-hidden border bg-black transition-all",
-                      selectedImage ===
-                        image
-                        ? "border-cyan ring-1 ring-cyan"
-                        : "border-border opacity-70 hover:opacity-100",
-                    )}
-                  >
-                    <img
-                      src={image}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                ),
-              )}
-            </div>
-          )}
-        </div>
+        ) : null}
 
         <div className="flex flex-col">
           <div className="flex flex-wrap gap-2">
@@ -215,124 +221,140 @@ function Produto() {
             {product.priceLabel}
           </p>
 
-          <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            {product.description}
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            {product.slug === "estampagem"
+              ? "Envia o teu design e indica a peça que queres personalizar."
+              : product.slug === "impressao"
+                ? "Envia o ficheiro e descreve o trabalho pretendido."
+                : product.description}
           </p>
 
-          {product.isCustomizable && (
-            <div className="mt-7 border border-border bg-surface p-5">
-              <p className="font-display text-sm">
-                Personalização online
-              </p>
+          {isService ? (
+            <div className="mt-8">
+              <ServiceQuoteForm
+                productId={product.slug}
+                productName={product.name}
+                serviceType={product.slug === "estampagem" ? "estampagem" : "impressao"}
+              />
+            </div>
+          ) : (
+            <>
+              {product.isCustomizable && (
+                <div className="mt-7 border border-border bg-surface p-5">
+                  <p className="font-display text-sm">
+                    Personalização online
+                  </p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <ImagePlus className="mt-0.5 h-4 w-4 shrink-0 text-magenta" />
-                  Carrega imagens e
-                  logótipos.
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <ImagePlus className="mt-0.5 h-4 w-4 shrink-0 text-magenta" />
+                      Carrega imagens e
+                      logótipos.
+                    </div>
+
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <Eye className="mt-0.5 h-4 w-4 shrink-0 text-cyan" />
+                      Vê a pré-visualização
+                      diretamente no site.
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <Eye className="mt-0.5 h-4 w-4 shrink-0 text-cyan" />
-                  Vê a pré-visualização
-                  diretamente no site.
+              <div className="mt-7">
+                <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
+                  Quantidade
+                </p>
+
+                <div className="mt-2 inline-flex items-center border border-border bg-surface">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuantity(
+                        (value) =>
+                          Math.max(
+                            1,
+                            value - 1,
+                          ),
+                      )
+                    }
+                    className="grid h-10 w-10 place-items-center hover:text-cyan"
+                  >
+                    −
+                  </button>
+
+                  <span className="w-12 text-center font-mono text-sm">
+                    {quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuantity(
+                        (value) =>
+                          value + 1,
+                      )
+                    }
+                    className="grid h-10 w-10 place-items-center hover:text-cyan"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
-            </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {product.isCustomizable && (
+                  <SportLink
+                    to="/personalizar"
+                    search={{
+                      produto:
+                        product.slug,
+                    }}
+                    size="lg"
+                    className="w-full"
+                  >
+                    Personalizar online
+                  </SportLink>
+                )}
+
+                <SportButton
+                  type="button"
+                  variant="outline"
+                  shape="square"
+                  size="lg"
+                  onClick={
+                    addWithoutCustomization
+                  }
+                  className={cn(
+                    "w-full",
+                    added &&
+                      "border-green-500 text-green-400",
+                  )}
+                >
+                  {added ? (
+                    <>
+                      <CheckCircle className="h-4 w-4" />
+                      Adicionado
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="h-4 w-4" />
+                      Adicionar sem
+                      personalizar
+                    </>
+                  )}
+                </SportButton>
+              </div>
+
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                Podes guardar uma
+                personalização criada no
+                editor ou adicionar o artigo
+                sem design para explicares o
+                pedido posteriormente.
+              </p>
+            </>
           )}
-
-          <div className="mt-7">
-            <p className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
-              Quantidade
-            </p>
-
-            <div className="mt-2 inline-flex items-center border border-border bg-surface">
-              <button
-                type="button"
-                onClick={() =>
-                  setQuantity(
-                    (value) =>
-                      Math.max(
-                        1,
-                        value - 1,
-                      ),
-                  )
-                }
-                className="grid h-10 w-10 place-items-center hover:text-cyan"
-              >
-                −
-              </button>
-
-              <span className="w-12 text-center font-mono text-sm">
-                {quantity}
-              </span>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setQuantity(
-                    (value) =>
-                      value + 1,
-                  )
-                }
-                className="grid h-10 w-10 place-items-center hover:text-cyan"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {product.isCustomizable && (
-              <SportLink
-                to="/personalizar"
-                search={{
-                  produto:
-                    product.slug,
-                }}
-                size="lg"
-                className="w-full"
-              >
-                Personalizar online
-              </SportLink>
-            )}
-
-            <SportButton
-              type="button"
-              variant="outline"
-              shape="square"
-              size="lg"
-              onClick={
-                addWithoutCustomization
-              }
-              className={cn(
-                "w-full",
-                added &&
-                  "border-green-500 text-green-400",
-              )}
-            >
-              {added ? (
-                <>
-                  <CheckCircle className="h-4 w-4" />
-                  Adicionado
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="h-4 w-4" />
-                  Adicionar sem
-                  personalizar
-                </>
-              )}
-            </SportButton>
-          </div>
-
-          <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-            Podes guardar uma
-            personalização criada no
-            editor ou adicionar o artigo
-            sem design para explicares o
-            pedido posteriormente.
-          </p>
         </div>
       </section>
 

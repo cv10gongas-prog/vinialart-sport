@@ -41,6 +41,7 @@ function Loja() {
   const { categoria } = Route.useSearch();
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string | undefined>(categoria);
+  const [modeFilter, setModeFilter] = useState<"all" | "product" | "service">("all");
   const [badge, setBadge] = useState<string | undefined>(undefined);
   const [sort, setSort] = useState("relevancia");
 
@@ -49,12 +50,13 @@ function Loja() {
       (p) =>
         p.name.toLowerCase().includes(query.toLowerCase()) &&
         (!cat || p.category === cat) &&
+        (modeFilter === "all" || (modeFilter === "product" ? p.customizationMode === "product" : p.customizationMode !== "product")) &&
         (!badge || p.badges.includes(badge as never)),
     );
     if (sort === "az") out = [...out].sort((a, b) => a.name.localeCompare(b.name));
     if (sort === "za") out = [...out].sort((a, b) => b.name.localeCompare(a.name));
     return out;
-  }, [query, cat, badge, sort]);
+  }, [query, cat, modeFilter, badge, sort]);
 
   return (
     <PageShell>
@@ -69,8 +71,41 @@ function Loja() {
         <aside className="mb-8 lg:mb-0">
           <div className="card-sport hover:!translate-y-0 p-5 border border-border/80 bg-surface">
             <p className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-foreground">
-              <SlidersHorizontal className="h-4 w-4 text-cyan" /> Categorias & Filtros
+              <SlidersHorizontal className="h-4 w-4 text-cyan" /> Tipo & Categorias
             </p>
+
+            <p className="mt-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+              Tipo de Artigo
+            </p>
+            <div className="mt-2 flex flex-col gap-1.5">
+              <button
+                onClick={() => setModeFilter("all")}
+                className={cn(
+                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
+                  modeFilter === "all" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                )}
+              >
+                <span>Todos os Artigos</span>
+              </button>
+              <button
+                onClick={() => setModeFilter("product")}
+                className={cn(
+                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
+                  modeFilter === "product" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                )}
+              >
+                <span>Produtos Online</span>
+              </button>
+              <button
+                onClick={() => setModeFilter("service")}
+                className={cn(
+                  "flex items-center justify-between rounded px-3 py-2 text-left font-display text-xs uppercase tracking-[0.1em] transition-all",
+                  modeFilter === "service" ? "bg-cyan text-black font-bold" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                )}
+              >
+                <span>Serviços Sob Medida</span>
+              </button>
+            </div>
 
             <p className="mt-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
               Categorias

@@ -49,8 +49,8 @@ function Carrinho() {
   return (
     <PageShell>
       <PageHero
-        eyebrow="Carrinho"
-        title={`${totalItems} ${totalItems === 1 ? "artigo" : "artigos"} selecionados`}
+        eyebrow="Resumo do pedido"
+        title={`${totalItems} ${totalItems === 1 ? "artigo selecionado" : "artigos selecionados"}`}
         text="Revê a tua seleção antes de pedir o orçamento."
       />
 
@@ -104,6 +104,28 @@ function Carrinho() {
                         <Edit3 className="h-3 w-3" aria-hidden="true" />
                         Editar personalização
                       </Link>
+                    </div>
+                  )}
+                  {item.serviceDetails && (
+                    <div className="mt-2 rounded border border-border/80 bg-background/50 p-2.5 text-xs text-muted-foreground space-y-1">
+                      <p className="font-semibold text-foreground">
+                        Peça/Suporte: <span className="font-normal text-muted-foreground">{item.serviceDetails.itemOrServiceType}</span>
+                      </p>
+                      {item.serviceDetails.approxDimensions && (
+                        <p className="text-[0.7rem]">
+                          Medidas / Localização: <span className="text-foreground">{item.serviceDetails.approxDimensions}</span>
+                        </p>
+                      )}
+                      {item.serviceDetails.notes && (
+                        <p className="text-[0.7rem] italic">
+                          "{item.serviceDetails.notes}"
+                        </p>
+                      )}
+                      {item.serviceDetails.fileName && (
+                        <p className="text-[0.7rem] text-cyan">
+                          ✓ Ficheiro anexado: {item.serviceDetails.fileName}
+                        </p>
+                      )}
                     </div>
                   )}
                   <p className="mt-1 text-xs text-muted-foreground">Preço sob consulta</p>

@@ -80,13 +80,13 @@ export const equipamentoConfig = buildConfig(
         baseSrc: jerseyFrontWhite,
       },
       printArea: {
-        xFraction: 0.31,
-        yFraction: 0.245,
-        widthFraction: 0.38,
-        heightFraction: 0.46,
+        xFraction: 0.33,
+        yFraction: 0.23,
+        widthFraction: 0.34,
+        heightFraction: 0.58,
         shape: {
           type: "rounded",
-          cornerRadius: 12,
+          cornerRadius: 16,
         },
       },
     },
@@ -98,13 +98,13 @@ export const equipamentoConfig = buildConfig(
         baseSrc: jerseyBackWhite,
       },
       printArea: {
-        xFraction: 0.31,
-        yFraction: 0.245,
-        widthFraction: 0.38,
-        heightFraction: 0.46,
+        xFraction: 0.33,
+        yFraction: 0.23,
+        widthFraction: 0.34,
+        heightFraction: 0.58,
         shape: {
           type: "rounded",
-          cornerRadius: 12,
+          cornerRadius: 16,
         },
       },
     },
@@ -117,37 +117,19 @@ export const bandeiraConfig = buildConfig(
   [
     {
       id: "FRONT",
-      label: "Frente",
+      label: "Bandeira",
       mockupSrc: flagWhite,
       mockup: {
         baseSrc: flagWhite,
       },
       printArea: {
-        xFraction: 0.18,
-        yFraction: 0.22,
-        widthFraction: 0.64,
-        heightFraction: 0.5,
+        xFraction: 0.165,
+        yFraction: 0.16,
+        widthFraction: 0.69,
+        heightFraction: 0.58,
         shape: {
           type: "rounded",
-          cornerRadius: 8,
-        },
-      },
-    },
-    {
-      id: "BACK",
-      label: "Verso",
-      mockupSrc: flagWhite,
-      mockup: {
-        baseSrc: flagWhite,
-      },
-      printArea: {
-        xFraction: 0.18,
-        yFraction: 0.22,
-        widthFraction: 0.64,
-        heightFraction: 0.5,
-        shape: {
-          type: "rounded",
-          cornerRadius: 8,
+          cornerRadius: 10,
         },
       },
     },

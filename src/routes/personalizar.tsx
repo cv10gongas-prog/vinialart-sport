@@ -3,10 +3,6 @@ import {
   Link,
 } from "@tanstack/react-router";
 
-import {
-  Layers,
-  Paintbrush,
-} from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
 import { ProductCustomizer } from "@/components/sport/customizer/ProductCustomizer";
@@ -26,8 +22,8 @@ import { useCart } from "@/lib/cart/store";
 import { cn } from "@/lib/utils";
 
 export interface PersonalizarSearch {
-  produto?: string;
-  cartItem?: string;
+  produto?: string | undefined;
+  cartItem?: string | undefined;
 }
 
 export const Route = createFileRoute(
@@ -82,172 +78,107 @@ function Personalizar() {
         )
       : undefined;
 
-  const selectedProductId =
+  // Default to caneleiras if product is not explicitly specified, or if valid product param
+  const activeProductId =
     editingCartItem?.productId ??
     produto ??
     "caneleiras-personalizadas";
 
   const config =
     getProductCustomizerConfig(
-      selectedProductId,
+      activeProductId,
     ) ?? caneleirasConfig;
-
-  const selectedProduct =
-    products.find(
-      (product) =>
-        product.slug === config.id,
-    );
 
   const initialDesign =
     editingCartItem?.customizerDesign;
 
+  const customizableProducts = products.filter(
+    (p) => p.isCustomizable && p.customizationMode === "product",
+  );
+
   return (
     <PageShell>
-      <section className="grain border-b border-border bg-surface bg-tech-grid">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <nav className="font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
-            <Link
-              to="/"
-              className="hover:text-cyan"
-            >
-              Início
-            </Link>{" "}
-            /{" "}
-            <Link
-              to="/loja"
-              className="hover:text-cyan"
-            >
-              Loja
-            </Link>{" "}
-            /{" "}
-            <span className="text-foreground">
-              Personalizar
+      {/* Top compact Studio Bar: Switcher + State */}
+      <div className="border-b border-border/80 bg-surface/90 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="bg-magenta px-2 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-white">
+              STUDIO
             </span>
-          </nav>
+            <span className="hidden font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground sm:inline">
+              Personalização em Tempo Real
+            </span>
+          </div>
 
-          <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-cyan px-3 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-black">
-                <Paintbrush className="h-3.5 w-3.5" />
-                Personalizador online
-              </div>
+          {/* Product Switcher Chips: CANELEIRAS | EQUIPAMENTO | BANDEIRA */}
+          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
+            {customizableProducts.map((p) => {
+              const active = p.slug === config.id;
+              const shortLabel =
+                p.slug === "caneleiras-personalizadas"
+                  ? "Caneleiras"
+                  : p.slug === "equipamento-personalizado"
+                    ? "Equipamento"
+                    : p.slug === "bandeira-personalizada"
+                      ? "Bandeira"
+                      : p.name;
 
-              <h1 className="mt-3 text-3xl font-black sm:text-5xl">
-                {editingCartItem
-                  ? `Editar ${editingCartItem.productName}`
-                  : config.name}
-              </h1>
-
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                Carrega as tuas imagens,
-                posiciona os elementos e
-                alterna para a
-                pré-visualização sempre
-                que quiseres.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 border border-border bg-background/70 px-3 py-2 font-mono text-[0.62rem] uppercase tracking-widest text-cyan">
-              <Layers className="h-3.5 w-3.5" />
-              Preview no próprio site
-            </div>
+              return (
+                <Link
+                  key={p.slug}
+                  to="/personalizar"
+                  search={{
+                    produto: p.slug,
+                  }}
+                  className={cn(
+                    "whitespace-nowrap px-3 py-1 font-display text-[0.68rem] uppercase tracking-wider transition-all",
+                    active
+                      ? "bg-cyan font-bold text-black shadow-sm"
+                      : "border border-border/70 bg-background/60 text-muted-foreground hover:border-cyan hover:text-foreground",
+                  )}
+                >
+                  {shortLabel}
+                </Link>
+              );
+            })}
           </div>
         </div>
-      </section>
+      </div>
 
-      {!editingCartItem && (
-        <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
-          <p className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-muted-foreground">
-            Escolhe o que queres
-            personalizar
-          </p>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {products
-              .filter(
-                (product) =>
-                  product.isCustomizable,
-              )
-              .map((product) => {
-                const active =
-                  product.slug ===
-                  config.id;
-
-                return (
-                  <Link
-                    key={product.slug}
-                    to="/personalizar"
-                    search={{
-                      produto:
-                        product.slug,
-                    }}
-                    className={cn(
-                      "border px-4 py-2 font-display text-[0.65rem] uppercase tracking-wider transition-colors",
-                      active
-                        ? "border-magenta bg-magenta text-white"
-                        : "border-border bg-surface text-muted-foreground hover:border-cyan hover:text-cyan",
-                    )}
-                  >
-                    {product.name}
-                  </Link>
-                );
-              })}
-          </div>
-        </section>
-      )}
-
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {selectedProduct && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border border-border bg-surface px-4 py-3">
-            <div>
-              <p className="font-mono text-[0.58rem] uppercase tracking-widest text-muted-foreground">
-                Produto atual
-              </p>
-
-              <p className="font-display text-sm">
-                {selectedProduct.name}
-              </p>
-            </div>
-
-            <span className="font-mono text-[0.6rem] uppercase tracking-widest text-cyan">
-              {selectedProduct.priceLabel}
-            </span>
-          </div>
-        )}
-
+      {/* Main Studio Viewport */}
+      <section className="mx-auto max-w-7xl px-3 py-3 sm:px-6 sm:py-5">
         <ProductCustomizer
           key={config.id}
           config={config}
-          initialDesignJson={
-            initialDesign
-          }
+          initialDesignJson={initialDesign}
           cartItemId={cartItemId}
         />
       </section>
 
-      <section className="border-y border-border bg-surface/50 py-12">
+      {/* Steps reference footer */}
+      <section className="border-t border-border bg-surface/40 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
             eyebrow="Como funciona"
             title="Do design ao pedido"
-            text="Cria a proposta visual, confirma o resultado e guarda-a no carrinho."
+            text="Cria a proposta visual, confirma o resultado no preview e guarda-a no teu pedido."
           />
 
-          <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {steps.map((step) => (
               <li
                 key={step.n}
-                className="border border-border bg-background p-4"
+                className="border border-border bg-background p-3.5"
               >
-                <span className="font-display text-2xl text-magenta">
+                <span className="font-display text-xl text-magenta">
                   {step.n}
                 </span>
 
-                <p className="mt-2 font-display text-sm">
+                <p className="mt-1.5 font-display text-xs uppercase">
                   {step.title}
                 </p>
 
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                <p className="mt-1 text-[0.7rem] leading-relaxed text-muted-foreground">
                   {step.text}
                 </p>
               </li>

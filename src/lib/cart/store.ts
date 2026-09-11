@@ -54,14 +54,15 @@ export function useCart() {
         variant?: string | undefined;
         customizerDesign?: string | undefined;
         previewDataUrl?: string | undefined;
+        serviceDetails?: import("./types").ServiceQuoteDetails | undefined;
       },
     ): string => {
       const qty = Math.max(1, options?.quantity ?? 1);
       const newId = cartId();
       setItems((prev) => {
-        if (!options?.customizerDesign) {
+        if (!options?.customizerDesign && !options?.serviceDetails) {
           const existing = prev.find(
-            (i) => i.productId === productId && i.variant === options?.variant && !i.customizerDesign,
+            (i) => i.productId === productId && i.variant === options?.variant && !i.customizerDesign && !i.serviceDetails,
           );
           if (existing) {
             return prev.map((i) =>
@@ -77,6 +78,7 @@ export function useCart() {
           variant: options?.variant,
           customizerDesign: options?.customizerDesign,
           previewDataUrl: options?.previewDataUrl,
+          serviceDetails: options?.serviceDetails,
           addedAt: Date.now(),
         };
         return [...prev, newItem];
@@ -94,6 +96,7 @@ export function useCart() {
         previewDataUrl?: string | undefined;
         quantity?: number | undefined;
         variant?: string | undefined;
+        serviceDetails?: import("./types").ServiceQuoteDetails | undefined;
       },
     ) => {
       setItems((prev) =>
@@ -105,6 +108,7 @@ export function useCart() {
             ...(updates.previewDataUrl !== undefined ? { previewDataUrl: updates.previewDataUrl } : {}),
             ...(updates.quantity !== undefined ? { quantity: updates.quantity } : {}),
             ...(updates.variant !== undefined ? { variant: updates.variant } : {}),
+            ...(updates.serviceDetails !== undefined ? { serviceDetails: updates.serviceDetails } : {}),
           };
         }),
       );
