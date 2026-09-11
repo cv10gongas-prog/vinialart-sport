@@ -57,7 +57,18 @@ export function ProductCustomizer({
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;
-    const customizerDesign = serializeDesign();
+
+    // Design payload + production spec (exact placement data for print/WooCommerce)
+    let customizerDesign = serializeDesign();
+
+    try {
+      customizerDesign = JSON.stringify({
+        ...JSON.parse(customizerDesign),
+        productionSpec: customizer.buildProductionSpec(),
+      });
+    } catch {
+      // keep the plain design payload if merging fails
+    }
 
     if (cartItemId) {
       updateItem(cartItemId, {
@@ -199,9 +210,9 @@ export function ProductCustomizer({
 
       {/* Main Studio Workspace: 2 Columns on Desktop */}
       {/* Left (65-70%): Big Design Canvas. Right (30-35%): Live Preview + Tools + CTA */}
-      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
         {/* LEFT: Big Design Workspace Canvas */}
-        <div className="flex min-w-0 flex-col">
+        <div className="flex min-w-0 flex-col lg:sticky lg:top-24">
           <div
             onDragOver={(event) => {
               event.preventDefault();
@@ -239,8 +250,18 @@ export function ProductCustomizer({
             </div>
 
             {/* Design Canvas Viewport */}
-            <div className="relative flex min-h-[340px] w-full min-w-0 flex-1 items-center justify-center p-2 sm:min-h-[560px] sm:p-3">
-              <CanvasEditor config={config} customizer={customizer} />
+            <div className="relative flex w-full min-w-0 items-center justify-center p-2 sm:p-3">
+              {/* Stage keeps the product proportions so there is no dead space */}
+              <div
+                className="relative mx-auto w-full min-w-0"
+                style={{
+                  aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
+                  maxHeight: "min(66vh, 620px)",
+                  maxWidth: `calc(min(66vh, 620px) * ${config.canvasWidth / config.canvasHeight})`,
+                }}
+              >
+                <CanvasEditor config={config} customizer={customizer} />
+              </div>
 
               {isDraggingFile && (
                 <div className="pointer-events-none absolute inset-2 flex items-center justify-center border-2 border-dashed border-magenta bg-magenta/10">
@@ -251,10 +272,47 @@ export function ProductCustomizer({
               )}
             </div>
 
-            {/* Bottom Surface Subtitle */}
-            <div className="flex items-center justify-between border-t border-border/60 bg-surface/50 px-3 py-1.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-              <span>{activeSurface.label}</span>
-              <span>Grelha ativa</span>
+            {/* Quick gizmo actions for the selected artwork */}
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] px-3 py-2"
+              style={{ background: "#121214" }}
+            >
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => customizer.alignSelected("horizontal")}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
+                >
+                  Centrar H
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => customizer.alignSelected("vertical")}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-cyan hover:text-cyan disabled:opacity-30"
+                >
+                  Centrar V
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!customizer.selectedLayer}
+                  onClick={() => {
+                    if (customizer.selectedLayer) {
+                      customizer.deleteLayer(customizer.selectedLayer.id);
+                    }
+                  }}
+                  className="border border-white/10 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-wider text-muted-foreground transition-colors hover:border-destructive hover:text-destructive disabled:opacity-30"
+                >
+                  Limpar camada
+                </button>
+              </div>
+
+              <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                {activeSurface.label}
+              </span>
             </div>
           </div>
         </div>
@@ -269,7 +327,10 @@ export function ProductCustomizer({
           />
 
           {/* 2. Simplified Tools & Layer Management */}
-          <div className="rounded-none border border-border bg-surface p-4">
+          <div
+            className="rounded-md border border-white/[0.07] p-4"
+            style={{ background: "#1a1a1e" }}
+          >
             <CustomizerToolbar customizer={customizer} />
           </div>
 

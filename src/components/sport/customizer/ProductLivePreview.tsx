@@ -522,6 +522,12 @@ export function LiveSurfaceRenderer({
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}
+                      opacity={layer.opacity ?? 1}
+                      globalCompositeOperation={
+                        layer.blendMode === "normal"
+                          ? "source-over"
+                          : (layer.blendMode ?? "multiply")
+                      }
                     />
                   );
                 }
@@ -552,6 +558,18 @@ export function LiveSurfaceRenderer({
 
           {/* Realistic Surface Shading/Highlight */}
           <Layer listening={false}>
+            {mockupImg && (
+              <Group clipFunc={clipFunc}>
+                <KonvaImage
+                  image={mockupImg}
+                  width={config.canvasWidth}
+                  height={config.canvasHeight}
+                  opacity={0.55}
+                  globalCompositeOperation="multiply"
+                />
+              </Group>
+            )}
+
             <Group clipFunc={clipFunc}>
               <Rect
                 x={paX}

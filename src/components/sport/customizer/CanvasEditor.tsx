@@ -261,6 +261,13 @@ function KonvaStageInner({
 
   const isEditMode = customizer.viewMode === "edit";
 
+  /**
+   * Guides stay discreet: they only appear while a layer is selected or when
+   * the surface is still empty, so the mockup reads like a real product photo.
+   */
+  const showGuides =
+    Boolean(selectedLayer) || activeLayers.length === 0;
+
   const sortedLayers = [...activeLayers]
     .filter((layer) => layer.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
@@ -466,17 +473,17 @@ function KonvaStageInner({
       <Layer
         name="guide-layer"
         listening={false}
-        visible={isEditMode}
+        visible={isEditMode && showGuides}
+        opacity={selectedLayer ? 0.9 : 0.5}
       >
         {contourPoints ? (
           <Line
             points={contourPoints}
             closed
-            stroke="#00c8ff"
-            strokeWidth={2}
-            dash={[7, 5]}
+            stroke="#5ac8fa"
+            strokeWidth={1}
+            dash={[4, 5]}
             lineJoin="round"
-            fill="rgba(0,200,255,0.035)"
           />
         ) : (
           <Rect
@@ -490,10 +497,9 @@ function KonvaStageInner({
                 ? printArea.shape.cornerRadius
                 : 0
             }
-            stroke="#00c8ff"
-            strokeWidth={2}
-            dash={[7, 5]}
-            fill="rgba(0,200,255,0.035)"
+            stroke="#5ac8fa"
+            strokeWidth={1}
+            dash={[4, 5]}
           />
         )}
       </Layer>
@@ -521,6 +527,11 @@ function KonvaStageInner({
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
                   opacity={layer.opacity ?? 1}
+                  globalCompositeOperation={
+                    layer.blendMode === "normal"
+                      ? "source-over"
+                      : (layer.blendMode ?? "multiply")
+                  }
                   draggable={
                     !layer.locked && isEditMode
                   }
@@ -595,13 +606,16 @@ function KonvaStageInner({
           <Transformer
             name="selection-transformer"
             ref={transformerRef}
-            borderStroke="#00c8ff"
-            borderStrokeWidth={1.5}
-            anchorFill="#ffffff"
-            anchorStroke="#00c8ff"
-            anchorSize={10}
+            borderStroke="#5ac8fa"
+            borderStrokeWidth={1}
+            borderDash={[3, 3]}
+            anchorFill="#0f1115"
+            anchorStroke="#5ac8fa"
+            anchorStrokeWidth={1}
+            anchorSize={9}
+            anchorCornerRadius={5}
             rotateEnabled
-            rotateAnchorOffset={22}
+            rotateAnchorOffset={24}
             rotationSnaps={[
               0, 15, 30, 45, 60, 75, 90, 105, 120, 135,
               150, 165, 180, 195, 210, 225, 240, 255,
@@ -633,6 +647,19 @@ function KonvaStageInner({
       </Layer>
 
       <Layer name="overlay-layer" listening={false}>
+        {/* Fabric texture, seams and product shadows re-projected over the art */}
+        {mockupImg && (
+          <Group clipFunc={clipFunc}>
+            <KonvaImage
+              image={mockupImg}
+              width={config.canvasWidth}
+              height={config.canvasHeight}
+              opacity={0.55}
+              globalCompositeOperation="multiply"
+            />
+          </Group>
+        )}
+
         <Group clipFunc={clipFunc}>
           <Rect
             x={paX}

@@ -94,6 +94,9 @@ export function CustomizerToolbar({
   const [bgError, setBgError] =
     useState<string | null>(null);
 
+  const [isPanelDragOver, setIsPanelDragOver] =
+    useState(false);
+
   useEffect(() => {
     setShowTextPanel(false);
   }, [state.activeSurfaceId]);
@@ -269,17 +272,45 @@ export function CustomizerToolbar({
 
             fileInputRef.current?.click();
           }}
-          className="flex w-full flex-col items-center gap-2 border border-dashed border-border bg-surface-2 px-3 py-5 text-center transition-colors hover:border-magenta"
-        >
-          <Upload className="h-5 w-5 text-magenta" />
+          onDragOver={(event) => {
+            event.preventDefault();
+            setIsPanelDragOver(true);
+          }}
+          onDragLeave={() => setIsPanelDragOver(false)}
+          onDrop={(event) => {
+            event.preventDefault();
+            setIsPanelDragOver(false);
 
-          <span className="text-xs text-foreground">
-            Carregar imagens ou
-            logótipos
+            if (event.dataTransfer.files.length > 0) {
+              addImagesFromFiles(event.dataTransfer.files);
+            }
+          }}
+          className={cn(
+            "group flex w-full flex-col items-center gap-2.5 rounded-md border border-dashed px-3 py-6 text-center transition-all duration-200",
+            isPanelDragOver
+              ? "border-magenta bg-magenta/10 scale-[1.01]"
+              : "border-white/10 bg-white/[0.02] hover:border-magenta/70 hover:bg-white/[0.04]",
+          )}
+        >
+          <span
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-full border transition-colors",
+              isPanelDragOver
+                ? "border-magenta bg-magenta/20 text-magenta"
+                : "border-white/10 bg-white/[0.03] text-magenta group-hover:border-magenta/50",
+            )}
+          >
+            <Upload className="h-4 w-4" />
           </span>
 
-          <span className="font-mono text-[0.58rem] uppercase tracking-widest text-muted-foreground">
-            Arrasta para a área de design · JPG · PNG · WEBP · Ctrl+V
+          <span className="text-xs text-foreground">
+            {isPanelDragOver
+              ? "Larga aqui o ficheiro"
+              : "Arrasta a tua imagem ou clica para escolher"}
+          </span>
+
+          <span className="font-mono text-[0.56rem] uppercase tracking-[0.18em] text-muted-foreground">
+            PNG · JPG · WEBP · Ctrl+V
           </span>
         </button>
       </div>
@@ -471,6 +502,48 @@ export function CustomizerToolbar({
               className="accent-cyan"
             />
           </label>
+
+          {selectedLayer.type === "image" && (
+            <div className="grid gap-1">
+              <span className="font-mono text-[0.58rem] uppercase tracking-wider text-muted-foreground">
+                Fusão com o produto
+              </span>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    ["multiply", "Realista"],
+                    ["overlay", "Tecido"],
+                    ["normal", "Sólido"],
+                  ] as const
+                ).map(([mode, label]) => {
+                  const active =
+                    (selectedLayer.type === "image" &&
+                      selectedLayer.blendMode) ||
+                    "multiply";
+
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() =>
+                        handleUpdateLayer({ blendMode: mode })
+                      }
+                      className={cn(
+                        "border py-2 font-mono text-[0.58rem] uppercase tracking-wider transition-colors",
+                        active === mode
+                          ? "border-cyan text-cyan"
+                          : "border-white/10 text-muted-foreground hover:border-cyan/60 hover:text-foreground",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
 
           <p className="font-mono text-[0.55rem] leading-relaxed text-muted-foreground">
             Setas do teclado movem 1px · Shift+setas 10px ·
