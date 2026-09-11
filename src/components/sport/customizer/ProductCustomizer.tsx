@@ -210,9 +210,9 @@ export function ProductCustomizer({
 
       {/* Main Studio Workspace: 2 Columns on Desktop */}
       {/* Left (65-70%): Big Design Canvas. Right (30-35%): Live Preview + Tools + CTA */}
-      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
         {/* LEFT: Big Design Workspace Canvas */}
-        <div className="flex min-w-0 flex-col">
+        <div className="flex min-w-0 flex-col lg:sticky lg:top-24">
           <div
             onDragOver={(event) => {
               event.preventDefault();
