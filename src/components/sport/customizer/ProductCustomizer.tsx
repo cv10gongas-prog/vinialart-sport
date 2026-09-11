@@ -53,6 +53,7 @@ export function ProductCustomizer({
 
   const [savedToCart, setSavedToCart] = useState(false);
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;
@@ -198,10 +199,32 @@ export function ProductCustomizer({
 
       {/* Main Studio Workspace: 2 Columns on Desktop */}
       {/* Left (65-70%): Big Design Canvas. Right (30-35%): Live Preview + Tools + CTA */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
+      <div className="mt-6 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1.4fr)_360px]">
         {/* LEFT: Big Design Workspace Canvas */}
-        <div className="flex flex-col">
-          <div className="relative flex flex-col overflow-hidden border border-border bg-black/95 shadow-inner">
+        <div className="flex min-w-0 flex-col">
+          <div
+            onDragOver={(event) => {
+              event.preventDefault();
+              setIsDraggingFile(true);
+            }}
+            onDragLeave={() => setIsDraggingFile(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              setIsDraggingFile(false);
+
+              if (event.dataTransfer.files.length > 0) {
+                customizer.addImagesFromFiles(
+                  event.dataTransfer.files,
+                );
+              }
+            }}
+            className={cn(
+              "relative flex min-w-0 flex-1 flex-col overflow-hidden border bg-black/95 shadow-inner transition-colors",
+              isDraggingFile
+                ? "border-magenta"
+                : "border-border",
+            )}
+          >
             {/* Top Workspace Header */}
             <div className="flex items-center justify-between border-b border-border/60 bg-surface/80 px-3 py-2">
               <div className="flex items-center gap-2">
@@ -210,14 +233,22 @@ export function ProductCustomizer({
                   Área de Design // {activeSurface.label}
                 </span>
               </div>
-              <span className="font-mono text-[0.55rem] uppercase tracking-wider text-muted-foreground">
-                Clica nos elementos para mover e dimensionar
+              <span className="hidden font-mono text-[0.55rem] uppercase tracking-wider text-muted-foreground sm:inline">
+                Arrasta imagens para aqui · setas movem · Del apaga
               </span>
             </div>
 
             {/* Design Canvas Viewport */}
-            <div className="flex min-h-[500px] w-full items-center justify-center p-3 sm:min-h-[620px]">
+            <div className="relative flex min-h-[340px] w-full min-w-0 flex-1 items-center justify-center p-2 sm:min-h-[560px] sm:p-3">
               <CanvasEditor config={config} customizer={customizer} />
+
+              {isDraggingFile && (
+                <div className="pointer-events-none absolute inset-2 flex items-center justify-center border-2 border-dashed border-magenta bg-magenta/10">
+                  <span className="font-display text-xs uppercase tracking-widest text-magenta">
+                    Larga a imagem para adicionar
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Bottom Surface Subtitle */}
@@ -229,7 +260,7 @@ export function ProductCustomizer({
         </div>
 
         {/* RIGHT: Live Preview (Top) + Tooling & Layers (Middle) + Action (Bottom) */}
-        <div className="flex flex-col gap-5">
+        <div className="flex min-w-0 flex-col gap-5">
           {/* 1. Live 2.5D Mockup Preview */}
           <ProductLivePreview
             config={config}
