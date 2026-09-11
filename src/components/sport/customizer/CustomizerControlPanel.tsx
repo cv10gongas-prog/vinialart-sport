@@ -94,7 +94,7 @@ export function CustomizerControlPanel({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-full bg-foreground py-4 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90"
+          className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90"
         >
           <Upload className="h-4 w-4" />
           <span>Carregar design</span>
