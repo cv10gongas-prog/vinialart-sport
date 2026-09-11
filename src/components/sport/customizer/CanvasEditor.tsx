@@ -606,13 +606,16 @@ function KonvaStageInner({
           <Transformer
             name="selection-transformer"
             ref={transformerRef}
-            borderStroke="#00c8ff"
-            borderStrokeWidth={1.5}
-            anchorFill="#ffffff"
-            anchorStroke="#00c8ff"
-            anchorSize={10}
+            borderStroke="#5ac8fa"
+            borderStrokeWidth={1}
+            borderDash={[3, 3]}
+            anchorFill="#0f1115"
+            anchorStroke="#5ac8fa"
+            anchorStrokeWidth={1}
+            anchorSize={9}
+            anchorCornerRadius={5}
             rotateEnabled
-            rotateAnchorOffset={22}
+            rotateAnchorOffset={24}
             rotationSnaps={[
               0, 15, 30, 45, 60, 75, 90, 105, 120, 135,
               150, 165, 180, 195, 210, 225, 240, 255,
