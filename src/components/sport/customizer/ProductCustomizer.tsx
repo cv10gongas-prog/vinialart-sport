@@ -317,7 +317,10 @@ export function ProductCustomizer({
           />
 
           {/* 2. Simplified Tools & Layer Management */}
-          <div className="rounded-none border border-border bg-surface p-4">
+          <div
+            className="rounded-md border border-white/[0.07] p-4"
+            style={{ background: "#1a1a1e" }}
+          >
             <CustomizerToolbar customizer={customizer} />
           </div>
 
