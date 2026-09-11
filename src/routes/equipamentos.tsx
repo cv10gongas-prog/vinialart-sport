@@ -67,7 +67,7 @@ function Equipamentos() {
           </div>
         </div>
 
-        <div className="mt-14 border border-border bg-surface p-8 text-center">
+        <div className="mt-16 rounded-3xl bg-surface/50 p-10 text-center">
           <h2 className="text-2xl sm:text-3xl">Encomenda para a tua equipa</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
             Envia-nos a tua lista de nomes, números e detalhes pretendidos e preparamos a proposta.
