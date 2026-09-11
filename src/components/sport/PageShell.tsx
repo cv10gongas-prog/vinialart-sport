@@ -24,7 +24,7 @@ export function PageHero({
 }) {
   return (
     <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-magenta/12 blur-[140px]" />
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full bg-magenta/5 blur-[160px]" />
       <div className="relative mx-auto max-w-[1600px] px-5 pb-14 pt-16 sm:px-8 md:pb-20 md:pt-24">
         <span className="label-eyebrow">{eyebrow}</span>
         <h1 className="mt-5 max-w-4xl break-words text-[2.4rem] leading-[0.9] sm:text-6xl md:text-7xl">
