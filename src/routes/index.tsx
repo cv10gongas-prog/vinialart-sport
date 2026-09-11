@@ -1,14 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
-
-import heroBrush from "@/assets/hero-brush.jpg";
-import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
-import prodCaneleiraDetail from "@/assets/prod-caneleira-detail.jpg";
-import prodEquipamento from "@/assets/prod-equipamento.jpg";
-import prodBandeira from "@/assets/prod-bandeira.jpg";
+import { ArrowUpRight, Upload, MessageSquare } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
-import { ProductCard } from "@/components/sport/ProductCard";
 import { SportLink } from "@/components/sport/SportButton";
 import { products } from "@/lib/sport-data";
 
@@ -17,17 +10,20 @@ export const Route = createFileRoute("/")({
 
   head: () => ({
     meta: [
-      { title: "VinilArt Sport — Personaliza o teu jogo" },
+      { title: "VinilArt Sport — Personalização desportiva" },
       {
         name: "description",
         content:
-          "Personalização desportiva para atletas, clubes e adeptos: caneleiras, equipamentos, bandeiras, estampagem e impressão.",
+          "Divisão desportiva da VinilArt: personalização, design e impressão em caneleiras, equipamentos, bandeiras, artigos para adeptos e estampagem.",
       },
-      { property: "og:title", content: "VinilArt Sport — Personaliza o teu jogo" },
+      {
+        property: "og:title",
+        content: "VinilArt Sport — Personalização desportiva",
+      },
       {
         property: "og:description",
         content:
-          "Personalização desportiva para atletas, clubes e adeptos: caneleiras, equipamentos e bandeiras.",
+          "Personalizamos material para o mundo do desporto: caneleiras, equipamentos, bandeiras, adeptos, estampagem e impressão.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -35,192 +31,274 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+/** Áreas de personalização (produtos com editor próprio). */
+const areas = [
+  { slug: "caneleiras-personalizadas", label: "Caneleiras" },
+  { slug: "equipamento-personalizado", label: "Equipamentos" },
+  { slug: "bandeira-personalizada", label: "Bandeiras" },
+];
+
 const services = [
   {
     slug: "adeptos",
     name: "Artigos para adeptos",
-    text: "Bandeiras e artigos de apoio preparados com as cores e símbolos do teu clube.",
+    text: "Artigos de apoio preparados com as cores e símbolos do clube.",
     to: "/adeptos" as const,
   },
   {
     slug: "estampagem",
     name: "Estampagem",
-    text: "Nomes, números, emblemas e grafismos aplicados em equipamentos e peças desportivas.",
+    text: "Nomes, números, emblemas e grafismos em peças desportivas.",
     to: "/produto/$slug" as const,
     params: { slug: "estampagem" },
   },
   {
     slug: "impressao",
     name: "Impressão",
-    text: "Impressão gráfica personalizada a partir do teu ficheiro, em suportes à medida.",
+    text: "Impressão gráfica a partir do teu ficheiro, em suportes à medida.",
     to: "/produto/$slug" as const,
     params: { slug: "impressao" },
   },
 ];
 
+/**
+ * Espaços reservados para fotografias reais de trabalhos VinilArt Sport.
+ * Sem imagens inventadas: composição tipográfica até existirem fotografias.
+ */
+const workSlots = [
+  { label: "Caneleiras", ratio: "aspect-[4/5]", accent: "bg-magenta" },
+  { label: "Equipamentos", ratio: "aspect-[4/3]", accent: "bg-cyan" },
+  { label: "Bandeiras", ratio: "aspect-[4/3]", accent: "bg-yellow" },
+  { label: "Adeptos", ratio: "aspect-[4/5]", accent: "bg-cyan" },
+  { label: "Estampagem", ratio: "aspect-[4/5]", accent: "bg-magenta" },
+  { label: "Impressão", ratio: "aspect-[4/3]", accent: "bg-yellow" },
+];
+
 function Home() {
-  const featured = products.filter(
-    (p) => p.isCustomizable && p.customizationMode === "product",
-  );
+  const areaProducts = areas
+    .map((area) => ({
+      ...area,
+      product: products.find((p) => p.slug === area.slug),
+    }))
+    .filter((a) => a.product);
 
   return (
     <PageShell>
-      {/* HERO — campanha de marca: texto curto, produto grande */}
+      {/* HERO — editorial, preto e branco, assinatura CMYK discreta */}
       <section className="relative -mt-[84px] overflow-hidden">
-        <img
-          src={heroBrush}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/70" />
+        <div className="relative mx-auto grid w-full max-w-[1600px] items-center gap-14 px-5 pb-20 pt-32 sm:px-8 sm:pb-24 sm:pt-40 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="flex gap-1" aria-hidden="true">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
+                <span className="h-1.5 w-1.5 rounded-full bg-magenta" />
+                <span className="h-1.5 w-1.5 rounded-full bg-yellow" />
+              </span>
+              <span className="label-eyebrow">VinilArt Sport</span>
+            </div>
 
-        <div className="relative mx-auto grid w-full max-w-[1600px] items-center gap-12 px-5 pb-16 pt-28 sm:px-8 sm:pb-20 sm:pt-32 lg:min-h-[84svh] lg:grid-cols-[1.02fr_1fr] lg:gap-16">
-          <div className="lg:pb-10">
-            <span className="label-eyebrow rise-in">VinilArt Sport</span>
-
-            <h1 className="rise-in mt-5 text-[3.1rem] leading-[0.84] sm:text-[5.2rem] lg:text-[6.2rem] xl:text-[7rem]">
-              O teu design.
-              <br />
-              <span className="text-sport-gradient">O teu jogo.</span>
+            <h1 className="rise-in mt-7 max-w-[18ch] text-[2.7rem] leading-[0.98] sm:text-[3.8rem] lg:text-[4.4rem]">
+              Personalizamos o material do teu desporto.
             </h1>
 
-            <p className="rise-in mt-7 max-w-md text-base text-muted-foreground sm:text-lg">
-              Personalização desportiva para atletas, clubes e adeptos.
+            <p className="rise-in mt-8 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Divisão desportiva da VinilArt. Design, personalização e impressão
+              em caneleiras, equipamentos, bandeiras, artigos para adeptos e
+              estampagem — para atletas, clubes e claques.
             </p>
 
-            <div className="rise-in mt-9 flex flex-wrap items-center gap-3">
+            <div className="rise-in mt-10 flex flex-wrap items-center gap-3">
               <SportLink to="/loja" size="lg" variant="primary">
                 Ver loja
               </SportLink>
-              <SportLink to="/personalizar" size="lg" variant="outline">
-                Personalizar
+              <SportLink to="/portfolio" size="lg" variant="outline">
+                Ver trabalhos
               </SportLink>
             </div>
           </div>
 
-          <div className="rise-in relative">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-10 rounded-full bg-magenta/20 blur-[120px]"
-            />
-            <div className="relative overflow-hidden rounded-[2rem] bg-studio">
-              <img
-                src={prodCaneleiras}
-                alt="Caneleiras personalizadas pela VinilArt Sport"
-                className="aspect-[4/5] w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
+          {/* Composição editorial: sem fotografia inventada */}
+          <div className="rise-in relative lg:-mr-8">
+            <div className="border-l border-border pl-8 sm:pl-10">
+              <ul className="space-y-0">
+                {[
+                  "Caneleiras",
+                  "Equipamentos",
+                  "Bandeiras",
+                  "Artigos para adeptos",
+                  "Estampagem",
+                  "Impressão",
+                ].map((item, index) => (
+                  <li
+                    key={item}
+                    className="flex items-baseline gap-4 border-b border-border/60 py-4 last:border-b-0"
+                  >
+                    <span className="font-mono text-[0.62rem] tracking-[0.2em] text-muted-foreground">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="font-display text-lg uppercase leading-none sm:text-2xl">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-8 max-w-xs font-mono text-[0.62rem] uppercase tracking-[0.2em] text-muted-foreground">
+                Personalização · Design · Impressão
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* PRODUTOS */}
-      <section className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 md:py-32">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <h2 className="max-w-xl text-[2rem] leading-[0.95] sm:text-5xl">
-            Produtos personalizáveis
+      {/* O QUE PERSONALIZAMOS */}
+      <section className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 md:py-28">
+        <div className="flex flex-wrap items-end justify-between gap-6 border-t border-border pt-10">
+          <h2 className="text-[1.9rem] leading-[1] sm:text-4xl">
+            O que personalizamos
           </h2>
           <Link
             to="/loja"
-            className="group inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
+            className="group inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
           >
-            <span>Ver tudo</span>
+            <span>Ver loja</span>
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((product) => (
-            <ProductCard key={product.slug} product={product} size="feature" />
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {areaProducts.map(({ slug, label, product }) => (
+            <Link
+              key={slug}
+              to="/produto/$slug"
+              params={{ slug }}
+              className="group relative block overflow-hidden rounded-[1.5rem] bg-studio"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden">
+                <img
+                  src={product!.image}
+                  alt={`Mockup neutro — ${label}`}
+                  loading="lazy"
+                  className="h-full w-full object-contain p-8 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl uppercase leading-none sm:text-2xl">
+                      {label}
+                    </h3>
+                    <span className="mt-2 block h-px w-8 bg-magenta transition-all duration-500 group-hover:w-16" />
+                  </div>
+                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground">
+                    Personalizar
+                  </span>
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
 
-
-      {/* PORTFÓLIO */}
-      <section className="border-y border-border bg-surface/30 py-24 md:py-32">
+      {/* TRABALHOS REALIZADOS */}
+      <section className="border-y border-border bg-surface/25 py-20 md:py-28">
         <div className="mx-auto max-w-[1600px] px-5 sm:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="text-[2rem] leading-[0.95] sm:text-5xl">
+            <h2 className="text-[1.9rem] leading-[1] sm:text-4xl">
               Trabalhos realizados
             </h2>
             <Link
               to="/portfolio"
-              className="inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
+              className="group inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
             >
               <span>Ver portfólio</span>
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2">
-            <figure className="group relative overflow-hidden rounded-2xl bg-studio sm:col-span-2 lg:row-span-2">
-              <img
-                src={prodCaneleiras}
-                alt="Caneleiras personalizadas produzidas pela VinilArt Sport"
-                loading="lazy"
-                className="media-zoom h-full min-h-[320px] w-full object-cover lg:min-h-[640px]"
-              />
-              <figcaption className="absolute inset-x-6 bottom-6 flex items-end justify-between opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                <span className="font-display text-lg">Caneleiras</span>
-                <span className="text-[0.65rem] uppercase tracking-[0.24em] text-muted-foreground">
-                  Personalização
-                </span>
-              </figcaption>
-            </figure>
-
-            {[
-              { src: prodCaneleiraDetail, label: "Aplicação", alt: "Detalhe gráfico aplicado numa caneleira" },
-              { src: prodEquipamento, label: "Equipamento", alt: "Equipamento desportivo personalizado" },
-              { src: prodBandeira, label: "Bandeira", alt: "Bandeira personalizada para adeptos" },
-            ].map((item) => (
+          <div className="mt-10 columns-1 gap-5 sm:columns-2 lg:columns-3 [&>figure]:mb-5">
+            {workSlots.map((slot) => (
               <figure
-                key={item.label}
-                className="group relative overflow-hidden rounded-2xl bg-studio"
+                key={slot.label}
+                className={`relative flex break-inside-avoid items-end overflow-hidden rounded-[1.25rem] border border-border/70 bg-studio ${slot.ratio}`}
               >
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  loading="lazy"
-                  className="media-zoom h-full min-h-[280px] w-full object-cover"
-                />
-                <figcaption className="absolute inset-x-5 bottom-5 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                  <span className="font-display text-base">{item.label}</span>
+                <figcaption className="w-full p-6">
+                  <span className={`mb-4 block h-px w-8 ${slot.accent}`} />
+                  <span className="block font-display text-lg uppercase leading-none">
+                    {slot.label}
+                  </span>
+                  <span className="mt-2 block font-mono text-[0.58rem] uppercase tracking-[0.2em] text-muted-foreground">
+                    Fotografia real por colocar
+                  </span>
                 </figcaption>
               </figure>
             ))}
+          </div>
+        </div>
+      </section>
 
-            <figure className="group relative hidden overflow-hidden rounded-2xl bg-studio lg:block">
-              <img
-                src={prodCaneleiraDetail}
-                alt="Grafismo desportivo aplicado em caneleira"
-                loading="lazy"
-                className="media-zoom h-full min-h-[280px] w-full object-cover"
-              />
-            </figure>
+      {/* COMO QUERES AVANÇAR? */}
+      <section className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 md:py-28">
+        <h2 className="text-[1.9rem] leading-[1] sm:text-4xl">
+          Como queres avançar?
+        </h2>
+
+        <div className="mt-10 grid gap-5 lg:grid-cols-2">
+          <div className="flex flex-col justify-between rounded-[1.5rem] border border-border bg-surface/40 p-8 transition-colors hover:bg-surface/70 sm:p-10">
+            <div>
+              <Upload className="h-5 w-5 text-cyan" />
+              <h3 className="mt-6 text-2xl leading-none sm:text-3xl">
+                Já tens o design?
+              </h3>
+              <p className="mt-5 max-w-md text-sm text-muted-foreground sm:text-base">
+                Carrega o teu ficheiro e vê como pode ficar no produto.
+              </p>
+            </div>
+            <SportLink
+              to="/personalizar"
+              size="lg"
+              variant="primary"
+              className="mt-10 self-start"
+            >
+              Personalizar
+            </SportLink>
+          </div>
+
+          <div className="flex flex-col justify-between rounded-[1.5rem] border border-border bg-surface/40 p-8 transition-colors hover:bg-surface/70 sm:p-10">
+            <div>
+              <MessageSquare className="h-5 w-5 text-magenta" />
+              <h3 className="mt-6 text-2xl leading-none sm:text-3xl">
+                Ainda não tens o design?
+              </h3>
+              <p className="mt-5 max-w-md text-sm text-muted-foreground sm:text-base">
+                Envia a tua ideia ou referência e a VinilArt trata contigo da
+                personalização.
+              </p>
+            </div>
+            <SportLink
+              to="/contactos"
+              size="lg"
+              variant="outline"
+              className="mt-10 self-start"
+            >
+              Pedir ajuda
+            </SportLink>
           </div>
         </div>
       </section>
 
       {/* SERVIÇOS */}
-      <section className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 md:py-32">
-        <h2 className="max-w-xl text-[2rem] leading-[0.95] sm:text-5xl">
-          Serviços
-        </h2>
+      <section className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 md:pb-28">
+        <h2 className="text-[1.9rem] leading-[1] sm:text-4xl">Serviços</h2>
 
-        <div className="mt-12 divide-y divide-border border-t border-border">
+        <div className="mt-10 divide-y divide-border border-t border-border">
           {services.map((service) =>
             service.params ? (
               <Link
                 key={service.slug}
                 to={service.to}
                 params={service.params}
-                className="group flex flex-wrap items-baseline justify-between gap-4 py-8 transition-colors hover:bg-foreground/[0.03] sm:px-2"
+                className="group flex flex-wrap items-baseline justify-between gap-4 py-7 transition-colors hover:bg-foreground/[0.03] sm:px-2"
               >
-                <span className="font-display text-2xl sm:text-3xl">
+                <span className="font-display text-xl uppercase sm:text-2xl">
                   {service.name}
                 </span>
                 <span className="max-w-md flex-1 text-sm text-muted-foreground sm:text-right">
@@ -232,9 +310,9 @@ function Home() {
               <Link
                 key={service.slug}
                 to={service.to}
-                className="group flex flex-wrap items-baseline justify-between gap-4 py-8 transition-colors hover:bg-foreground/[0.03] sm:px-2"
+                className="group flex flex-wrap items-baseline justify-between gap-4 py-7 transition-colors hover:bg-foreground/[0.03] sm:px-2"
               >
-                <span className="font-display text-2xl sm:text-3xl">
+                <span className="font-display text-xl uppercase sm:text-2xl">
                   {service.name}
                 </span>
                 <span className="max-w-md flex-1 text-sm text-muted-foreground sm:text-right">
@@ -247,18 +325,18 @@ function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative overflow-hidden border-t border-border">
-        <div className="pointer-events-none absolute -bottom-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-magenta/15 blur-[150px]" />
-        <div className="relative mx-auto max-w-3xl px-5 py-24 text-center sm:px-8 md:py-32">
-          <h2 className="text-[2.2rem] leading-[0.95] sm:text-6xl">
-            Tens uma ideia?
-          </h2>
-          <p className="mx-auto mt-6 max-w-lg text-base text-muted-foreground sm:text-lg">
-            Envia-nos o teu ficheiro ou a tua referência. A VinilArt trata do
-            resto.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
+      {/* CTA / CONTACTO */}
+      <section className="border-t border-border">
+        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-10 px-5 py-20 sm:px-8 md:py-24">
+          <div className="max-w-xl">
+            <h2 className="text-[1.9rem] leading-[1] sm:text-4xl">
+              Fala com a VinilArt Sport
+            </h2>
+            <p className="mt-5 text-sm text-muted-foreground sm:text-base">
+              Envia o teu ficheiro ou a tua ideia e recebes uma proposta.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
             <SportLink to="/contactos" size="lg" variant="primary">
               Pedir orçamento
             </SportLink>
