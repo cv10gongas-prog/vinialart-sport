@@ -48,12 +48,11 @@ export const products: Product[] = [
     slug: "caneleiras-personalizadas",
     name: "Caneleiras Personalizadas",
     category: "Caneleiras",
-    image: shinGuardPairWhite,
+    image: prodCaneleiras,
     gallery: [
-      shinGuardPairWhite,
-      shinGuardSingleWhite,
-      shinGuardDetailWhite,
-      shinGuardBackWhite,
+      prodCaneleiraDetail,
+      prodCaneleiraAngle,
+      prodCaneleiraBack,
     ],
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável", "Mais popular"],
@@ -66,7 +65,7 @@ export const products: Product[] = [
     slug: "equipamento-personalizado",
     name: "Equipamento Personalizado",
     category: "Equipamentos",
-    image: jerseyFrontWhite,
+    image: prodEquipamento,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
@@ -78,7 +77,7 @@ export const products: Product[] = [
     slug: "bandeira-personalizada",
     name: "Bandeira Personalizada",
     category: "Bandeiras",
-    image: flagWhite,
+    image: prodBandeira,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
@@ -90,7 +89,7 @@ export const products: Product[] = [
     slug: "artigos-adeptos",
     name: "Artigos para Adeptos",
     category: "Artigos para Adeptos",
-    image: supporterItemWhite,
+    image: prodAdeptos,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
@@ -102,7 +101,7 @@ export const products: Product[] = [
     slug: "estampagem",
     name: "Estampagem",
     category: "Estampagem",
-    image: jerseyFrontWhite,
+    image: prodEstampagem,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
@@ -114,7 +113,7 @@ export const products: Product[] = [
     slug: "impressao",
     name: "Impressão",
     category: "Impressão",
-    image: printSurfaceWhite,
+    image: prodImpressao,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
     description:
