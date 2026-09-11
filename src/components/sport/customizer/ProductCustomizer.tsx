@@ -274,7 +274,7 @@ export function ProductCustomizer({
           </div>
 
           {/* 3. Primary CTA: Add to Order / Update */}
-          <div className="sticky bottom-4 z-10 bg-background/95 p-2 backdrop-blur-sm sm:static sm:p-0">
+          <div className="mt-1">
             <SportButton
               size="lg"
               onClick={handleAddToCart}
