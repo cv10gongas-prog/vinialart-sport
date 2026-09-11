@@ -43,7 +43,7 @@ export function EditorMock({
             <img
               src={shinGuardPairWhite}
               alt="Design aplicado ao produto final em tempo real"
-              className="aspect-[16/10] w-full object-cover"
+              className="aspect-[16/10] w-full object-contain p-6"
             />
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between border border-border/60 bg-black/80 px-3 py-2 backdrop-blur-sm">
               <div className="flex items-center gap-2 font-mono text-[0.6rem] text-cyan">

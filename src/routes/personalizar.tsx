@@ -108,14 +108,13 @@ function Personalizar() {
                     {product?.image && (
                       <img
                         src={product.image}
-                        alt={product.name}
+                        alt={`Mockup neutro — ${product.name}`}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                        className="h-full w-full object-contain p-6 pb-24 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                       />
                     )}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-background via-background/55 to-transparent" />
-
                     <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
+
                       <div>
                         <h2 className="text-2xl leading-[0.92] sm:text-[2rem]">
                           {item.name}

@@ -116,7 +116,7 @@ function Produto() {
               <img
                 src={selectedImage}
                 alt={product.name}
-                className="aspect-[4/3] w-full object-cover lg:aspect-[5/4]"
+                className="aspect-[4/3] w-full object-contain p-12 lg:aspect-[5/4]"
               />
             </div>
 
@@ -138,7 +138,7 @@ function Produto() {
                     <img
                       src={image}
                       alt=""
-                      className="aspect-square w-full object-cover"
+                      className="aspect-square w-full object-contain p-4"
                     />
                   </button>
                 ))}

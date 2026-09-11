@@ -3,7 +3,7 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Edit3 } from "lucide-reac
 import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { useCart } from "@/lib/cart/store";
-import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
+import { shinGuardPairWhite } from "@/lib/customizer/mockups";
 
 
 export const Route = createFileRoute("/carrinho")({
@@ -51,9 +51,9 @@ function Carrinho() {
 
           <div className="relative overflow-hidden rounded-[2rem] bg-studio">
             <img
-              src={prodCaneleiras}
-              alt="Caneleiras personalizadas pela VinilArt Sport"
-              className="aspect-[4/5] w-full object-cover"
+              src={shinGuardPairWhite}
+              alt="Mockup neutro de caneleiras"
+              className="aspect-[4/5] w-full object-contain p-10"
             />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
           </div>

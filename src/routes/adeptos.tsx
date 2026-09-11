@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { ServiceQuoteForm } from "@/components/sport/ServiceQuoteForm";
-import prodBandeira from "@/assets/prod-bandeira.jpg";
+import { flagWhite } from "@/lib/customizer/mockups";
 
 export const Route = createFileRoute("/adeptos")({
   component: Adeptos,
@@ -45,9 +45,9 @@ function Adeptos() {
           <div className="group overflow-hidden rounded-3xl bg-surface/60">
             <div className="overflow-hidden bg-studio">
               <img
-                src={prodBandeira}
-                alt="Bandeira personalizada para adeptos"
-                className="media-zoom aspect-[16/10] w-full object-cover"
+                src={flagWhite}
+                alt="Mockup neutro de bandeira"
+                className="aspect-[16/10] w-full object-contain p-8"
               />
             </div>
             <div className="p-8">
