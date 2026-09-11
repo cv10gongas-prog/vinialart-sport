@@ -5,11 +5,16 @@ import {
 } from "react";
 
 import {
+  AlignCenterHorizontal,
+  AlignCenterVertical,
   Check,
   Copy,
   Eraser,
+  FlipHorizontal,
+  FlipVertical,
   Loader2,
   RotateCcw,
+  RotateCw,
   Sparkles,
   Target,
   Maximize2,
@@ -68,6 +73,10 @@ export function CustomizerToolbar({
     clearDraft,
     undo,
     redo,
+    alignSelected,
+    flipSelected,
+    rotateSelected,
+    setSelectedOpacity,
   } = customizer;
 
   const fileInputRef =
@@ -358,6 +367,117 @@ export function CustomizerToolbar({
           }
         />
       </div>
+
+      {selectedLayer && (
+        <div className="grid gap-2.5 border border-border bg-surface p-3">
+          <p className="font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+            Posição e transformação
+          </p>
+
+          <div className="grid grid-cols-4 gap-1.5">
+            <button
+              type="button"
+              title="Centrar horizontalmente"
+              onClick={() => alignSelected("horizontal")}
+              className="flex items-center justify-center border border-border py-2 hover:border-cyan hover:text-cyan"
+            >
+              <AlignCenterHorizontal className="h-3.5 w-3.5" />
+            </button>
+
+            <button
+              type="button"
+              title="Centrar verticalmente"
+              onClick={() => alignSelected("vertical")}
+              className="flex items-center justify-center border border-border py-2 hover:border-cyan hover:text-cyan"
+            >
+              <AlignCenterVertical className="h-3.5 w-3.5" />
+            </button>
+
+            <button
+              type="button"
+              title="Espelhar na horizontal"
+              onClick={() => flipSelected("x")}
+              className="flex items-center justify-center border border-border py-2 hover:border-magenta hover:text-magenta"
+            >
+              <FlipHorizontal className="h-3.5 w-3.5" />
+            </button>
+
+            <button
+              type="button"
+              title="Espelhar na vertical"
+              onClick={() => flipSelected("y")}
+              className="flex items-center justify-center border border-border py-2 hover:border-magenta hover:text-magenta"
+            >
+              <FlipVertical className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              title="Rodar -15°"
+              onClick={() => rotateSelected(-15)}
+              className="flex items-center justify-center gap-1 border border-border py-2 font-mono text-[0.6rem] hover:border-cyan hover:text-cyan"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              15°
+            </button>
+
+            <button
+              type="button"
+              title="Rodar +15°"
+              onClick={() => rotateSelected(15)}
+              className="flex items-center justify-center gap-1 border border-border py-2 font-mono text-[0.6rem] hover:border-cyan hover:text-cyan"
+            >
+              <RotateCw className="h-3.5 w-3.5" />
+              15°
+            </button>
+
+            <button
+              type="button"
+              title="Repor rotação"
+              onClick={() =>
+                handleUpdateLayer({ rotation: 0 })
+              }
+              className="border border-border py-2 font-mono text-[0.6rem] uppercase hover:border-cyan hover:text-cyan"
+            >
+              0°
+            </button>
+          </div>
+
+          <label className="grid gap-1">
+            <span className="flex items-center justify-between font-mono text-[0.58rem] uppercase tracking-wider text-muted-foreground">
+              Transparência
+              <span className="text-cyan">
+                {Math.round(
+                  (selectedLayer.opacity ?? 1) * 100,
+                )}
+                %
+              </span>
+            </span>
+
+            <input
+              type="range"
+              min={5}
+              max={100}
+              value={Math.round(
+                (selectedLayer.opacity ?? 1) * 100,
+              )}
+              onChange={(event) =>
+                setSelectedOpacity(
+                  Number(event.target.value) / 100,
+                )
+              }
+              className="accent-cyan"
+            />
+          </label>
+
+          <p className="font-mono text-[0.55rem] leading-relaxed text-muted-foreground">
+            Setas do teclado movem 1px · Shift+setas 10px ·
+            Del apaga · Ctrl+Z desfaz
+          </p>
+        </div>
+      )}
 
       {imageSelected && (
         <div className="grid gap-2 border border-border bg-surface p-3">
