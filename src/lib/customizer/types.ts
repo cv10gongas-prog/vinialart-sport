@@ -114,8 +114,13 @@ export interface SubjectBoundingBox {
   focusPoint?: { x: number; y: number } | undefined;
 }
 
+/** How the artwork is composited onto the product surface. */
+export type LayerBlendMode = "normal" | "multiply" | "overlay";
+
 export interface ImageLayer extends BaseLayer {
   type: "image";
+  /** Composite mode used to fuse the art with the fabric/plastic below. */
+  blendMode?: LayerBlendMode | undefined;
   /** Currently active Object URL (blob:) displayed on canvas */
   srcUrl: string;
   /** Currently active file key in IndexedDB */
