@@ -466,17 +466,17 @@ function KonvaStageInner({
       <Layer
         name="guide-layer"
         listening={false}
-        visible={isEditMode}
+        visible={isEditMode && showGuides}
+        opacity={selectedLayer ? 0.9 : 0.5}
       >
         {contourPoints ? (
           <Line
             points={contourPoints}
             closed
-            stroke="#00c8ff"
-            strokeWidth={2}
-            dash={[7, 5]}
+            stroke="#5ac8fa"
+            strokeWidth={1}
+            dash={[4, 5]}
             lineJoin="round"
-            fill="rgba(0,200,255,0.035)"
           />
         ) : (
           <Rect
@@ -490,10 +490,9 @@ function KonvaStageInner({
                 ? printArea.shape.cornerRadius
                 : 0
             }
-            stroke="#00c8ff"
-            strokeWidth={2}
-            dash={[7, 5]}
-            fill="rgba(0,200,255,0.035)"
+            stroke="#5ac8fa"
+            strokeWidth={1}
+            dash={[4, 5]}
           />
         )}
       </Layer>
