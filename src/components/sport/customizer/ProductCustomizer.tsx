@@ -250,7 +250,7 @@ export function ProductCustomizer({
             </div>
 
             {/* Design Canvas Viewport */}
-            <div className="relative flex min-h-[340px] w-full min-w-0 flex-1 items-center justify-center p-2 sm:min-h-[560px] sm:p-3">
+            <div className="relative flex min-h-[340px] max-h-[420px] w-full min-w-0 flex-1 items-center justify-center p-2 sm:max-h-[620px] sm:min-h-[520px] sm:p-3">
               <CanvasEditor config={config} customizer={customizer} />
 
               {isDraggingFile && (
