@@ -57,7 +57,18 @@ export function ProductCustomizer({
 
   function handleAddToCart() {
     const previewDataUrl = exportCustomerPreview() ?? undefined;
-    const customizerDesign = serializeDesign();
+
+    // Design payload + production spec (exact placement data for print/WooCommerce)
+    let customizerDesign = serializeDesign();
+
+    try {
+      customizerDesign = JSON.stringify({
+        ...JSON.parse(customizerDesign),
+        productionSpec: customizer.buildProductionSpec(),
+      });
+    } catch {
+      // keep the plain design payload if merging fails
+    }
 
     if (cartItemId) {
       updateItem(cartItemId, {

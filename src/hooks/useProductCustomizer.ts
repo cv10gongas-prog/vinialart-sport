@@ -1089,6 +1089,7 @@ export function useProductCustomizer(
     downloadPreview,
     downloadProductionArt,
     serializeDesign,
+    buildProductionSpec,
     dispatch,
   };
 }
