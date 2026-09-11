@@ -88,6 +88,10 @@ function Personalizar() {
           <h1 className="mt-4 max-w-2xl text-[2.4rem] leading-[0.9] sm:text-6xl">
             O que queres personalizar?
           </h1>
+          <p className="mt-6 max-w-md text-base text-muted-foreground">
+            Escolhe o artigo, carrega o teu design e vê o resultado no produto.
+          </p>
+
 
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {customizableProducts.map((item) => {
