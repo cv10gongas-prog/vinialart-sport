@@ -1,13 +1,16 @@
-import {
-  flagWhite,
-  jerseyFrontWhite,
-  printSurfaceWhite,
-  shinGuardBackWhite,
-  shinGuardDetailWhite,
-  shinGuardPairWhite,
-  shinGuardSingleWhite,
-  supporterItemWhite,
-} from "@/lib/customizer/mockups";
+/**
+ * Catalogue imagery uses real product photography.
+ * The neutral white mockups stay reserved for the customizer canvas.
+ */
+import prodCaneleiras from "@/assets/prod-caneleiras.jpg";
+import prodCaneleiraDetail from "@/assets/prod-caneleira-detail.jpg";
+import prodCaneleiraAngle from "@/assets/prod-caneleira-angle.jpg";
+import prodCaneleiraBack from "@/assets/prod-caneleira-back.jpg";
+import prodEquipamento from "@/assets/prod-equipamento.jpg";
+import prodBandeira from "@/assets/prod-bandeira.jpg";
+import prodAdeptos from "@/assets/prod-adeptos.jpg";
+import prodEstampagem from "@/assets/prod-estampagem.jpg";
+import prodImpressao from "@/assets/prod-impressao.jpg";
 
 export type Badge = "Personalizável" | "Novo" | "Mais popular";
 
