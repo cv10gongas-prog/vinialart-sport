@@ -109,7 +109,6 @@ export const supporterDefinitions: {
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
     area: {
-      // Cobertura completa das mangas (0.13 a 0.87) e corpo inteiro (0.14 a 0.90)
       xFraction: 0.13,
       yFraction: 0.14,
       widthFraction: 0.74,
@@ -138,12 +137,13 @@ export const supporterDefinitions: {
     photo: "base-calcoes.jpg",
     base: "calcoes",
     area: {
-      xFraction: 0.54,
-      yFraction: 0.49,
-      widthFraction: 0.15,
-      heightFraction: 0.18,
+      xFraction: 0.52,
+      yFraction: 0.52,
+      widthFraction: 0.22,
+      heightFraction: 0.26,
       shape: { type: "rounded", cornerRadius: 6 },
     },
+    note: "Área de personalização ajustada à perna para número ou emblema do clube.",
   },
 ];
 
