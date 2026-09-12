@@ -216,6 +216,15 @@ function KonvaStageInner({
     img.src = shadeSrc;
   }, [shadeSrc]);
 
+  const { printArea } = activeSurface;
+  const paX = printArea.xFraction * config.canvasWidth;
+  const paY = printArea.yFraction * config.canvasHeight;
+  const paW = printArea.widthFraction * config.canvasWidth;
+  const paH = printArea.heightFraction * config.canvasHeight;
+  const centerX = paX + paW / 2;
+  const centerY = paY + paH / 2;
+
+  // Auto-correção: deteta imagens deformadas gravadas no estado/localStorage e restaura o aspect-ratio real
   useEffect(() => {
     activeLayers.forEach((layer) => {
       if (layer.type !== "image") return;
@@ -233,12 +242,39 @@ function KonvaStageInner({
           ...previous,
           [layer.id]: img,
         }));
+
+        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+          const currentRatio = layer.width / (layer.height || 1);
+          const realRatio = img.naturalWidth / img.naturalHeight;
+
+          if (Math.abs(currentRatio - realRatio) > 0.03 || !layer.naturalWidth) {
+            const baseScale = Math.min(paW / img.naturalWidth, paH / img.naturalHeight);
+            const scale = baseScale * 0.85;
+            const newW = img.naturalWidth * scale;
+            const newH = img.naturalHeight * scale;
+
+            dispatch({
+              type: "UPDATE_LAYER",
+              surfaceId: state.activeSurfaceId,
+              layerId: layer.id,
+              changes: {
+                width: newW,
+                height: newH,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                x: paX + (paW - newW) / 2,
+                y: paY + (paH - newH) / 2,
+                scaleX: 1,
+                scaleY: 1,
+              },
+            });
+          }
+        }
       };
 
       img.src = layer.srcUrl;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeLayers]);
+  }, [activeLayers, layerImgs, paW, paH, paX, paY, dispatch, state.activeSurfaceId]);
 
   useEffect(() => {
     if (!transformerRef.current || !stageRef.current) {
@@ -284,17 +320,6 @@ function KonvaStageInner({
     layerImgs,
     stageRef,
   ]);
-
-  const { printArea } = activeSurface;
-
-  const paX = printArea.xFraction * config.canvasWidth;
-  const paY = printArea.yFraction * config.canvasHeight;
-  const paW = printArea.widthFraction * config.canvasWidth;
-  const paH =
-    printArea.heightFraction * config.canvasHeight;
-
-  const centerX = paX + paW / 2;
-  const centerY = paY + paH / 2;
 
   const isEditMode = customizer.viewMode === "edit";
 
