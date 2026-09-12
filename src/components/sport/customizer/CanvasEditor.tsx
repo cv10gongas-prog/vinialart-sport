@@ -15,11 +15,13 @@ import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 interface CanvasEditorProps {
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string | undefined;
 }
 
 export function CanvasEditor({
   config,
   customizer,
+  baseColor,
 }: CanvasEditorProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -70,11 +72,15 @@ export function CanvasEditor({
     };
   }, []);
 
+  const PADDING = 30;
+  const availableWidth = Math.max(0, size.width - PADDING * 2);
+  const availableHeight = Math.max(0, size.height - PADDING * 2);
+
   const baseScale =
-    size.width > 0 && size.height > 0
+    availableWidth > 0 && availableHeight > 0
       ? Math.min(
-          size.width / config.canvasWidth,
-          size.height / config.canvasHeight,
+          availableWidth / config.canvasWidth,
+          availableHeight / config.canvasHeight,
         )
       : 0;
 
@@ -124,6 +130,7 @@ export function CanvasEditor({
             <KonvaStageInner
               config={config}
               customizer={customizer}
+              baseColor={baseColor}
               KonvaLib={KonvaLib}
             />
           </div>
@@ -137,6 +144,7 @@ export function CanvasEditor({
 function KonvaStageInner({
   config,
   customizer,
+  baseColor,
   KonvaLib,
 }: CanvasEditorProps & {
   KonvaLib: any;
@@ -150,6 +158,7 @@ function KonvaStageInner({
     Rect,
     Group,
     Line,
+    Path: KonvaPath,
   } = KonvaLib;
 
   const {
@@ -255,6 +264,7 @@ function KonvaStageInner({
 
     if (node) {
       transformerRef.current.nodes([node]);
+      transformerRef.current.update();
     } else {
       transformerRef.current.nodes([]);
     }
@@ -264,12 +274,16 @@ function KonvaStageInner({
     selectedLayer?.id,
     selectedLayer?.locked,
     selectedLayer?.visible,
-    state.activeSurfaceId,
-    activeLayers.length,
-    layerImgs,
+    selectedLayer?.x,
+    selectedLayer?.y,
+    selectedLayer?.width,
+    (selectedLayer as any)?.height,
     selectedLayer?.scaleX,
     selectedLayer?.scaleY,
     selectedLayer?.rotation,
+    state.activeSurfaceId,
+    activeLayers.length,
+    layerImgs,
     stageRef,
   ]);
 
@@ -486,11 +500,35 @@ function KonvaStageInner({
       onTap={handleStageClick}
     >
       <Layer name="mockup-layer" listening={false}>
+        {/* Base color tinting underlay: strictly clipped to the product silhouette */}
+        {baseColor && baseColor.toLowerCase() !== "#ffffff" && (
+          activeSurface.mockup?.silhouettePath ? (
+            <KonvaPath
+              data={activeSurface.mockup.silhouettePath}
+              scaleX={config.canvasWidth / 800}
+              scaleY={config.canvasHeight / 800}
+              fill={baseColor}
+            />
+          ) : (
+            <Rect
+              x={0}
+              y={0}
+              width={config.canvasWidth}
+              height={config.canvasHeight}
+              fill={baseColor}
+            />
+          )
+        )}
         {mockupImg && (
           <KonvaImage
             image={mockupImg}
             width={config.canvasWidth}
             height={config.canvasHeight}
+            globalCompositeOperation={
+              baseColor && baseColor.toLowerCase() !== "#ffffff"
+                ? "multiply"
+                : "source-over"
+            }
           />
         )}
       </Layer>
@@ -499,15 +537,15 @@ function KonvaStageInner({
         name="guide-layer"
         listening={false}
         visible={isEditMode && showGuides}
-        opacity={selectedLayer ? 0.9 : 0.5}
+        opacity={selectedLayer ? 0.95 : 0.65}
       >
         {contourPoints ? (
           <Line
             points={contourPoints}
             closed
-            stroke="rgba(255,255,255,0.5)"
-            strokeWidth={1}
-            dash={[4, 5]}
+            stroke="rgba(0, 200, 255, 0.6)"
+            strokeWidth={1.5}
+            dash={[5, 5]}
             lineJoin="round"
           />
         ) : (
@@ -520,11 +558,11 @@ function KonvaStageInner({
               typeof printArea.shape?.cornerRadius ===
               "number"
                 ? printArea.shape.cornerRadius
-                : 0
+                : 8
             }
-            stroke="rgba(255,255,255,0.5)"
-            strokeWidth={1}
-            dash={[4, 5]}
+            stroke="rgba(0, 200, 255, 0.6)"
+            strokeWidth={1.5}
+            dash={[5, 5]}
           />
         )}
       </Layer>
@@ -665,8 +703,16 @@ function KonvaStageInner({
         )}
       </Layer>
 
-      <Layer name="overlay-layer" listening={false} />
-
+      <Layer name="overlay-layer" listening={false}>
+        {shadeImg && (
+          <KonvaImage
+            image={shadeImg}
+            width={config.canvasWidth}
+            height={config.canvasHeight}
+            globalCompositeOperation="multiply"
+          />
+        )}
+      </Layer>
     </Stage>
   );
 }

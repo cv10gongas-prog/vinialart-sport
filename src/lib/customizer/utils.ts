@@ -19,6 +19,89 @@ import { nanoid } from "./nanoid";
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+// Mathematical Core: Fit & Alignment
+// ---------------------------------------------------------------------------
+
+export interface FitArtworkResult {
+  x: number;          // center X in canvas pixel space
+  y: number;          // center Y in canvas pixel space
+  width: number;      // rendered width in pixels
+  height: number;     // rendered height in pixels
+  scaleX: number;     // 1
+  scaleY: number;     // 1
+  rotation: number;   // 0
+  topLeftX: number;   // top-left X in canvas pixel space
+  topLeftY: number;   // top-left Y in canvas pixel space
+  scale: number;      // aspect ratio scale factor
+}
+
+/**
+ * Função matemática central única de fit para artworks no customizador:
+ *
+ * scale = mode === 'cover'
+ *   ? max(printArea.width / imageWidth, printArea.height / imageHeight)
+ *   : min(printArea.width / imageWidth, printArea.height / imageHeight);
+ *
+ * renderedWidth = imageWidth * scale;
+ * renderedHeight = imageHeight * scale;
+ *
+ * topLeftX = printArea.x + (printArea.width - renderedWidth) / 2;
+ * topLeftY = printArea.y + (printArea.height - renderedHeight) / 2;
+ *
+ * Center (Konva x,y com offsetX = renderedWidth / 2, offsetY = renderedHeight / 2):
+ * centerX = printArea.x + printArea.width / 2;
+ * centerY = printArea.y + printArea.height / 2;
+ */
+export function fitArtworkToPrintArea(
+  imageWidth: number,
+  imageHeight: number,
+  printArea: PrintArea,
+  canvasWidth: number,
+  canvasHeight: number,
+  mode: "contain" | "cover" = "contain",
+  initialScaleFraction: number = 1.0,
+): FitArtworkResult {
+  const paX = printArea.xFraction * canvasWidth;
+  const paY = printArea.yFraction * canvasHeight;
+  const paW = printArea.widthFraction * canvasWidth;
+  const paH = printArea.heightFraction * canvasHeight;
+
+  const safeW = imageWidth > 0 ? imageWidth : paW;
+  const safeH = imageHeight > 0 ? imageHeight : paH;
+
+  const baseScale =
+    mode === "cover"
+      ? Math.max(paW / safeW, paH / safeH)
+      : Math.min(paW / safeW, paH / safeH);
+
+  // Apply moderate initial scale fraction (e.g. 0.40 for elegant chest/center placement)
+  const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 1.0);
+
+  const renderedWidth = safeW * scale;
+  const renderedHeight = safeH * scale;
+
+  const topLeftX = paX + (paW - renderedWidth) / 2;
+  const topLeftY = paY + (paH - renderedHeight) / 2;
+
+  // Centro geométrico exato da printArea
+  const centerX = paX + paW / 2;
+  const centerY = paY + paH / 2;
+
+  return {
+    x: centerX,
+    y: centerY,
+    width: renderedWidth,
+    height: renderedHeight,
+    scaleX: 1,
+    scaleY: 1,
+    rotation: 0,
+    topLeftX,
+    topLeftY,
+    scale,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Layer factories
 // ---------------------------------------------------------------------------
 
@@ -32,36 +115,29 @@ export function createImageLayer(
   canvasHeight: number,
   printArea: PrintArea,
   zIndex: number,
+  initialScaleFraction: number = 0.40,
 ): ImageLayer {
-  // Start the image at the print area centre, fitting comfortably inside with ~12% margin/padding
-  const areaW = printArea.widthFraction * canvasWidth;
-  const areaH = printArea.heightFraction * canvasHeight;
-  const areaX = printArea.xFraction * canvasWidth;
-  const areaY = printArea.yFraction * canvasHeight;
-
-  // Use 86% of the available printable bounding box so new uploads don't abruptly touch edges
-  const maxW = areaW * 0.86;
-  const maxH = areaH * 0.86;
-
-  // Fit within print area preserving aspect ratio
-  const scale = Math.min(maxW / naturalWidth, maxH / naturalHeight, 1);
-  const w = naturalWidth * scale;
-  const h = naturalHeight * scale;
-
-  // Centre in print area (Konva x = centre when offsetX = w/2)
-  const x = areaX + areaW / 2;
-  const y = areaY + areaH / 2;
+  // Novo upload: escala inicial elegante (40% da área de impressão), centrado na printArea, mantendo aspect ratio
+  const fit = fitArtworkToPrintArea(
+    naturalWidth,
+    naturalHeight,
+    printArea,
+    canvasWidth,
+    canvasHeight,
+    "contain",
+    initialScaleFraction,
+  );
 
   return {
     id: nanoid(),
     type: "image",
     surfaceId,
     name: filename || "Imagem",
-    x,
-    y,
-    scaleX: 1,
-    scaleY: 1,
-    rotation: 0,
+    x: fit.x,
+    y: fit.y,
+    scaleX: fit.scaleX,
+    scaleY: fit.scaleY,
+    rotation: fit.rotation,
     zIndex,
     visible: true,
     locked: false,
@@ -73,8 +149,8 @@ export function createImageLayer(
     isProcessingBg: false,
     naturalWidth,
     naturalHeight,
-    width: w,
-    height: h,
+    width: fit.width,
+    height: fit.height,
   };
 }
 
@@ -128,7 +204,7 @@ export function createTextLayer(
 // ---------------------------------------------------------------------------
 
 /**
- * Ajustar à área: escala e centraliza preservando a proporção para caber 100% dentro da área útil.
+ * Ajustar à área: executa a mesma fórmula matemática central única com 'contain'.
  */
 export function smartFitLayer(
   layer: ImageLayer,
@@ -136,37 +212,31 @@ export function smartFitLayer(
   canvasWidth: number,
   canvasHeight: number,
 ): Partial<ImageLayer> {
-  const areaW = printArea.widthFraction * canvasWidth;
-  const areaH = printArea.heightFraction * canvasHeight;
-  const areaX = printArea.xFraction * canvasWidth;
-  const areaY = printArea.yFraction * canvasHeight;
-
-  // Use natural source dimensions to guarantee true aspect ratio
   const natW = layer.naturalWidth > 0 ? layer.naturalWidth : layer.width;
   const natH = layer.naturalHeight > 0 ? layer.naturalHeight : layer.height;
 
-  // Fit inside full print area preserving aspect ratio
-  const fitScale = Math.min(areaW / natW, areaH / natH);
-  const fittedW = natW * fitScale;
-  const fittedH = natH * fitScale;
-
-  // Place center of image exactly at center of print area
-  const newX = areaX + areaW / 2;
-  const newY = areaY + areaH / 2;
+  const fit = fitArtworkToPrintArea(
+    natW,
+    natH,
+    printArea,
+    canvasWidth,
+    canvasHeight,
+    "contain",
+  );
 
   return {
-    x: newX,
-    y: newY,
-    width: fittedW,
-    height: fittedH,
-    scaleX: 1,
-    scaleY: 1,
-    rotation: 0,
+    x: fit.x,
+    y: fit.y,
+    width: fit.width,
+    height: fit.height,
+    scaleX: fit.scaleX,
+    scaleY: fit.scaleY,
+    rotation: fit.rotation,
   };
 }
 
 /**
- * Preencher área: expande a imagem mantendo a proporção para cobrir toda a área imprimível.
+ * Preencher área: executa a mesma fórmula matemática central única com 'cover'.
  */
 export function coverFitLayer(
   layer: ImageLayer,
@@ -174,30 +244,26 @@ export function coverFitLayer(
   canvasWidth: number,
   canvasHeight: number,
 ): Partial<ImageLayer> {
-  const areaW = printArea.widthFraction * canvasWidth;
-  const areaH = printArea.heightFraction * canvasHeight;
-  const areaX = printArea.xFraction * canvasWidth;
-  const areaY = printArea.yFraction * canvasHeight;
-
   const natW = layer.naturalWidth > 0 ? layer.naturalWidth : layer.width;
   const natH = layer.naturalHeight > 0 ? layer.naturalHeight : layer.height;
 
-  // Cover entire area: Math.max ensures entire printArea is covered
-  const coverScale = Math.max(areaW / natW, areaH / natH);
-  const coveredW = natW * coverScale;
-  const coveredH = natH * coverScale;
-
-  const newX = areaX + areaW / 2;
-  const newY = areaY + areaH / 2;
+  const fit = fitArtworkToPrintArea(
+    natW,
+    natH,
+    printArea,
+    canvasWidth,
+    canvasHeight,
+    "cover",
+  );
 
   return {
-    x: newX,
-    y: newY,
-    width: coveredW,
-    height: coveredH,
-    scaleX: 1,
-    scaleY: 1,
-    rotation: 0,
+    x: fit.x,
+    y: fit.y,
+    width: fit.width,
+    height: fit.height,
+    scaleX: fit.scaleX,
+    scaleY: fit.scaleY,
+    rotation: fit.rotation,
   };
 }
 

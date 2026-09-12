@@ -9,6 +9,7 @@ import { supporterDefinitions } from "@/lib/supporter-products";
 import { caneleirasConfig } from "./caneleiras";
 
 import {
+  bottleShadeOverlay,
   flagShadeOverlay,
   flagWhite,
   jerseyShadeOverlay,
@@ -16,6 +17,8 @@ import {
   jerseyFrontWhite,
   printSurfaceWhite,
   supporterItemWhite,
+  JERSEY_PATH,
+  JERSEY_BACK_PATH,
 } from "@/lib/customizer/mockups";
 
 const sharedTools: AllowedTool[] = [
@@ -38,10 +41,10 @@ const sharedTools: AllowedTool[] = [
 ];
 
 const colors = [
-  "#ec008c",
-  "#00c8ff",
-  "#ffd400",
   "#ffffff",
+  "#00c8ff",
+  "#ec008c",
+  "#ffd400",
   "#111111",
   "#166534",
   "#1d4ed8",
@@ -79,19 +82,20 @@ export const equipamentoConfig = buildConfig(
     {
       id: "FRONT",
       label: "Frente",
-      mockupSrc: "/catalog/editor/tshirt.svg",
+      mockupSrc: jerseyFrontWhite,
       mockup: {
-        baseSrc: "/catalog/editor/tshirt.svg",
+        baseSrc: jerseyFrontWhite,
         overlaySrc: jerseyShadeOverlay,
+        silhouettePath: JERSEY_PATH,
       },
       printArea: {
-        xFraction: 0.33,
-        yFraction: 0.30,
-        widthFraction: 0.34,
-        heightFraction: 0.44,
+        xFraction: 0.28,
+        yFraction: 0.24,
+        widthFraction: 0.44,
+        heightFraction: 0.40,
         shape: {
           type: "rounded",
-          cornerRadius: 12,
+          cornerRadius: 8,
         },
       },
     },
@@ -102,15 +106,16 @@ export const equipamentoConfig = buildConfig(
       mockup: {
         baseSrc: jerseyBackWhite,
         overlaySrc: jerseyShadeOverlay,
+        silhouettePath: JERSEY_BACK_PATH,
       },
       printArea: {
-        xFraction: 0.33,
-        yFraction: 0.30,
-        widthFraction: 0.34,
-        heightFraction: 0.44,
+        xFraction: 0.28,
+        yFraction: 0.24,
+        widthFraction: 0.44,
+        heightFraction: 0.40,
         shape: {
           type: "rounded",
-          cornerRadius: 12,
+          cornerRadius: 8,
         },
       },
     },
@@ -230,12 +235,24 @@ export const productCustomizerConfigs: Record<
   string,
   ProductCustomizerConfig
 > = {
-  ...Object.fromEntries(supporterDefinitions.map(d=>{
-    const config=buildConfig(`${d.id}-personalizado`, d.name,[{id:"FRONT",label:d.id==="garrafa"?"Corpo":"Frente",mockupSrc:`/catalog/editor/${d.base}.svg`,printArea:d.area}]);
-    config.projection=d.projection??"flat";
-    if(d.note) config.mockupNote=d.note;
-    return [config.id,config];
-  })),
+  ...Object.fromEntries(
+    supporterDefinitions.map((d) => {
+      const surface: Surface = {
+        id: "FRONT",
+        label: d.id === "garrafa" ? "Corpo" : "Frente",
+        mockupSrc: `/catalog/editor/${d.base}.svg`,
+        mockup: {
+          baseSrc: `/catalog/editor/${d.base}.svg`,
+          ...(d.id === "garrafa" ? { overlaySrc: bottleShadeOverlay } : {}),
+        },
+        printArea: d.area,
+      };
+      const config = buildConfig(`${d.id}-personalizado`, d.name, [surface]);
+      config.projection = d.projection ?? "flat";
+      if (d.note) config.mockupNote = d.note;
+      return [config.id, config];
+    }),
+  ),
   [caneleirasConfig.id]: caneleirasConfig,
   [equipamentoConfig.id]: equipamentoConfig,
   [bandeiraConfig.id]: bandeiraConfig,

@@ -19,7 +19,7 @@ function svgData(svg: string): string {
 }
 
 /** Silhuetas — fonte única de verdade. Não alterar. */
-const SHIN_GUARD_PATH = `
+export const SHIN_GUARD_PATH = `
   M400 45
   C495 45 580 85 585 190
   C590 280 575 420 555 560
@@ -30,7 +30,7 @@ const SHIN_GUARD_PATH = `
   Z
 `;
 
-const SHIN_GUARD_BACKING_PATH = `
+export const SHIN_GUARD_BACKING_PATH = `
   M400 40
   C500 40 586 81 591 190
   C596 281 581 421 561 561
@@ -41,7 +41,7 @@ const SHIN_GUARD_BACKING_PATH = `
   Z
 `;
 
-const JERSEY_PATH = `
+export const JERSEY_PATH = `
   M275 145
   L350 115
   C370 145 430 145 450 115
@@ -58,7 +58,7 @@ const JERSEY_PATH = `
   Z
 `;
 
-const JERSEY_BACK_PATH = `
+export const JERSEY_BACK_PATH = `
   M275 145
   L345 125
   C375 140 425 140 455 125
@@ -75,7 +75,7 @@ const JERSEY_BACK_PATH = `
   Z
 `;
 
-const FLAG_PATH = `
+export const FLAG_PATH = `
   M106 130
   C240 85 360 175 490 130
   C590 95 680 145 730 130
@@ -357,6 +357,7 @@ export const jerseyBackWhite = svgData(`
 export const jerseyShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
   <defs>
+    <clipPath id="jerseyShadeClip"><path d="${JERSEY_PATH}"/></clipPath>
     <filter id="b" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="20"/>
     </filter>
@@ -366,11 +367,13 @@ export const jerseyShadeOverlay = svgData(`
       <stop offset="100%" stop-color="#0d1218" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="800" fill="url(#v)"/>
-  <path d="M330 200 C318 400 322 560 336 740" fill="none" stroke="#0d1218" stroke-opacity="0.2" stroke-width="18" filter="url(#b)"/>
-  <path d="M470 220 C482 420 478 580 464 740" fill="none" stroke="#0d1218" stroke-opacity="0.16" stroke-width="16" filter="url(#b)"/>
-  <ellipse cx="250" cy="470" rx="60" ry="260" fill="#0d1218" opacity="0.16" filter="url(#b)"/>
-  <ellipse cx="552" cy="470" rx="60" ry="260" fill="#0d1218" opacity="0.18" filter="url(#b)"/>
+  <g clip-path="url(#jerseyShadeClip)">
+    <rect width="800" height="800" fill="url(#v)"/>
+    <path d="M330 200 C318 400 322 560 336 740" fill="none" stroke="#0d1218" stroke-opacity="0.2" stroke-width="18" filter="url(#b)"/>
+    <path d="M470 220 C482 420 478 580 464 740" fill="none" stroke="#0d1218" stroke-opacity="0.16" stroke-width="16" filter="url(#b)"/>
+    <ellipse cx="250" cy="470" rx="60" ry="260" fill="#0d1218" opacity="0.16" filter="url(#b)"/>
+    <ellipse cx="552" cy="470" rx="60" ry="260" fill="#0d1218" opacity="0.18" filter="url(#b)"/>
+  </g>
 </svg>
 `);
 
@@ -480,5 +483,29 @@ export const printSurfaceWhite = svgData(`
     </g>
     <rect x="175" y="100" width="450" height="600" rx="8" fill="none" stroke="url(#rim)" stroke-width="3"/>
   </g>
+</svg>
+`);
+
+/**
+ * Overlay cilíndrico realista para a garrafa desportiva.
+ * Luz de reflexo vertical e sombras de curvatura nas bordas esquerda e direita.
+ */
+export const bottleShadeOverlay = svgData(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <linearGradient id="cylinderLighting" x1="0%" y1="0%" x2="100%" y2="0%">
+      <!-- Sombra lateral esquerda (borda do cilindro) -->
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.32"/>
+      <stop offset="14%" stop-color="#000000" stop-opacity="0.08"/>
+      <!-- Brilho / reflexo longitudinal central-esquerdo -->
+      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="42%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.04"/>
+      <!-- Queda de luz suave na curva direita -->
+      <stop offset="90%" stop-color="#000000" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.36"/>
+    </linearGradient>
+  </defs>
+  <rect x="186" y="127" width="88" height="285" rx="3" fill="url(#cylinderLighting)"/>
 </svg>
 `);

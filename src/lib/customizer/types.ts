@@ -60,6 +60,8 @@ export interface SurfaceMockup {
     width: number;
     height: number;
   } | undefined;
+  /** Optional SVG path string for clipping baseColor tinting to the product silhouette */
+  silhouettePath?: string | undefined;
 }
 
 export interface Surface {

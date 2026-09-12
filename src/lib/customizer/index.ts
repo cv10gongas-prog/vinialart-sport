@@ -6,7 +6,9 @@ export { customizerReducer, createInitialState } from "./reducer";
 export {
   createImageLayer,
   createTextLayer,
+  fitArtworkToPrintArea,
   smartFitLayer,
+  coverFitLayer,
   sortedLayers,
   nextZIndex,
   serializeDesign,

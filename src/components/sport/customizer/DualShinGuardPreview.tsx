@@ -15,11 +15,13 @@ import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 interface DualShinGuardPreviewProps {
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string | undefined;
 }
 
 export function DualShinGuardPreview({
   config,
   customizer,
+  baseColor,
 }: DualShinGuardPreviewProps) {
   const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,6 +76,7 @@ export function DualShinGuardPreview({
             surface={leftSurface}
             config={config}
             customizer={customizer}
+            baseColor={baseColor}
             KonvaLib={KonvaLib}
           />
         </div>
@@ -88,6 +91,7 @@ export function DualShinGuardPreview({
             surface={rightSurface}
             config={config}
             customizer={customizer}
+            baseColor={baseColor}
             KonvaLib={KonvaLib}
           />
         </div>
@@ -100,26 +104,35 @@ export function SingleSurfacePreviewCanvas({
   surface,
   config,
   customizer,
+  baseColor,
   KonvaLib,
   stageRef,
 }: {
   surface: Surface;
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   KonvaLib: any;
   stageRef?: ((stage: import("konva").default.Stage | null) => void) | undefined;
 }) {
-  const { Stage, Layer, Image: KonvaImage, Text, Rect, Group } = KonvaLib;
+  const { Stage, Layer, Image: KonvaImage, Text, Rect, Group, Path: KonvaPath } = KonvaLib;
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(config.canvasWidth);
+  const [size, setSize] = useState<{ width: number; height: number }>({
+    width: config.canvasWidth,
+    height: config.canvasHeight,
+  });
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const update = () => {
       const rect = el.getBoundingClientRect();
-      if (rect.width > 0) setContainerWidth(rect.width);
+      if (rect.width > 0 && rect.height > 0) {
+        setSize({ width: rect.width, height: rect.height });
+      } else if (rect.width > 0) {
+        setSize((prev) => ({ ...prev, width: rect.width }));
+      }
     };
     update();
     const ro = new ResizeObserver(update);
@@ -131,9 +144,22 @@ export function SingleSurfacePreviewCanvas({
     };
   }, []);
 
-  const baseScale = containerWidth / config.canvasWidth;
+  const PADDING = 16;
+  const availableWidth = Math.max(0, size.width - PADDING * 2);
+  const availableHeight = Math.max(0, (size.height > 0 ? size.height : size.width) - PADDING * 2);
+
+  const baseScale =
+    availableWidth > 0 && availableHeight > 0
+      ? Math.min(
+          availableWidth / config.canvasWidth,
+          availableHeight / config.canvasHeight,
+        )
+      : availableWidth > 0
+        ? availableWidth / config.canvasWidth
+        : 1;
 
   const [mockupImg, setMockupImg] = useState<HTMLImageElement | null>(null);
+  const [shadeImg, setShadeImg] = useState<HTMLImageElement | null>(null);
   const [layerImgs, setLayerImgs] = useState<Record<string, HTMLImageElement>>({});
 
   useEffect(() => {
@@ -141,6 +167,17 @@ export function SingleSurfacePreviewCanvas({
     img.onload = () => setMockupImg(img);
     img.src = surface.mockupSrc;
   }, [surface.mockupSrc]);
+
+  const shadeSrc = surface.mockup?.overlaySrc;
+  useEffect(() => {
+    if (!shadeSrc) {
+      setShadeImg(null);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => setShadeImg(img);
+    img.src = shadeSrc;
+  }, [shadeSrc]);
 
   const layers = customizer.state.surfaces[surface.id]?.layers ?? [];
   const visibleLayers = [...layers]
@@ -212,13 +249,36 @@ export function SingleSurfacePreviewCanvas({
         }}
       >
         <Stage ref={stageRef} width={config.canvasWidth} height={config.canvasHeight}>
-          {/* Base Neutral Mockup */}
+          {/* Base Neutral Mockup with color tinting (strictly clipped to product silhouette) */}
           <Layer listening={false}>
+            {baseColor && baseColor.toLowerCase() !== "#ffffff" && (
+              surface.mockup?.silhouettePath ? (
+                <KonvaPath
+                  data={surface.mockup.silhouettePath}
+                  scaleX={config.canvasWidth / 800}
+                  scaleY={config.canvasHeight / 800}
+                  fill={baseColor}
+                />
+              ) : (
+                <Rect
+                  x={0}
+                  y={0}
+                  width={config.canvasWidth}
+                  height={config.canvasHeight}
+                  fill={baseColor}
+                />
+              )
+            )}
             {mockupImg && (
               <KonvaImage
                 image={mockupImg}
                 width={config.canvasWidth}
                 height={config.canvasHeight}
+                globalCompositeOperation={
+                  baseColor && baseColor.toLowerCase() !== "#ffffff"
+                    ? "multiply"
+                    : "source-over"
+                }
               />
             )}
           </Layer>
@@ -274,7 +334,17 @@ export function SingleSurfacePreviewCanvas({
             </Group>
           </Layer>
 
-
+          {/* Shading / Reflection Overlay (above artwork) */}
+          <Layer listening={false}>
+            {shadeImg && (
+              <KonvaImage
+                image={shadeImg}
+                width={config.canvasWidth}
+                height={config.canvasHeight}
+                globalCompositeOperation="multiply"
+              />
+            )}
+          </Layer>
         </Stage>
       </div>
     </div>
