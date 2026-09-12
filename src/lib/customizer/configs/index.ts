@@ -1,270 +1,168 @@
-import type {
-  AllowedTool,
-  ProductCustomizerConfig,
-  Surface,
-} from "@/lib/customizer/types";
+import type { Product } from "./sport-data";
+import type { PrintArea } from "./customizer/types";
 
-import { supporterDefinitions } from "@/lib/supporter-products";
-
-import { caneleirasConfig } from "./caneleiras";
-
-import {
-  bottleShadeOverlay,
-  flagShadeOverlay,
-  flagWhite,
-  jerseyShadeOverlay,
-  jerseyBackWhite,
-  jerseyFrontWhite,
-  printSurfaceWhite,
-  supporterItemWhite,
-  JERSEY_PATH,
-  JERSEY_BACK_PATH,
-} from "@/lib/customizer/mockups";
-
-const sharedTools: AllowedTool[] = [
-  "upload-image",
-  "add-text",
-  "smart-fit",
-  "move",
-  "resize",
-  "rotate",
-  "delete",
-  "duplicate",
-  "lock",
-  "reorder",
-  "undo",
-  "redo",
-  "reset",
-  "export-preview",
-  "remove-bg-future",
-  "ai-adjust-future",
+export const CAP_CROWN_POINTS: number[] = [
+  0.50, 0.00,
+  0.59, 0.01,
+  0.69, 0.04,
+  0.77, 0.08,
+  0.84, 0.14,
+  0.90, 0.22,
+  0.95, 0.32,
+  0.98, 0.44,
+  1.00, 0.58,
+  0.99, 0.72,
+  0.98, 0.86,
+  0.96, 0.98,
+  0.88, 1.00,
+  0.76, 0.99,
+  0.64, 0.98,
+  0.52, 0.97,
+  0.40, 0.95,
+  0.28, 0.94,
+  0.16, 0.93,
+  0.08, 0.92,
+  0.01, 0.90,
+  0.00, 0.84,
+  0.01, 0.70,
+  0.03, 0.56,
+  0.06, 0.43,
+  0.11, 0.31,
+  0.18, 0.20,
+  0.27, 0.11,
+  0.38, 0.04,
+  0.45, 0.01,
 ];
 
-const colors = [
-  "#ffffff",
-  "#00c8ff",
-  "#ec008c",
-  "#ffd400",
-  "#111111",
-  "#166534",
-  "#1d4ed8",
+export const supporterDefinitions: {
+  id: string;
+  name: string;
+  photo: string;
+  base: string;
+  area: PrintArea;
+  note?: string;
+  projection?: "cylinder";
+  isDirectCustomizable?: boolean;
+}[] = [
+  {
+    id: "garrafa",
+    name: "Garrafa",
+    photo: "base-garrafa.jpg",
+    base: "garrafa",
+    area: {
+      xFraction: 186 / 480,
+      yFraction: 127 / 480,
+      widthFraction: 88 / 480,
+      heightFraction: 285 / 480,
+      shape: { type: "rounded", cornerRadius: 4 },
+    },
+    projection: "cylinder",
+  },
+  {
+    id: "bone",
+    name: "Boné",
+    photo: "bone-personalizado.jpg",
+    base: "bone",
+    area: {
+      xFraction: 127 / 480,
+      yFraction: 92 / 480,
+      widthFraction: 204 / 480,
+      heightFraction: 162 / 480,
+      shape: {
+        type: "contour",
+        points: CAP_CROWN_POINTS,
+      },
+    },
+    note: "Área de personalização ajustada exclusivamente ao painel frontal branco do boné.",
+  },
+  {
+    id: "saco",
+    name: "Saco",
+    photo: "base-saco.jpg",
+    base: "saco",
+    area: {
+      xFraction: 104 / 480,
+      yFraction: 72 / 480,
+      widthFraction: 272 / 480,
+      heightFraction: 336 / 480,
+      shape: { type: "rounded", cornerRadius: 18 },
+    },
+    note: "Área útil ampla no painel frontal principal, delimitada pelas costuras e cordões.",
+  },
+  {
+    id: "mochila",
+    name: "Mochila",
+    photo: "base-mochila.jpg",
+    base: "mochila",
+    area: {
+      xFraction: 164 / 480,
+      yFraction: 105 / 480,
+      widthFraction: 100 / 480,
+      heightFraction: 236 / 480,
+      shape: { type: "rounded", cornerRadius: 14 },
+    },
+    note: "Área útil expandida a toda a face do bolso frontal, delimitada pelos fechos e costuras.",
+  },
+  {
+    id: "tshirt",
+    name: "T-shirt",
+    photo: "tshirt-branca-base.jpg",
+    base: "tshirt",
+    area: {
+      xFraction: 0.13,
+      yFraction: 0.14,
+      widthFraction: 0.74,
+      heightFraction: 0.76,
+      shape: { type: "silhouette" },
+    },
+    note: "Personalização total: corpo frontal e mangas.",
+  },
+  {
+    id: "bracadeira",
+    name: "Braçadeira",
+    photo: "bracadeira-em-uso.jpg",
+    base: "bracadeira",
+    area: {
+      xFraction: 0.34,
+      yFraction: 0.315,
+      widthFraction: 0.422,
+      heightFraction: 0.305,
+    },
+    note: "Sem base neutra direta no editor. Pedido gerido sob consulta com apoio da equipa técnica.",
+    isDirectCustomizable: false,
+  },
+  {
+    id: "calcoes",
+    name: "Calções",
+    photo: "base-calcoes.jpg",
+    base: "calcoes",
+    area: {
+      xFraction: 0.52,
+      yFraction: 0.52,
+      widthFraction: 0.22,
+      heightFraction: 0.26,
+      shape: { type: "rounded", cornerRadius: 6 },
+    },
+    note: "Área de personalização ajustada à perna para número ou emblema do clube.",
+  },
 ];
 
-const fonts = [
-  "Archivo Black",
-  "Barlow",
-  "Arial",
-  "Impact",
-  "Georgia",
-];
-
-function buildConfig(
-  id: string,
-  name: string,
-  surfaces: Surface[],
-): ProductCustomizerConfig {
-  return {
-    id,
-    name,
-    surfaces,
-    allowedTools: sharedTools,
-    canvasWidth: 480,
-    canvasHeight: 480,
-    colorSwatches: colors,
-    fontOptions: fonts,
-  };
-}
-
-export const equipamentoConfig = buildConfig(
-  "equipamento-personalizado",
-  "Equipamento Personalizado",
-  [
-    {
-      id: "FRONT",
-      label: "Frente",
-      mockupSrc: jerseyFrontWhite,
-      mockup: {
-        baseSrc: jerseyFrontWhite,
-        overlaySrc: jerseyShadeOverlay,
-        silhouettePath: JERSEY_PATH,
-      },
-      printArea: {
-        xFraction: 0.32,
-        yFraction: 0.26,
-        widthFraction: 0.36,
-        heightFraction: 0.34,
-        shape: {
-          type: "rounded",
-          cornerRadius: 8,
-        },
-      },
-    },
-    {
-      id: "BACK",
-      label: "Costas",
-      mockupSrc: jerseyBackWhite,
-      mockup: {
-        baseSrc: jerseyBackWhite,
-        overlaySrc: jerseyShadeOverlay,
-        silhouettePath: JERSEY_BACK_PATH,
-      },
-      printArea: {
-        xFraction: 0.32,
-        yFraction: 0.24,
-        widthFraction: 0.36,
-        heightFraction: 0.38,
-        shape: {
-          type: "rounded",
-          cornerRadius: 8,
-        },
-      },
-    },
-  ],
-);
-
-export const FLAG_CONTOUR_POINTS: number[] = [
-  0,0.0288,0.04,0.0133,0.0796,0.004,0.1187,0,0.1575,0.0004,0.1959,0.0044,0.2341,0.0111,
-  0.2722,0.0195,0.3101,0.0288,0.3479,0.0382,0.3857,0.0466,0.4236,0.0532,0.4615,0.0572,
-  0.4996,0.0577,0.5379,0.0537,0.5765,0.0444,0.6154,0.0288,0.6452,0.0163,0.6746,0.0077,
-  0.7035,0.0026,0.7318,0.0004,0.7595,0.0008,0.7864,0.0032,0.8125,0.0071,0.8377,0.012,
-  0.862,0.0175,0.8853,0.0229,0.9076,0.0279,0.9286,0.032,0.9485,0.0346,0.967,0.0353,
-  0.9842,0.0335,1,0.0288,1,0.9712,0.9842,0.9758,0.967,0.9776,0.9485,0.9769,0.9286,0.9743,
-  0.9076,0.9703,0.8853,0.9652,0.862,0.9598,0.8377,0.9543,0.8125,0.9494,0.7864,0.9455,
-  0.7595,0.9431,0.7318,0.9428,0.7035,0.9449,0.6746,0.95,0.6452,0.9586,0.6154,0.9712,
-  0.5765,0.9867,0.5379,0.996,0.4996,1,0.4615,0.9996,0.4236,0.9956,0.3857,0.9889,
-  0.3479,0.9805,0.3101,0.9712,0.2722,0.9618,0.2341,0.9534,0.1959,0.9468,0.1575,0.9428,
-  0.1187,0.9423,0.0796,0.9463,0.04,0.9556,0,0.9712
-];
-
-export const bandeiraConfig = buildConfig(
-  "bandeira-personalizada",
-  "Bandeira Personalizada",
-  [
-    {
-      id: "FRONT",
-      label: "Bandeira",
-      mockupSrc: "/catalog/editor/bandeira-reta.svg",
-      mockup: {
-        baseSrc: "/catalog/editor/bandeira-reta.svg",
-      },
-      printArea: {
-        xFraction: 36/480, yFraction:92/480, widthFraction:408/480, heightFraction:288/480,
-        shape: {type:"rect"},
-      },
-    },
-  ],
-);
-
-export const adeptosConfig = buildConfig(
-  "artigos-adeptos",
-  "Artigos para Adeptos",
-  [
-    {
-      id: "FRONT",
-      label: "Área Principal",
-      mockupSrc: supporterItemWhite,
-      mockup: {
-        baseSrc: supporterItemWhite,
-      },
-      printArea: {
-        xFraction: 0.15,
-        yFraction: 0.39,
-        widthFraction: 0.7,
-        heightFraction: 0.21,
-        shape: {
-          type: "rounded",
-          cornerRadius: 12,
-        },
-      },
-    },
-  ],
-);
-
-export const estampagemConfig = buildConfig(
-  "estampagem",
-  "Estampagem",
-  [
-    {
-      id: "FRONT",
-      label: "Área Principal",
-      mockupSrc: jerseyFrontWhite,
-      mockup: {
-        baseSrc: jerseyFrontWhite,
-        overlaySrc: jerseyShadeOverlay,
-      },
-      printArea: {
-        xFraction: 0.32,
-        yFraction: 0.26,
-        widthFraction: 0.36,
-        heightFraction: 0.34,
-        shape: {
-          type: "rounded",
-          cornerRadius: 12,
-        },
-      },
-    },
-  ],
-);
-
-export const impressaoConfig = buildConfig(
-  "impressao",
-  "Impressão",
-  [
-    {
-      id: "FRONT",
-      label: "Área de Impressão",
-      mockupSrc: printSurfaceWhite,
-      mockup: {
-        baseSrc: printSurfaceWhite,
-      },
-      printArea: {
-        xFraction: 0.255,
-        yFraction: 0.175,
-        widthFraction: 0.49,
-        heightFraction: 0.65,
-        shape: {
-          type: "rounded",
-          cornerRadius: 6,
-        },
-      },
-    },
-  ],
-);
-
-export const productCustomizerConfigs: Record<
-  string,
-  ProductCustomizerConfig
-> = {
-  ...Object.fromEntries(
-    supporterDefinitions.map((d) => {
-      const surface: Surface = {
-        id: "FRONT",
-        label: d.id === "garrafa" ? "Corpo" : "Frente",
-        mockupSrc: `/catalog/editor/${d.base}.svg`,
-        mockup: {
-          baseSrc: `/catalog/editor/${d.base}.svg`,
-          ...(d.id === "garrafa" ? { overlaySrc: bottleShadeOverlay } : {}),
-        },
-        printArea: d.area,
-      };
-      const config = buildConfig(`${d.id}-personalizado`, d.name, [surface]);
-      config.projection = d.projection ?? "flat";
-      if (d.note) config.mockupNote = d.note;
-      return [config.id, config];
-    }),
-  ),
-  [caneleirasConfig.id]: caneleirasConfig,
-  [equipamentoConfig.id]: equipamentoConfig,
-  [bandeiraConfig.id]: bandeiraConfig,
-  [adeptosConfig.id]: adeptosConfig,
-  [estampagemConfig.id]: estampagemConfig,
-  [impressaoConfig.id]: impressaoConfig,
-};
-
-export function getProductCustomizerConfig(
-  productId: string,
-): ProductCustomizerConfig | undefined {
-  return productCustomizerConfigs[productId];
-}
-
-export { caneleirasConfig };
+export const supporterProducts: Product[] = supporterDefinitions.map((d) => ({
+  slug: `${d.id}-personalizado`,
+  name: d.name,
+  category: "Artigos para Adeptos",
+  image: `/catalog/editor/${d.base}.svg`,
+  catalogImage: `/catalog/${d.photo}`,
+  imageKind:
+    d.id === "bone" || d.id === "bracadeira"
+      ? "Fotografia de trabalho"
+      : "Base de personalização",
+  priceLabel: "Sob consulta",
+  badges: ["Personalizável"],
+  description:
+    d.isDirectCustomizable === false
+      ? "Braçadeiras desportivas personalizadas sob consulta com a equipa da VinilArt."
+      : "Personaliza com a tua imagem ou pede ajuda à VinilArt.",
+  isCustomizable: d.isDirectCustomizable !== false,
+  customizationMode: d.isDirectCustomizable === false ? "service" : "product",
+}));
