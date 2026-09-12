@@ -62,6 +62,14 @@ export const SHORTS_CONTOUR_POINTS: number[] = [
   0.145, 0.125,
 ];
 
+/** Silhueta para recorte de cor dos calções */
+export const SHORTS_SILHOUETTE_PATH =
+  "M 125 82 C 180 79, 300 79, 355 82 L 358 120 C 372 200, 388 290, 406 408 C 380 412, 340 414, 272 410 C 260 350, 248 290, 240 245 C 232 290, 220 350, 208 410 C 140 414, 100 412, 74 408 C 92 290, 108 200, 122 120 Z";
+
+/** Silhueta para recorte de cor da braçadeira (impede a cor de vazar para o fundo) */
+export const BRACADEIRA_SILHOUETTE_PATH =
+  "M 54 182 h 372 a 6 6 0 0 1 6 6 v 104 a 6 6 0 0 1 -6 6 h -372 a 6 6 0 0 1 -6 -6 v -104 a 6 6 0 0 1 6 -6 z";
+
 export const supporterDefinitions: {
   id: string;
   name: string;
@@ -71,6 +79,7 @@ export const supporterDefinitions: {
   note?: string;
   projection?: "cylinder";
   isDirectCustomizable?: boolean;
+  silhouettePath?: string;
 }[] = [
   {
     id: "garrafa",
@@ -151,13 +160,14 @@ export const supporterDefinitions: {
     photo: "bracadeira-em-uso.jpg",
     base: "bracadeira",
     area: {
-      // Área elástica útil (entre a presilha esquerda e o velcro da direita, dentro das costuras)
-      xFraction: 86 / 480,
+      // Caixa milimétrica útil sobre a fita elástica (dentro das costuras)
+      xFraction: 88 / 480,
       yFraction: 196 / 480,
-      widthFraction: 308 / 480,
+      widthFraction: 304 / 480,
       heightFraction: 88 / 480,
       shape: { type: "rounded", cornerRadius: 4 },
     },
+    silhouettePath: BRACADEIRA_SILHOUETTE_PATH,
     note: "Personalização na fita elástica: letra C de capitão, emblema e patrocínio.",
     isDirectCustomizable: true,
   },
@@ -176,6 +186,7 @@ export const supporterDefinitions: {
         points: SHORTS_CONTOUR_POINTS,
       },
     },
+    silhouettePath: SHORTS_SILHOUETTE_PATH,
     note: "Personalização total: número e emblema com contorno anatómico dos calções.",
   },
 ];
