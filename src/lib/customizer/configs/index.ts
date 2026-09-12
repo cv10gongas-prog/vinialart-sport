@@ -244,6 +244,7 @@ export const productCustomizerConfigs: Record<
         mockup: {
           baseSrc: `/catalog/editor/${d.base}.svg`,
           ...(d.id === "garrafa" ? { overlaySrc: bottleShadeOverlay } : {}),
+          ...(d.silhouettePath ? { silhouettePath: d.silhouettePath } : {}),
         },
         printArea: d.area,
       };
