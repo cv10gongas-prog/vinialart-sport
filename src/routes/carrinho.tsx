@@ -54,7 +54,7 @@ function Carrinho() {
     <PageShell className="commerce-cart">
       <PageHero
         eyebrow="Resumo do pedido"
-        title={items.length ? "O teu pedido." : "O teu pedido está vazio."}
+        title={items.length ? "O teu pedido." : "O teu pedido ainda está vazio."}
         text={
           items.length
             ? "Revê os produtos, os designs e as quantidades antes de pedir orçamento."
@@ -64,7 +64,7 @@ function Carrinho() {
       <section className="product-container cart-layout">
         {!items.length ? (
           <SportLink to="/loja" size="lg">
-            Explorar loja
+            Ver loja
           </SportLink>
         ) : (
           <>
@@ -110,7 +110,10 @@ function Carrinho() {
                       {item.variant && <p>Tamanho: {item.variant}</p>}
                       {item.serviceDetails && (
                         <>
-                          <p>{item.serviceDetails.itemOrServiceType}</p>
+                          {item.serviceDetails.itemOrServiceType &&
+                            item.serviceDetails.itemOrServiceType !== item.productName && (
+                              <p>{item.serviceDetails.itemOrServiceType}</p>
+                            )}
                           {item.serviceDetails.description && (
                             <p className="cart-brief">{item.serviceDetails.description}</p>
                           )}

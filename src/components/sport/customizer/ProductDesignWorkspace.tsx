@@ -194,12 +194,14 @@ export function ProductDesignWorkspace({
         <div className="surface-uploads">
           {config.surfaces.map((s) => (
             <label key={s.id} className="surface-upload">
-              <span>{label(s.id, s.label)}</span>
+              <span className="surface-upload-title">
+                {label(s.id, s.label)}
+              </span>
               <span className="upload-action">
                 <Upload size={16} />
                 {(c.state.surfaces[s.id]?.layers.length ?? 0) > 0
                   ? "Substituir ficheiro"
-                  : "Carregar ficheiro"}
+                  : "Carrega o teu design"}
               </span>
               <input
                 aria-label={`Carregar ${label(s.id, s.label).toLowerCase()}`}
@@ -215,7 +217,7 @@ export function ProductDesignWorkspace({
                 {c.state.surfaces[s.id]?.layers
                   .filter((l) => l.type === "image")
                   .map((l) => l.name)
-                  .join(", ") || "PNG, JPG ou WEBP · até 20 MB"}
+                  .join(", ") || "PNG, JPG ou imagem de referência"}
               </small>
             </label>
           ))}
@@ -321,22 +323,6 @@ export function ProductDesignWorkspace({
               }}
             />
           </label>
-          <div className="adjust-buttons">
-            <button disabled={!c.canUndo} onClick={c.undo}>
-              Desfazer
-            </button>
-            <button disabled={!c.canRedo} onClick={c.redo}>
-              Refazer
-            </button>
-            <button
-              disabled={!selected}
-              onClick={() => {
-                if (selected) c.deleteLayer(selected.id);
-              }}
-            >
-              Remover design
-            </button>
-          </div>
         </div>
         <div className="order-options">
           {config.id.includes("caneleiras") && (
