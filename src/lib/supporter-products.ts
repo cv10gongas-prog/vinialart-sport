@@ -34,7 +34,7 @@ export const CAP_CROWN_POINTS: number[] = [
   0.45, 0.01,
 ];
 
-/** Contorno anatómico dos calções para as linhas-guia */
+/** Contorno anatómico dos calções */
 export const SHORTS_CONTOUR_POINTS: number[] = [
   0.154, 0.012,
   0.319, 0.003,
@@ -76,7 +76,7 @@ export const SHORTS_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor da braçadeira na escala padrão de 800x800 do Konva */
+/** Silhueta de cor da braçadeira na escala de 800x800 */
 export const BRACADEIRA_SILHOUETTE_PATH = `
   M 90 300
   H 710
@@ -87,6 +87,19 @@ export const BRACADEIRA_SILHOUETTE_PATH = `
   A 10 10 0 0 1 80 490
   V 310
   A 10 10 0 0 1 90 300
+  Z
+`;
+
+/** Silhueta de cor da garrafa na escala de 800x800 (pinta apenas o corpo lacado) */
+export const BOTTLE_SILHOUETTE_PATH = `
+  M 364 177
+  C 364 212, 300 218, 300 245
+  L 300 668
+  C 300 684, 316 690, 340 690
+  L 460 690
+  C 484 690, 500 684, 500 668
+  L 500 245
+  C 500 218, 436 212, 436 177
   Z
 `;
 
@@ -107,13 +120,17 @@ export const supporterDefinitions: {
     photo: "base-garrafa.jpg",
     base: "garrafa",
     area: {
-      xFraction: 186 / 480,
-      yFraction: 127 / 480,
-      widthFraction: 88 / 480,
-      heightFraction: 285 / 480,
+      // Centrada perfeitamente no corpo cilíndrico (x=192 a 288, y=150 a 390 em 480px)
+      xFraction: 192 / 480,
+      yFraction: 150 / 480,
+      widthFraction: 96 / 480,
+      heightFraction: 240 / 480,
       shape: { type: "rounded", cornerRadius: 4 },
     },
     projection: "cylinder",
+    silhouettePath: BOTTLE_SILHOUETTE_PATH,
+    note: "Gravação frontal cilíndrica com acabamento 3D em aço inox.",
+    isDirectCustomizable: true,
   },
   {
     id: "bone",
@@ -180,7 +197,6 @@ export const supporterDefinitions: {
     photo: "bracadeira-em-uso.jpg",
     base: "bracadeira",
     area: {
-      // Área útil entre a presilha esquerda e o fecho de velcro (x=84 a 396, y=192 a 288 em 480px)
       xFraction: 86 / 480,
       yFraction: 194 / 480,
       widthFraction: 308 / 480,
