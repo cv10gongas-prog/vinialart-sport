@@ -218,13 +218,13 @@ export const impressaoConfig = buildConfig(
         baseSrc: printSurfaceWhite,
       },
       printArea: {
-        xFraction: 0.27,
-        yFraction: 0.19,
-        widthFraction: 0.46,
-        heightFraction: 0.62,
+        xFraction: 0.21,
+        yFraction: 0.12,
+        widthFraction: 0.58,
+        heightFraction: 0.76,
         shape: {
           type: "rounded",
-          cornerRadius: 6,
+          cornerRadius: 4,
         },
       },
     },
