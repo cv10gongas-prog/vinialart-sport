@@ -90,7 +90,7 @@ export const BRACADEIRA_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta exata da garrafa a cobrir todo o corpo e ombros (conforme o teu desenho a rosa) */
+/** Silhueta de cor exata da garrafa a cobrir todo o corpo */
 export const BOTTLE_SILHOUETTE_PATH = `
   M 364 177
   C 364 212, 300 218, 300 245
@@ -120,16 +120,16 @@ export const supporterDefinitions: {
     photo: "base-garrafa.jpg",
     base: "garrafa",
     area: {
-      // Área expandida cobrindo todo o corpo e ombros desenhados a rosa
-      xFraction: 0.35,
-      yFraction: 0.22,
-      widthFraction: 0.30,
-      heightFraction: 0.58,
-      shape: { type: "rounded", cornerRadius: 10 },
+      // Área útil abrangendo de ponta a ponta conforme o teu desenho
+      xFraction: 0.31,
+      yFraction: 0.16,
+      widthFraction: 0.38,
+      heightFraction: 0.72,
+      shape: { type: "rounded", cornerRadius: 14 },
     },
     projection: "cylinder",
     silhouettePath: BOTTLE_SILHOUETTE_PATH,
-    note: "Gravação frontal com acabamento cilíndrico em aço inoxidável.",
+    note: "Gravação frontal total com acabamento cilíndrico em aço inoxidável.",
     isDirectCustomizable: true,
   },
   {
