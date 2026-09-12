@@ -4,6 +4,8 @@ import type {
   Surface,
 } from "@/lib/customizer/types";
 
+import { supporterDefinitions } from "@/lib/supporter-products";
+
 import { caneleirasConfig } from "./caneleiras";
 
 import {
@@ -77,16 +79,16 @@ export const equipamentoConfig = buildConfig(
     {
       id: "FRONT",
       label: "Frente",
-      mockupSrc: jerseyFrontWhite,
+      mockupSrc: "/catalog/editor/tshirt.svg",
       mockup: {
-        baseSrc: jerseyFrontWhite,
+        baseSrc: "/catalog/editor/tshirt.svg",
         overlaySrc: jerseyShadeOverlay,
       },
       printArea: {
         xFraction: 0.33,
-        yFraction: 0.22,
+        yFraction: 0.30,
         widthFraction: 0.34,
-        heightFraction: 0.60,
+        heightFraction: 0.44,
         shape: {
           type: "rounded",
           cornerRadius: 12,
@@ -103,9 +105,9 @@ export const equipamentoConfig = buildConfig(
       },
       printArea: {
         xFraction: 0.33,
-        yFraction: 0.22,
+        yFraction: 0.30,
         widthFraction: 0.34,
-        heightFraction: 0.60,
+        heightFraction: 0.44,
         shape: {
           type: "rounded",
           cornerRadius: 12,
@@ -136,20 +138,13 @@ export const bandeiraConfig = buildConfig(
     {
       id: "FRONT",
       label: "Bandeira",
-      mockupSrc: flagWhite,
+      mockupSrc: "/catalog/editor/bandeira-reta.svg",
       mockup: {
-        baseSrc: flagWhite,
-        overlaySrc: flagShadeOverlay,
+        baseSrc: "/catalog/editor/bandeira-reta.svg",
       },
       printArea: {
-        xFraction: 0.1325,
-        yFraction: 0.1464,
-        widthFraction: 0.78,
-        heightFraction: 0.5571,
-        shape: {
-          type: "contour",
-          points: FLAG_CONTOUR_POINTS,
-        },
+        xFraction: 36/480, yFraction:92/480, widthFraction:408/480, heightFraction:288/480,
+        shape: {type:"rect"},
       },
     },
   ],
@@ -235,6 +230,12 @@ export const productCustomizerConfigs: Record<
   string,
   ProductCustomizerConfig
 > = {
+  ...Object.fromEntries(supporterDefinitions.map(d=>{
+    const config=buildConfig(`${d.id}-personalizado`, d.name,[{id:"FRONT",label:d.id==="garrafa"?"Corpo":"Frente",mockupSrc:`/catalog/editor/${d.base}.svg`,printArea:d.area}]);
+    config.projection=d.projection??"flat";
+    if(d.note) config.mockupNote=d.note;
+    return [config.id,config];
+  })),
   [caneleirasConfig.id]: caneleirasConfig,
   [equipamentoConfig.id]: equipamentoConfig,
   [bandeiraConfig.id]: bandeiraConfig,

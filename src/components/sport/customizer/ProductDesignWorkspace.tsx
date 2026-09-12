@@ -10,7 +10,7 @@ import type { CartItem } from "@/lib/cart/types";
 import type { ProductCustomizerConfig } from "@/lib/customizer/types";
 
 const label = (id: string, fallback: string) =>
-  ({ LEFT: "Caneleira esquerda", RIGHT: "Caneleira direita", FRONT: "Frente", BACK: "Costas" })[
+  ({ LEFT: "Caneleira esquerda", RIGHT: "Caneleira direita" })[
     id
   ] || fallback;
 export function ProductDesignWorkspace({
@@ -136,7 +136,11 @@ export function ProductDesignWorkspace({
               role="tab"
               aria-selected={c.state.activeSurfaceId === s.id}
               className={c.state.activeSurfaceId === s.id ? "is-active" : ""}
-              onClick={() => c.setSurface(s.id)}
+              onClick={() => {
+                c.setSurface(s.id);
+                const artwork = c.state.surfaces[s.id]?.layers.find(layer => layer.visible && !layer.locked);
+                if (artwork) c.dispatch({type: "SELECT_LAYER", surfaceId: s.id, layerId: artwork.id});
+              }}
             >
               {label(s.id, s.label).replace("Caneleira ", "")}
             </button>
@@ -188,6 +192,7 @@ export function ProductDesignWorkspace({
       <div className="integrated-info">{info}</div>
       <div className="integrated-media">
         {surfaces(true)}
+        {config.mockupNote && <p className="surface-hint">{config.mockupNote}</p>}
         <p className="surface-hint">Toca na arte para mover, ajustar ou rodar.</p>
       </div>
       <div className="integrated-controls">
@@ -274,7 +279,7 @@ export function ProductDesignWorkspace({
               aria-label="Tamanho"
               type="range"
               min="0.1"
-              max="4"
+              max={Math.max(4, selected?.scaleX ?? 1)}
               step="0.01"
               value={selected?.scaleX ?? 1}
               disabled={!selected}
@@ -289,7 +294,7 @@ export function ProductDesignWorkspace({
                 aria-label="Aumentar tamanho"
                 onClick={() => {
                   if (selected) {
-                    const value = Math.min(4, Math.round((selected.scaleX + 0.1) * 100) / 100);
+                    const value = Math.round((selected.scaleX + 0.1) * 100) / 100;
                     c.updateLayer(selected.id, { scaleX: value, scaleY: value });
                   }
                 }}
@@ -325,20 +330,11 @@ export function ProductDesignWorkspace({
           </label>
         </div>
         <div className="order-options">
-          {config.id.includes("caneleiras") && (
-            <label>
-              Tamanho do produto
-              <select aria-label="Tamanho do produto" value={size} onChange={(e) => setSize(e.target.value)}>
-                <option value="">Escolher tamanho</option>
-                {["10 cm", "12 cm", "14 cm", "15 cm", "16 cm", "18 cm", "20 cm"]
-                  .map((option) => <option key={option} value={option}>{option}</option>)}
-                {size && !["10 cm", "12 cm", "14 cm", "15 cm", "16 cm", "18 cm", "20 cm"].includes(size) && (
-                  <option value={size}>{size}</option>
-                )}
-              </select>
-              <small>A confirmar no orçamento.</small>
+          {(config.sizeOptions?.length || config.id.includes("caneleiras")) ? (
+            <label>Tamanho / medidas pretendidas
+              <input aria-label="Tamanho / medidas pretendidas" value={size} onChange={e=>setSize(e.target.value)} placeholder="A confirmar com a VinilArt" />
             </label>
-          )}
+          ) : null}
           <label>
             Quantidade
             <span className="quantity-stepper">

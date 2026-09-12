@@ -131,7 +131,7 @@ export function SingleSurfacePreviewCanvas({
     };
   }, []);
 
-  const baseScale = Math.min(containerWidth / config.canvasWidth, 1);
+  const baseScale = containerWidth / config.canvasWidth;
 
   const [mockupImg, setMockupImg] = useState<HTMLImageElement | null>(null);
   const [layerImgs, setLayerImgs] = useState<Record<string, HTMLImageElement>>({});
@@ -204,6 +204,7 @@ export function SingleSurfacePreviewCanvas({
     >
       <div
         style={{
+          flexShrink: 0,
           width: config.canvasWidth,
           height: config.canvasHeight,
           transformOrigin: "center center",

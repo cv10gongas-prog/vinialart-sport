@@ -74,7 +74,7 @@ function Loja() {
           </div>
         </section>
 
-        <section className="mt-24"><h2 className="text-2xl sm:text-3xl">Merchandising e acessórios</h2><p className="mt-4 mb-8 text-muted-foreground">Alguns exemplos de artigos para personalizar, sob consulta.</p><CatalogExamples limit={4}/></section>
+        <section className="mt-24"><h2 className="text-2xl sm:text-3xl">Merchandising e acessórios</h2><p className="mt-4 mb-8 text-muted-foreground">Alguns exemplos de artigos para personalizar, sob consulta.</p><CatalogExamples limit={7}/></section>
         <section className="mt-24 overflow-hidden brand-shop-cta rounded-md bg-surface/50 px-6 py-14 sm:px-12">
           <div className="flex flex-wrap items-center justify-between gap-8">
             <div className="max-w-xl">

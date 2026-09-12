@@ -218,6 +218,9 @@ export interface ProductCustomizerConfig {
    * Use to document where production mockups should be swapped in.
    */
   mockupNote?: string;
+  /** Future renderer hint; no 3D implementation or physical dimensions implied. */
+  projection?: "flat" | "cylinder";
+  sizeOptions?: string[];
 }
 
 // ---------------------------------------------------------------------------

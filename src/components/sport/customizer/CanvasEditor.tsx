@@ -266,6 +266,10 @@ function KonvaStageInner({
     selectedLayer?.visible,
     state.activeSurfaceId,
     activeLayers.length,
+    layerImgs,
+    selectedLayer?.scaleX,
+    selectedLayer?.scaleY,
+    selectedLayer?.rotation,
     stageRef,
   ]);
 
@@ -466,7 +470,7 @@ function KonvaStageInner({
             y: node.y(),
             scaleX: node.scaleX(),
             scaleY: node.scaleY(),
-            rotation: node.rotation(),
+            rotation: ((node.rotation() + 180) % 360 + 360) % 360 - 180,
           },
         });
       },
@@ -623,11 +627,11 @@ function KonvaStageInner({
           <Transformer
             name="selection-transformer"
             ref={transformerRef}
-            borderStroke="rgba(255,255,255,0.85)"
+            borderStroke="#00c8ed"
             borderStrokeWidth={1}
             borderDash={[3, 3]}
             anchorFill="#ffffff"
-            anchorStroke="rgba(255,255,255,0.9)"
+            anchorStroke="#00c8ed"
             anchorStrokeWidth={1}
             anchorSize={9}
             anchorCornerRadius={5}
@@ -645,8 +649,6 @@ function KonvaStageInner({
               "top-right",
               "bottom-left",
               "bottom-right",
-              "middle-left",
-              "middle-right",
             ]}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             boundBoxFunc={(oldBox: any, newBox: any) => {
