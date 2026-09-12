@@ -38,28 +38,28 @@ export function fitArtworkToPrintArea(
   canvasWidth: number,
   canvasHeight: number,
   mode: "contain" | "cover" = "contain",
-  initialScaleFraction: number = 0.8,
+  initialScaleFraction: number = 0.85,
 ): FitArtworkResult {
   const paX = printArea.xFraction * canvasWidth;
   const paY = printArea.yFraction * canvasHeight;
   const paW = printArea.widthFraction * canvasWidth;
   const paH = printArea.heightFraction * canvasHeight;
 
-  const safeW = imageWidth > 0 ? imageWidth : paW;
-  const safeH = imageHeight > 0 ? imageHeight : paH;
+  // Se a largura/altura forem desconhecidas, assume SEMPRE 1:1 quadrado
+  // NUNCA usar paW e paH como dimensões de imagem para não esticar logótipos
+  const safeW = imageWidth > 0 ? imageWidth : (imageHeight > 0 ? imageHeight : 500);
+  const safeH = imageHeight > 0 ? imageHeight : (imageWidth > 0 ? imageWidth : 500);
 
   const baseScale =
     mode === "cover"
       ? Math.max(paW / safeW, paH / safeH)
       : Math.min(paW / safeW, paH / safeH);
 
-  // Mantém estritamente as proporções reais da imagem sem esticar
-  const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 0.8);
+  const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 0.85);
 
   const renderedWidth = safeW * scale;
   const renderedHeight = safeH * scale;
 
-  // Centro geométrico perfeito
   const topLeftX = paX + (paW - renderedWidth) / 2;
   const topLeftY = paY + (paH - renderedHeight) / 2;
 
@@ -91,7 +91,7 @@ export function createImageLayer(
   canvasHeight: number,
   printArea: PrintArea,
   zIndex: number,
-  initialScaleFraction: number = 0.8,
+  initialScaleFraction: number = 0.85,
 ): ImageLayer {
   const fit = fitArtworkToPrintArea(
     naturalWidth,
@@ -193,7 +193,7 @@ export function smartFitLayer(
     canvasWidth,
     canvasHeight,
     "contain",
-    0.9,
+    0.85,
   );
 
   return {
