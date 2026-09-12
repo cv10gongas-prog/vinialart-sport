@@ -459,24 +459,22 @@ export const printSurfaceWhite = svgData(`
 `);
 
 /**
- * Overlay 3D cilíndrico com transparências puras:
- * - Centro 100% transparente para mostrar as cores reais e vivas do logótipo;
- * - Brilho branco suave (opacity 0.22) para reflexo especular 3D;
- * - Sombras pretas progressivas nos rebordos (opacity 0.32 e 0.36) para curvar o logótipo em volta do cilindro.
+ * Overlay 3D cilíndrico de ponta a ponta (desde o topo dos ombros até à base)
  */
 export const bottleShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
   <defs>
     <linearGradient id="cylinderTransparency" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.34"/>
-      <stop offset="14%" stop-color="#000000" stop-opacity="0.08"/>
-      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.24"/>
-      <stop offset="44%" stop-color="#ffffff" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#000000" stop-opacity="0.04"/>
-      <stop offset="88%" stop-color="#000000" stop-opacity="0.20"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.38"/>
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.36"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0.08"/>
+      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.26"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#000000" stop-opacity="0.05"/>
+      <stop offset="88%" stop-color="#000000" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.40"/>
     </linearGradient>
   </defs>
-  <rect x="180" y="147" width="120" height="254" rx="6" fill="url(#cylinderTransparency)"/>
+  <!-- Alinhado milimetricamente à nova área de impressão de ponta a ponta -->
+  <rect x="149" y="77" width="182" height="345" rx="8" fill="url(#cylinderTransparency)"/>
 </svg>
 `);
