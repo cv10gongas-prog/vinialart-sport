@@ -34,32 +34,32 @@ export const CAP_CROWN_POINTS: number[] = [
   0.45, 0.01,
 ];
 
-/** Contorno anatómico exato dos calções (inclui a subida da virilha entre as pernas) */
+/** Contorno anatómico exato dos calções */
 export const SHORTS_CONTOUR_POINTS: number[] = [
-  0.154, 0.012, // Cós topo esquerdo
+  0.154, 0.012,
   0.319, 0.003,
-  0.500, 0.000, // Cós centro topo
+  0.500, 0.000,
   0.681, 0.003,
-  0.846, 0.012, // Cós topo direito
-  0.855, 0.125, // Cós lateral direita
-  0.898, 0.363, // Anca direita
-  0.946, 0.631, // Perna direita exterior
+  0.846, 0.012,
+  0.855, 0.125,
+  0.898, 0.363,
+  0.946, 0.631,
   0.982, 0.839,
-  1.000, 0.982, // Canto exterior da bainha direita
-  0.801, 1.000, // Meio da bainha direita
-  0.596, 0.988, // Canto interior da bainha direita
-  0.560, 0.810, // Perna direita interior (a subir)
+  1.000, 0.982,
+  0.801, 1.000,
+  0.596, 0.988,
+  0.560, 0.810,
   0.524, 0.631,
-  0.500, 0.497, // VÉRTICE DA VIRILHA / ENTREPERNAS
+  0.500, 0.497,
   0.476, 0.631,
-  0.440, 0.810, // Perna esquerda interior (a descer)
-  0.404, 0.988, // Canto interior da bainha esquerda
-  0.199, 1.000, // Meio da bainha esquerda
-  0.000, 0.982, // Canto exterior da bainha esquerda
+  0.440, 0.810,
+  0.404, 0.988,
+  0.199, 1.000,
+  0.000, 0.982,
   0.018, 0.839,
-  0.054, 0.631, // Perna esquerda exterior (a subir)
-  0.102, 0.363, // Anca esquerda
-  0.145, 0.125, // Cós lateral esquerda
+  0.054, 0.631,
+  0.102, 0.363,
+  0.145, 0.125,
 ];
 
 export const supporterDefinitions: {
@@ -151,13 +151,15 @@ export const supporterDefinitions: {
     photo: "bracadeira-em-uso.jpg",
     base: "bracadeira",
     area: {
-      xFraction: 0.34,
-      yFraction: 0.315,
-      widthFraction: 0.422,
-      heightFraction: 0.305,
+      // Área elástica útil (entre a presilha esquerda e o velcro da direita, dentro das costuras)
+      xFraction: 86 / 480,
+      yFraction: 196 / 480,
+      widthFraction: 308 / 480,
+      heightFraction: 88 / 480,
+      shape: { type: "rounded", cornerRadius: 4 },
     },
-    note: "Sem base neutra direta no editor. Pedido gerido sob consulta com apoio da equipa técnica.",
-    isDirectCustomizable: false,
+    note: "Personalização na fita elástica: letra C de capitão, emblema e patrocínio.",
+    isDirectCustomizable: true,
   },
   {
     id: "calcoes",
@@ -185,15 +187,12 @@ export const supporterProducts: Product[] = supporterDefinitions.map((d) => ({
   image: `/catalog/editor/${d.base}.svg`,
   catalogImage: `/catalog/${d.photo}`,
   imageKind:
-    d.id === "bone" || d.id === "bracadeira"
+    d.id === "bone"
       ? "Fotografia de trabalho"
       : "Base de personalização",
   priceLabel: "Sob consulta",
   badges: ["Personalizável"],
-  description:
-    d.isDirectCustomizable === false
-      ? "Braçadeiras desportivas personalizadas sob consulta com a equipa da VinilArt."
-      : "Personaliza com a tua imagem ou pede ajuda à VinilArt.",
-  isCustomizable: d.isDirectCustomizable !== false,
-  customizationMode: d.isDirectCustomizable === false ? "service" : "product",
+  description: "Personaliza com a tua imagem ou pede ajuda à VinilArt.",
+  isCustomizable: true,
+  customizationMode: "product",
 }));
