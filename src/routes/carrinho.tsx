@@ -1,10 +1,12 @@
+import { useState } from "react";
+import { downloadOrder } from "@/lib/cart/export-order";
+import { products } from "@/lib/sport-data";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Edit3 } from "lucide-react";
 import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { useCart } from "@/lib/cart/store";
 import { shinGuardPairWhite } from "@/lib/customizer/mockups";
-
 
 export const Route = createFileRoute("/carrinho")({
   component: Carrinho,
@@ -25,205 +27,187 @@ export const Route = createFileRoute("/carrinho")({
 
 function Carrinho() {
   const { items, totalItems, removeItem, updateQty } = useCart();
-
-  if (items.length === 0) {
-    return (
-      <PageShell>
-        <section className="mx-auto grid max-w-[1600px] items-center gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_0.9fr]">
-          <div>
-            <span className="label-eyebrow">Carrinho</span>
-            <h1 className="mt-4 max-w-xl text-[2.4rem] leading-[0.9] sm:text-6xl">
-              O teu carrinho está vazio.
-            </h1>
-            <p className="mt-6 max-w-md text-base text-muted-foreground">
-              Explora a loja, escolhe um artigo e personaliza-o para pedires o
-              teu orçamento.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              <SportLink to="/loja" size="lg">
-                Explorar loja
-              </SportLink>
-              <SportLink to="/personalizar" variant="outline" size="lg">
-                Personalizar produto
-              </SportLink>
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-[2rem] bg-studio">
-            <img
-              src={shinGuardPairWhite}
-              alt="Mockup neutro de caneleiras"
-              className="aspect-[4/5] w-full object-contain p-10"
-            />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent" />
-          </div>
-        </section>
-      </PageShell>
-    );
+  const [quote, setQuote] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [ready, setReady] = useState(false);
+  async function exportRequest(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    setBusy(true);
+    setError("");
+    try {
+      await downloadOrder(
+        items,
+        String(form.get("nome")),
+        String(form.get("contacto")),
+        String(form.get("notas")),
+      );
+      setReady(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível preparar o pedido.");
+    } finally {
+      setBusy(false);
+    }
   }
-
-
   return (
-    <PageShell>
+    <PageShell className="commerce-cart">
       <PageHero
         eyebrow="Resumo do pedido"
-        title={`${totalItems} ${totalItems === 1 ? "artigo selecionado" : "artigos selecionados"}`}
-        text="Revê a tua seleção antes de pedir o orçamento."
+        title={items.length ? "O teu pedido." : "O teu pedido está vazio."}
+        text={
+          items.length
+            ? "Revê os produtos, os designs e as quantidades antes de pedir orçamento."
+            : "Escolhe um produto na loja para começar."
+        }
       />
-
-      <section className="mx-auto max-w-[1600px] px-5 py-12 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          {/* Items list */}
-          <div className="divide-y divide-border border-t border-border">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start gap-5 py-6"
-              >
-                {/* Preview thumbnail */}
-                {item.previewDataUrl ? (
-                  <img
-                    src={item.previewDataUrl}
-                    alt={`Pré-visualização de ${item.productName}`}
-                    width={112}
-                    height={112}
-                    className="h-24 w-24 shrink-0 rounded-2xl bg-studio object-cover sm:h-28 sm:w-28"
-                  />
-                ) : (
-                  <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-studio sm:h-28 sm:w-28">
-                    <ShoppingBag className="h-6 w-6 text-muted-foreground/40" aria-hidden="true" />
-                  </div>
-                )}
-
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <Link
-                    to="/produto/$slug"
-                    params={{ slug: item.productId }}
-                    className="font-display text-sm hover:text-cyan"
-                  >
-                    {item.productName}
-                  </Link>
-                  {item.variant && (
-                    <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-                      Tamanho: {item.variant}
+      <section className="product-container cart-layout">
+        {!items.length ? (
+          <SportLink to="/loja" size="lg">
+            Explorar loja
+          </SportLink>
+        ) : (
+          <>
+            <div>
+              {items.map((item) => {
+                const product = products.find((p) => p.slug === item.productId);
+                const mode =
+                  item.mode ??
+                  (item.customizerDesign ? "design" : item.serviceDetails ? "ajuda" : "servico");
+                const preview = item.previewDataUrl || product?.catalogImage;
+                const edit =
+                  item.productId === "artigos-adeptos" ? (
+                    <Link to="/adeptos" search={{ artigo: undefined, cartItem: item.id }}>
+                      Editar pedido
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/produto/$slug"
+                      params={{ slug: item.productId }}
+                      search={{ cartItem: item.id, modo: undefined }}
+                    >
+                      Editar pedido
+                    </Link>
+                  );
+                return (
+                  <article key={item.id} className="cart-product">
+                    <div className="cart-image">
+                      {preview ? (
+                        <img src={preview} alt={`Preview de ${item.productName}`} />
+                      ) : (
+                        <ShoppingBag />
+                      )}
+                    </div>
+                    <div className="cart-product-info">
+                      <h2>{item.productName}</h2>
+                      <p className="cart-mode">
+                        {mode === "design"
+                          ? "Design carregado"
+                          : mode === "ajuda"
+                            ? "Ajuda VinilArt"
+                            : "Pedido sob consulta"}
+                      </p>
+                      {item.variant && <p>Tamanho: {item.variant}</p>}
+                      {item.serviceDetails && (
+                        <>
+                          <p>{item.serviceDetails.itemOrServiceType}</p>
+                          {item.serviceDetails.description && (
+                            <p className="cart-brief">{item.serviceDetails.description}</p>
+                          )}
+                          {item.serviceDetails.fileName && (
+                            <p className="cart-filename">
+                              Referência: {item.serviceDetails.fileName}
+                            </p>
+                          )}
+                        </>
+                      )}
+                      <p>Sob consulta</p>
+                      <div className="cart-actions">
+                        {edit}
+                        <button
+                          onClick={() => {
+                            try {
+                              removeItem(item.id);
+                            } catch (e) {
+                              setError(String(e));
+                            }
+                          }}
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </div>
+                    <label className="cart-quantity">
+                      Quantidade
+                      <input
+                        aria-label={`Quantidade de ${item.productName}`}
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          try {
+                            updateQty(item.id, Math.max(1, Math.floor(+e.target.value) || 1));
+                          } catch (err) {
+                            setError(String(err));
+                          }
+                        }}
+                      />
+                    </label>
+                  </article>
+                );
+              })}
+            </div>
+            <aside className="cart-summary">
+              <h2>Resumo</h2>
+              <p>{totalItems} unidade(s)</p>
+              <p>Sob consulta</p>
+              <p className="text-muted-foreground">
+                A VinilArt analisa os artigos, ficheiros e quantidades para preparar o orçamento.
+              </p>
+              <button className="order-primary" onClick={() => setQuote(true)}>
+                Pedir orçamento
+              </button>
+              <SportLink to="/loja" variant="outline" className="w-full">
+                Continuar na loja
+              </SportLink>
+              {quote && (
+                <form onSubmit={exportRequest} className="quote-request mt-6">
+                  <h3>Preparar orçamento</h3>
+                  <label>
+                    Nome
+                    <input name="nome" required autoComplete="name" />
+                  </label>
+                  <label>
+                    Email ou telefone
+                    <input name="contacto" required />
+                  </label>
+                  <label>
+                    Observações
+                    <textarea name="notas" rows={3} />
+                  </label>
+                  <p>
+                    Descarrega o pedido com os previews e ficheiros originais para o enviares à
+                    VinilArt pelo teu canal habitual. O envio não é automático.
+                  </p>
+                  <button className="order-primary" disabled={busy}>
+                    {busy ? "A preparar…" : "Descarregar pedido completo"}
+                  </button>
+                  {ready && (
+                    <p role="status" className="order-success">
+                      Pedido descarregado. Envia o ficheiro à VinilArt para receberes o orçamento.
                     </p>
                   )}
-                  {item.customizerDesign && (
-                    <div className="mt-0.5 flex flex-wrap items-center gap-3">
-                      <span className="text-[0.65rem] uppercase tracking-[0.12em] text-cyan">
-                        Design personalizado incluído
-                      </span>
-                      <Link
-                        to="/personalizar"
-                        search={{ cartItem: item.id }}
-                        className="inline-flex items-center gap-1 font-display text-[0.65rem] uppercase tracking-[0.12em] text-magenta hover:underline"
-                      >
-                        <Edit3 className="h-3 w-3" aria-hidden="true" />
-                        Editar personalização
-                      </Link>
-                    </div>
-                  )}
-                  {item.serviceDetails && (
-                    <div className="mt-2 rounded border border-border/80 bg-background/50 p-2.5 text-xs text-muted-foreground space-y-1">
-                      <p className="font-semibold text-foreground">
-                        Peça/Suporte: <span className="font-normal text-muted-foreground">{item.serviceDetails.itemOrServiceType}</span>
-                      </p>
-                      {item.serviceDetails.approxDimensions && (
-                        <p className="text-[0.7rem]">
-                          Medidas / Localização: <span className="text-foreground">{item.serviceDetails.approxDimensions}</span>
-                        </p>
-                      )}
-                      {item.serviceDetails.notes && (
-                        <p className="text-[0.7rem] italic">
-                          "{item.serviceDetails.notes}"
-                        </p>
-                      )}
-                      {item.serviceDetails.fileName && (
-                        <p className="text-[0.7rem] text-cyan">
-                          ✓ Ficheiro anexado: {item.serviceDetails.fileName}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  <p className="mt-1 text-xs text-muted-foreground">Preço sob consulta</p>
-                </div>
-
-                {/* Quantity + remove */}
-                <div className="flex shrink-0 flex-col items-end gap-3">
-                  <button
-                    aria-label={`Remover ${item.productName} do carrinho`}
-                    onClick={() => removeItem(item.id)}
-                    className="text-muted-foreground transition-colors hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <div className="inline-flex items-center rounded-full border border-border">
-                    <button
-                      aria-label="Diminuir quantidade"
-                      onClick={() => updateQty(item.id, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                      className="grid h-8 w-8 place-items-center text-muted-foreground transition-colors hover:text-cyan disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-                    >
-                      <Minus className="h-3 w-3" aria-hidden="true" />
-                    </button>
-                    <span className="w-10 text-center font-display text-sm" aria-live="polite">
-                      {item.quantity}
-                    </span>
-                    <button
-                      aria-label="Aumentar quantidade"
-                      onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="grid h-8 w-8 place-items-center text-muted-foreground transition-colors hover:text-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-                    >
-                      <Plus className="h-3 w-3" aria-hidden="true" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Summary sidebar */}
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-3xl bg-surface/50 p-8">
-              <p className="label-eyebrow">Resumo do pedido</p>
-              <div className="my-6 border-t border-border" />
-
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Artigos</dt>
-                  <dd>{totalItems}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Preço</dt>
-                  <dd className="text-muted-foreground">Sob consulta</dd>
-                </div>
-              </dl>
-
-              <p className="mt-4 text-xs text-muted-foreground">
-                O valor final é calculado após análise do teu pedido e design.
-                Receberás uma proposta detalhada.
-              </p>
-
-              <SportLink
-                to="/contactos"
-                size="lg"
-                className="mt-6 w-full justify-center"
-              >
-                Pedir orçamento <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </SportLink>
-
-              <SportLink
-                to="/loja"
-                variant="outline"
-                shape="square"
-                size="sm"
-                className="mt-3 w-full justify-center"
-              >
-                Continuar a comprar
-              </SportLink>
-            </div>
-          </aside>
-        </div>
+                </form>
+              )}
+            </aside>
+          </>
+        )}
+        {error && (
+          <p role="alert" className="order-error">
+            {error}
+          </p>
+        )}
       </section>
     </PageShell>
   );

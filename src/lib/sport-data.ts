@@ -23,6 +23,9 @@ export type Product = {
   name: string;
   category: string;
   image: string;
+  catalogImage?: string | undefined;
+  catalogGallery?: string[] | undefined;
+  imageKind?: "Fotografia de trabalho" | "Base de personalização" | undefined;
   gallery?: string[] | undefined;
   priceLabel: string;
   badges: Badge[];
@@ -51,11 +54,13 @@ export const products: Product[] = [
     name: "Caneleiras Personalizadas",
     category: "Caneleiras",
     image: shinGuardPairWhite,
+    catalogImage: "/catalog/caneleiras-clube.jpg",
+    catalogGallery: ["/catalog/caneleiras-cores.jpg", "/catalog/base-caneleiras.jpg"],
+    imageKind: "Fotografia de trabalho",
     gallery: [shinGuardSingleWhite, shinGuardBackWhite],
     priceLabel: "Preço sob consulta",
-    badges: ["Personalizável", "Mais popular"],
-    description:
-      "Cria uma proposta visual para as tuas caneleiras com fotografias, logótipos, nome, número e outros grafismos. Cada lado pode ser personalizado de forma independente.",
+    badges: ["Personalizável"],
+    description: "O teu design nas duas caneleiras, com personalização independente de cada lado.",
     isCustomizable: true,
     customizationMode: "product",
   },
@@ -64,10 +69,12 @@ export const products: Product[] = [
     name: "Equipamento Personalizado",
     category: "Equipamentos",
     image: jerseyFrontWhite,
+    catalogImage: "/catalog/equipamento-azul.jpg",
+    catalogGallery: ["/catalog/equipamento-vermelho.jpg"],
+    imageKind: "Fotografia de trabalho",
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
-    description:
-      "Cria uma proposta visual para um equipamento com cores, emblemas, imagens, nomes, números e outros elementos gráficos.",
+    description: "Personaliza a frente e as costas com a identidade da tua equipa.",
     isCustomizable: true,
     customizationMode: "product",
   },
@@ -76,10 +83,11 @@ export const products: Product[] = [
     name: "Bandeira Personalizada",
     category: "Bandeiras",
     image: flagWhite,
+    catalogImage: "/catalog/base-bandeira.jpg",
+    imageKind: "Base de personalização",
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
-    description:
-      "Cria uma proposta visual para uma bandeira utilizando as tuas cores, imagens, logótipos e texto.",
+    description: "As tuas cores e símbolos numa bandeira personalizada.",
     isCustomizable: true,
     customizationMode: "product",
   },
@@ -88,10 +96,11 @@ export const products: Product[] = [
     name: "Artigos para Adeptos",
     category: "Artigos para Adeptos",
     image: supporterItemWhite,
+    catalogImage: "/catalog/bone-personalizado.jpg",
+    imageKind: "Fotografia de trabalho",
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
-    description:
-      "Prepara uma ideia visual para artigos de apoio através das tuas imagens, cores, símbolos e mensagens.",
+    description: "Bandeiras personalizadas e outros artigos de apoio, sob consulta.",
     isCustomizable: false,
     customizationMode: "catalog",
   },
@@ -100,10 +109,11 @@ export const products: Product[] = [
     name: "Estampagem",
     category: "Estampagem",
     image: jerseyFrontWhite,
+    catalogImage: "/catalog/estampagem-producao.jpg",
+    imageKind: "Fotografia de trabalho",
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
-    description:
-      "Prepara nomes, números, logótipos ou outros grafismos para a estampagem de equipamentos ou peças desportivas.",
+    description: "Nomes, números, emblemas e grafismos nas tuas peças desportivas.",
     isCustomizable: false,
     customizationMode: "service",
   },
@@ -114,8 +124,7 @@ export const products: Product[] = [
     image: printSurfaceWhite,
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
-    description:
-      "Serviço de impressão gráfica personalizada em suportes e materiais à tua medida com envio do teu ficheiro.",
+    description: "Envia o teu ficheiro e indica as quantidades, medidas e materiais pretendidos.",
     isCustomizable: false,
     customizationMode: "service",
   },

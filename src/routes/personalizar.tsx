@@ -1,15 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Upload, HelpCircle } from "lucide-react";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { Upload, HelpCircle } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
+import { ProductCard } from "@/components/sport/ProductCard";
 import { SportLink } from "@/components/sport/SportButton";
 import { ProductCustomizer } from "@/components/sport/customizer/ProductCustomizer";
 import { ProductAssistanceForm } from "@/components/sport/ProductAssistanceForm";
 
-import {
-  caneleirasConfig,
-  getProductCustomizerConfig,
-} from "@/lib/customizer/configs";
+import { caneleirasConfig, getProductCustomizerConfig } from "@/lib/customizer/configs";
 
 import { products } from "@/lib/sport-data";
 
@@ -23,10 +21,8 @@ export interface PersonalizarSearch {
 
 export const Route = createFileRoute("/personalizar")({
   validateSearch: (search: Record<string, unknown>): PersonalizarSearch => ({
-    produto:
-      typeof search["produto"] === "string" ? search["produto"] : undefined,
-    cartItem:
-      typeof search["cartItem"] === "string" ? search["cartItem"] : undefined,
+    produto: typeof search["produto"] === "string" ? search["produto"] : undefined,
+    cartItem: typeof search["cartItem"] === "string" ? search["cartItem"] : undefined,
     modo:
       search["modo"] === "design" || search["modo"] === "ajuda"
         ? (search["modo"] as "design" | "ajuda")
@@ -54,33 +50,24 @@ export const Route = createFileRoute("/personalizar")({
   }),
 });
 
-const customizableProducts = [
-  { slug: "caneleiras-personalizadas", name: "Caneleiras" },
-  { slug: "equipamento-personalizado", name: "Equipamento" },
-  { slug: "bandeira-personalizada", name: "Bandeira" },
-];
-
 function Personalizar() {
   const { produto, cartItem: cartItemId, modo } = Route.useSearch();
 
   const { items } = useCart();
 
-  const editingCartItem = cartItemId
-    ? items.find((item) => item.id === cartItemId)
-    : undefined;
+  const editingCartItem = cartItemId ? items.find((item) => item.id === cartItemId) : undefined;
 
   const activeProductId = editingCartItem?.productId ?? produto;
-  const config = activeProductId
-    ? getProductCustomizerConfig(activeProductId)
-    : undefined;
+  const config = activeProductId ? getProductCustomizerConfig(activeProductId) : undefined;
 
   const currentProduct = products.find((p) => p.slug === activeProductId);
   const initialDesign = editingCartItem?.customizerDesign;
 
   const effectiveMode = editingCartItem ? (modo ?? "design") : modo;
 
+  if(activeProductId) return <Navigate to="/produto/$slug" params={{slug:activeProductId}} search={{cartItem:cartItemId,modo:modo}} replace/>;
   return (
-    <PageShell>
+    <PageShell className="brand-customize-page">
       {/* ESCOLHA DE PRODUTO */}
       {!activeProductId ? (
         <section className="mx-auto max-w-[1600px] px-5 py-16 sm:px-8 sm:py-24">
@@ -92,66 +79,30 @@ function Personalizar() {
             Escolhe o artigo, carrega o teu design e vê o resultado no produto.
           </p>
 
-
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {customizableProducts.map((item) => {
-              const product = products.find((p) => p.slug === item.slug);
-
-              return (
-                <Link
-                  key={item.slug}
-                  to="/personalizar"
-                  search={{ produto: item.slug }}
-                  className="group relative block overflow-hidden rounded-[1.75rem] bg-studio"
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden">
-                    {product?.image && (
-                      <img
-                        src={product.image}
-                        alt={`Mockup neutro — ${product.name}`}
-                        loading="lazy"
-                        className="h-full w-full object-contain p-6 pb-24 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-                      />
-                    )}
-                    <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
-
-                      <div>
-                        <h2 className="text-2xl leading-[0.92] sm:text-[2rem]">
-                          {item.name}
-                        </h2>
-                        <p className="mt-2 text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-cyan opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                          Começar
-                        </p>
-                      </div>
-                      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-foreground/20 bg-background/50 backdrop-blur-sm transition-all duration-500 group-hover:border-transparent group-hover:bg-foreground group-hover:text-background">
-                        <ArrowUpRight className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+            {products
+              .filter((product) => product.customizationMode === "product")
+              .map((product) => (
+                <ProductCard key={product.slug} product={product} personalize mode={modo} />
+              ))}
           </div>
         </section>
-
       ) : !effectiveMode ? (
         /* ESCOLHA DE FLUXO */
         <section className="mx-auto max-w-[1100px] px-5 py-16 sm:px-8 sm:py-24">
-          <span className="label-eyebrow">
-            {currentProduct?.name ?? "Produto selecionado"}
-          </span>
+          <span className="label-eyebrow">{currentProduct?.name ?? "Produto selecionado"}</span>
           <h1 className="mt-4 max-w-2xl text-[2.2rem] leading-[0.92] sm:text-6xl">
             Já tens o design?
           </h1>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2">
-            <div className="flex flex-col justify-between rounded-3xl bg-surface/60 p-8 transition-colors hover:bg-surface">
+            <div className="home-path home-path-ready flex flex-col justify-between p-8">
               <div>
                 <Upload className="h-5 w-5 text-cyan" />
                 <h2 className="mt-6 text-2xl">Tenho o design</h2>
                 <p className="mt-4 text-sm text-muted-foreground">
-                  Carrega o teu ficheiro, posiciona-o no produto e vê o resultado
-                  antes de fechar o pedido.
+                  Carrega o teu ficheiro, posiciona-o no produto e vê o resultado antes de fechar o
+                  pedido.
                 </p>
               </div>
               <SportLink
@@ -165,7 +116,7 @@ function Personalizar() {
               </SportLink>
             </div>
 
-            <div className="flex flex-col justify-between rounded-3xl bg-surface/60 p-8 transition-colors hover:bg-surface">
+            <div className="home-path home-path-help flex flex-col justify-between p-8">
               <div>
                 <HelpCircle className="h-5 w-5 text-magenta" />
                 <h2 className="mt-6 text-2xl">Quero ajuda</h2>
@@ -196,9 +147,7 @@ function Personalizar() {
             ← Voltar
           </Link>
 
-          <h1 className="mt-8 text-[2rem] leading-[0.95] sm:text-5xl">
-            Ainda não tens o design?
-          </h1>
+          <h1 className="mt-8 text-[2rem] leading-[0.95] sm:text-5xl">Ainda não tens o design?</h1>
           <p className="mt-5 max-w-lg text-sm text-muted-foreground sm:text-base">
             Envia-nos a tua ideia ou referência. A VinilArt trata do resto.
           </p>

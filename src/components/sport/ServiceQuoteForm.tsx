@@ -100,12 +100,10 @@ export function ServiceQuoteForm({
             Pedido de Orçamento
           </span>
           <h3 className="font-display text-lg sm:text-xl text-foreground mt-0.5">
-            Configurar {productName}
+            O teu pedido de {productName.toLowerCase()}
           </h3>
         </div>
-        <span className="bg-yellow/10 border border-yellow/40 px-2.5 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-wider text-yellow">
-          Sem Custos Imediatos
-        </span>
+
       </div>
 
       <div className="mt-6 grid gap-5">

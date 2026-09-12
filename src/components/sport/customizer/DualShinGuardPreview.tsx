@@ -96,17 +96,19 @@ export function DualShinGuardPreview({
   );
 }
 
-function SingleSurfacePreviewCanvas({
+export function SingleSurfacePreviewCanvas({
   surface,
   config,
   customizer,
   KonvaLib,
+  stageRef,
 }: {
   surface: Surface;
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   KonvaLib: any;
+  stageRef?: ((stage: import("konva").default.Stage | null) => void) | undefined;
 }) {
   const { Stage, Layer, Image: KonvaImage, Text, Rect, Group } = KonvaLib;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -208,7 +210,7 @@ function SingleSurfacePreviewCanvas({
           transform: `scale(${baseScale})`,
         }}
       >
-        <Stage width={config.canvasWidth} height={config.canvasHeight}>
+        <Stage ref={stageRef} width={config.canvasWidth} height={config.canvasHeight}>
           {/* Base Neutral Mockup */}
           <Layer listening={false}>
             {mockupImg && (
@@ -241,12 +243,8 @@ function SingleSurfacePreviewCanvas({
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}
-                      opacity={layer.opacity ?? 1}
-                      globalCompositeOperation={
-                        layer.blendMode === "multiply"
-                          ? "multiply"
-                          : "source-over"
-                      }
+                      opacity={1}
+                      globalCompositeOperation="source-over"
                     />
                   );
                 }
@@ -275,31 +273,7 @@ function SingleSurfacePreviewCanvas({
             </Group>
           </Layer>
 
-          {/* Realistic Surface Shading/Highlight */}
-          <Layer listening={false}>
-            <Group clipFunc={clipFunc}>
-              <Rect
-                x={paX}
-                y={paY}
-                width={paW}
-                height={paH}
-                fillLinearGradientStartPoint={{ x: 0, y: 0 }}
-                fillLinearGradientEndPoint={{ x: paW, y: 0 }}
-                fillLinearGradientColorStops={[
-                  0,
-                  "rgba(255,255,255,0)",
-                  0.35,
-                  "rgba(255,255,255,0.04)",
-                  0.5,
-                  "rgba(255,255,255,0.12)",
-                  0.65,
-                  "rgba(255,255,255,0.03)",
-                  1,
-                  "rgba(255,255,255,0)",
-                ]}
-              />
-            </Group>
-          </Layer>
+
         </Stage>
       </div>
     </div>

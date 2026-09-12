@@ -1,19 +1,31 @@
 import { useEffect, useState } from "react";
 
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { Check, ShoppingBag, Upload, HelpCircle, ArrowUpRight } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
 import { ProductCard } from "@/components/sport/ProductCard";
 import { SportLink } from "@/components/sport/SportButton";
 
+import type { Product } from "@/lib/sport-data";
+import type { CartItem } from "@/lib/cart/types";
+import { ProductDesignWorkspace } from "@/components/sport/customizer/ProductDesignWorkspace";
+import { QuoteRequestForm } from "@/components/sport/QuoteRequestForm";
+import { getProductCustomizerConfig } from "@/lib/customizer/configs";
 import { products } from "@/lib/sport-data";
 import { useCart } from "@/lib/cart/store";
 import { cn } from "@/lib/utils";
+import { productPresentationImage } from "@/lib/sport-presentation";
 
 import { ServiceQuoteForm } from "@/components/sport/ServiceQuoteForm";
 
 export const Route = createFileRoute("/produto/$slug")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { cartItem?: string | undefined; modo?: "design" | "ajuda" | undefined } => ({
+    cartItem: typeof search["cartItem"] === "string" ? search["cartItem"] : undefined,
+    modo: search["modo"] === "design" || search["modo"] === "ajuda" ? search["modo"] : undefined,
+  }),
   loader: ({ params }) => {
     const product = products.find((item) => item.slug === params.slug);
 
@@ -21,6 +33,8 @@ export const Route = createFileRoute("/produto/$slug")({
       throw notFound();
     }
 
+    if (product.customizationMode === "catalog")
+      throw redirect({ to: "/adeptos", search: { artigo: undefined, cartItem: undefined } });
     return { product };
   },
 
@@ -45,241 +59,124 @@ export const Route = createFileRoute("/produto/$slug")({
 
 function Produto() {
   const { product } = Route.useLoaderData();
-  const { addItem } = useCart();
-
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-
-  const gallery = [product.image, ...(product.gallery ?? [])];
-  const [selectedImage, setSelectedImage] = useState(gallery[0]);
-
-  useEffect(() => {
-    setSelectedImage(gallery[0]);
-    setQuantity(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.slug]);
-
-  const relatedPreferred = products.filter(
-    (item) =>
-      item.slug !== product.slug &&
-      (item.category === product.category || item.isCustomizable),
-  );
-
-  // Preenche sempre a grelha (evita colunas vazias) com os restantes artigos.
-  const related = [
-    ...relatedPreferred,
-    ...products.filter(
-      (item) =>
-        item.slug !== product.slug &&
-        !relatedPreferred.some((r) => r.slug === item.slug),
-    ),
-  ].slice(0, 3);
-
-
-  const isService = product.customizationMode === "service";
-
-  function addWithoutCustomization() {
-    addItem(product.slug, product.name, { quantity });
-
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 2000);
-  }
-
+  const { cartItem, modo } = Route.useSearch();
+  const { items } = useCart();
+  const item = items.find((i) => i.id === cartItem && i.productId === product.slug);
   return (
-    <PageShell>
-      <div className="mx-auto max-w-[1600px] px-5 pt-10 sm:px-8">
-        <nav className="text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">
-          <Link to="/" className="transition-colors hover:text-foreground">
-            Início
-          </Link>
-          <span className="px-2 text-muted-foreground/50">/</span>
-          <Link to="/loja" className="transition-colors hover:text-foreground">
-            Loja
-          </Link>
-          <span className="px-2 text-muted-foreground/50">/</span>
-          <span className="text-foreground">{product.name}</span>
+    <ProductPage
+      key={`${product.slug}-${item?.id ?? "new"}`}
+      product={product}
+      item={item}
+      initialMode={modo}
+    />
+  );
+}
+function ProductPage({
+  product,
+  item,
+  initialMode,
+}: {
+  product: Product;
+  item?: CartItem | undefined;
+  initialMode?: "design" | "ajuda" | undefined;
+}) {
+  const [mode, setMode] = useState<"design" | "ajuda" | undefined>(
+    item ? (item.mode === "design" || item.customizerDesign ? "design" : "ajuda") : initialMode,
+  );
+  const gallery = [product.catalogImage ?? product.image, ...(product.catalogGallery ?? [])];
+  const [selected, setSelected] = useState(gallery[0]!);
+  const config = getProductCustomizerConfig(product.slug);
+  const isProduct = product.customizationMode === "product";
+  const related = products
+    .filter((p) => p.slug !== product.slug && p.customizationMode === "product")
+    .concat(products.filter((p) => p.customizationMode === "catalog"))
+    .slice(0, 3);
+  const info = (
+    <>
+      <span className="label-eyebrow">{product.category}</span>
+      <h1>{product.name}</h1>
+      <p className="brand-price">Sob consulta</p>
+      <p className="product-description">{product.description}</p>
+      {isProduct && (
+        <div className="product-path-choice">
+          <h2>Como queres avançar?</h2>
+          <button
+            aria-pressed={mode === "design"}
+            className={mode === "design" ? "selected-design" : ""}
+            onClick={() => setMode("design")}
+          >
+            <Upload size={18} />
+            Já tenho o design
+          </button>
+          <button
+            aria-pressed={mode === "ajuda"}
+            className={mode === "ajuda" ? "selected-help" : ""}
+            onClick={() => setMode("ajuda")}
+          >
+            <HelpCircle size={18} />
+            Quero ajuda da VinilArt
+          </button>
+        </div>
+      )}
+    </>
+  );
+  return (
+    <PageShell className="brand-detail integrated-product">
+      <div className="product-container">
+        <nav className="product-breadcrumb" aria-label="Percurso">
+          <Link to="/loja">Loja</Link>
+          <span>/</span>
+          <span>{product.name}</span>
         </nav>
-      </div>
-
-      <section
-        className={cn(
-          "mx-auto max-w-[1600px] px-5 py-10 sm:px-8 sm:py-14",
-          isService
-            ? "max-w-3xl"
-            : "grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-20",
-        )}
-      >
-        {/* GALERIA GRANDE */}
-        {!isService && (
-          <div className="flex flex-col gap-4">
-            <div className="overflow-hidden rounded-3xl bg-studio">
-              <img
-                src={selectedImage}
-                alt={product.name}
-                className="aspect-[4/3] w-full object-contain p-12 lg:aspect-[5/4]"
-              />
+        {mode === "design" && config ? (
+          <ProductDesignWorkspace config={config} info={info} item={item} />
+        ) : (
+          <div className={`integrated-layout ${!isProduct ? "service-product" : ""}`}>
+            <div className="integrated-media">
+              <div className={`product-gallery ${product.catalogImage ? "has-photo" : ""}`}>
+                <img
+                  src={product.catalogImage ? selected : productPresentationImage(selected)}
+                  alt={`${product.name} — ${product.imageKind ?? "base neutra"}`}
+                />
+              </div>
+              {product.catalogImage && <p className="image-caption">{product.imageKind}</p>}
+              {gallery.length > 1 && (
+                <div className="gallery-thumbs">
+                  {gallery.map((img, i) => (
+                    <button
+                      key={img}
+                      aria-label={`Ver imagem ${i + 1}`}
+                      aria-pressed={selected === img}
+                      onClick={() => setSelected(img)}
+                    >
+                      <img src={img} alt="" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {gallery.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {gallery.map((image, index) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    aria-label={`Ver imagem ${index + 1}`}
-                    onClick={() => setSelectedImage(image)}
-                    className={cn(
-                      "overflow-hidden rounded-xl bg-studio transition-all duration-300",
-                      selectedImage === image
-                        ? "ring-2 ring-foreground"
-                        : "opacity-60 hover:opacity-100",
-                    )}
-                  >
-                    <img
-                      src={image}
-                      alt=""
-                      className="aspect-square w-full object-contain p-4"
-                    />
-                  </button>
-                ))}
+            <div className="integrated-info">{info}</div>
+            {(mode === "ajuda" || !isProduct) && (
+              <div className="integrated-controls">
+                <QuoteRequestForm
+                  productId={product.slug}
+                  productName={product.name}
+                  item={item}
+                  mode={isProduct ? "ajuda" : "servico"}
+                />
               </div>
             )}
           </div>
         )}
-
-        {/* INFORMAÇÃO & AÇÕES */}
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <span className="label-eyebrow">{product.category}</span>
-
-          <h1 className="mt-4 text-[2.2rem] leading-[0.92] sm:text-5xl">
-            {product.name}
-          </h1>
-
-          <p className="mt-5 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Preço sob consulta
-          </p>
-
-          <p className="mt-6 max-w-lg text-sm text-muted-foreground sm:text-base">
-            {product.description}
-          </p>
-
-          {isService ? (
-            <div className="mt-10">
-              <ServiceQuoteForm
-                productId={product.slug}
-                productName={product.name}
-                serviceType={
-                  product.slug === "estampagem" ? "estampagem" : "impressao"
-                }
-              />
-            </div>
-          ) : product.isCustomizable ? (
-            <div className="mt-10 space-y-3">
-              <SportLink
-                to="/personalizar"
-                search={{ produto: product.slug, modo: "design" }}
-                size="lg"
-                variant="primary"
-                className="w-full"
-              >
-                <Upload className="h-4 w-4" />
-                Tenho o design
-              </SportLink>
-
-              <SportLink
-                to="/personalizar"
-                search={{ produto: product.slug, modo: "ajuda" }}
-                size="lg"
-                variant="outline"
-                className="w-full"
-              >
-                <HelpCircle className="h-4 w-4" />
-                Quero ajuda
-              </SportLink>
-            </div>
-          ) : (
-            <div className="mt-10">
-              <SportLink
-                to="/contactos"
-                size="lg"
-                variant="primary"
-                className="w-full"
-              >
-                Pedir orçamento
-              </SportLink>
-            </div>
-          )}
-
-          {!isService && (
-            <div className="mt-10 border-t border-border pt-8">
-              <div className="flex flex-wrap items-center gap-5">
-                <span className="text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
-                  Quantidade
-                </span>
-                <div className="inline-flex items-center rounded-full border border-border">
-                  <button
-                    type="button"
-                    aria-label="Diminuir quantidade"
-                    onClick={() => setQuantity((v) => Math.max(1, v - 1))}
-                    className="grid h-11 w-11 place-items-center rounded-full transition-colors hover:bg-foreground/5"
-                  >
-                    −
-                  </button>
-                  <span className="w-10 text-center text-sm">{quantity}</span>
-                  <button
-                    type="button"
-                    aria-label="Aumentar quantidade"
-                    onClick={() => setQuantity((v) => v + 1)}
-                    className="grid h-11 w-11 place-items-center rounded-full transition-colors hover:bg-foreground/5"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={addWithoutCustomization}
-                className={cn(
-                  "mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border text-[0.7rem] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-foreground/40 hover:bg-foreground/5",
-                  added && "border-cyan text-cyan",
-                )}
-              >
-                {added ? (
-                  <>
-                    <Check className="h-4 w-4" />
-                    <span>Adicionado ao pedido</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="h-4 w-4" />
-                    <span>Adicionar sem personalizar</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8">
-        <div className="flex items-end justify-between gap-6 border-t border-border pt-8">
-          <h2 className="text-2xl sm:text-3xl">Também na loja</h2>
-          <Link
-            to="/loja"
-            className="inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <span>Ver tudo</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {related.map((item) => (
-            <ProductCard key={item.slug} product={item} />
-          ))}
-        </div>
-      </section>
+        <section className="product-related">
+          <h2>Também na loja</h2>
+          <div className="catalog-grid">
+            {related.map((p) => (
+              <ProductCard key={p.slug} product={p} />
+            ))}
+          </div>
+        </section>
+      </div>
     </PageShell>
   );
 }

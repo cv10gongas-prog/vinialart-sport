@@ -220,53 +220,34 @@ export function useProductCustomizer(
   }, []);
 
   const addImageFromFile = useCallback(
-    (file: File) => {
-      // Validate MIME type
-      if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-        console.warn(`[Customizer] Tipo de ficheiro não suportado: ${file.type}`);
-        return;
-      }
-      // Validate file size
-      if (file.size > MAX_UPLOAD_BYTES) {
-        console.warn(`[Customizer] Ficheiro demasiado grande: ${(file.size / 1024 / 1024).toFixed(1)} MB (máx. 20 MB)`);
-        return;
-      }
-
+    async (file: File, surfaceId = state.activeSurfaceId, replace = false) => {
+      if (!ALLOWED_IMAGE_TYPES.has(file.type)) throw new Error("Usa uma imagem PNG, JPG ou WEBP.");
+      if (file.size > MAX_UPLOAD_BYTES) throw new Error("O ficheiro deve ter até 20 MB.");
+      const surface = config.surfaces.find(s => s.id === surfaceId);
+      if (!surface) throw new Error("Superfície indisponível.");
       const fileKey = `img_${nanoid()}`;
+      await saveImageBlob(fileKey, file, file.name);
       const srcUrl = URL.createObjectURL(file);
       blobUrlsRef.current.add(srcUrl);
-
-      // Queue for IndexedDB persistence
-      pendingBlobsRef.current.set(fileKey, { blob: file, filename: file.name });
-
       const img = new window.Image();
-      img.onload = () => {
-        const layer = createImageLayer(
-          state.activeSurfaceId,
-          srcUrl,
-          file.name,
-          img.naturalWidth,
-          img.naturalHeight,
-          config.canvasWidth,
-          config.canvasHeight,
-          activeSurface.printArea,
-          nextZIndex(activeLayers),
-        );
-        layer.fileKey = fileKey;
-        layer.originalFileKey = fileKey;
-        layer.originalSrcUrl = srcUrl;
-
-        dispatch({
-          type: "ADD_IMAGE_LAYER",
-          surfaceId: state.activeSurfaceId,
-          layer,
-        });
-      };
-      img.src = srcUrl;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.activeSurfaceId, activeSurface, config],
+      await new Promise<void>((resolve, reject) => { img.onload=()=>resolve(); img.onerror=()=>reject(new Error("Não foi possível ler a imagem.")); img.src=srcUrl; });
+      const layer = createImageLayer(surfaceId, srcUrl, file.name, img.naturalWidth, img.naturalHeight, config.canvasWidth, config.canvasHeight, surface.printArea, 0);
+      layer.fileKey=fileKey; layer.originalFileKey=fileKey; layer.originalSrcUrl=srcUrl;
+      if(replace) dispatch({type:"RESET_SURFACE",surfaceId});
+      dispatch({type:"SET_ACTIVE_SURFACE",surfaceId});
+      dispatch({type:"ADD_IMAGE_LAYER",surfaceId,layer});
+    }, [state.activeSurfaceId, config],
   );
+
+  const syncSurface = useCallback((sourceSurfaceId: string, targetSurfaceId: string) => {
+    dispatch({type:"COPY_DESIGN_TO_SURFACE",sourceSurfaceId,targetSurfaceId});
+  }, []);
+
+  const persistDesign = useCallback(async () => {
+    await saveCustomizerDraft(config.id,state,pendingBlobsRef.current);
+    pendingBlobsRef.current.clear();
+    return serializeCustomizerDesign(state);
+  },[config.id,state]);
 
   const addText = useCallback(
     (
@@ -987,7 +968,7 @@ export function useProductCustomizer(
               zIndex: layer.zIndex,
               visible: layer.visible,
               rotation: layer.rotation,
-              opacity: layer.opacity ?? 1,
+              opacity: 1,
               /** Position in canvas pixels */
               positionPx: { x: layer.x, y: layer.y },
               /** Position relative to the print area (0..1) */
@@ -1001,7 +982,7 @@ export function useProductCustomizer(
             if (layer.type === "image") {
               return {
                 ...common,
-                blendMode: layer.blendMode ?? "normal",
+                blendMode: "normal",
                 source: {
                   filename: layer.filename,
                   /** IndexedDB key of the original high-resolution upload */
@@ -1071,6 +1052,8 @@ export function useProductCustomizer(
     toggleVisibility,
     reorderLayer,
     copyDesignToOtherSurface,
+    syncSurface,
+    persistDesign,
     selectLayer,
     smartFit,
     coverFit,

@@ -7,7 +7,6 @@ import {
   Trash2,
   Undo2,
   Redo2,
-  AlignCenterHorizontal,
   AlignCenterVertical,
 } from "lucide-react";
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
@@ -25,10 +24,7 @@ const chip =
  * Minimal, commercial control rail: upload, fit, sliders, duplicate, remove.
  * No technical vocabulary and no boxed-in software panels.
  */
-export function CustomizerControlPanel({
-  customizer,
-  className,
-}: CustomizerControlPanelProps) {
+export function CustomizerControlPanel({ customizer, className }: CustomizerControlPanelProps) {
   const {
     config,
     state,
@@ -49,8 +45,7 @@ export function CustomizerControlPanel({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isShinGuard =
-    state.activeSurfaceId === "LEFT" || state.activeSurfaceId === "RIGHT";
+  const isShinGuard = state.activeSurfaceId === "LEFT" || state.activeSurfaceId === "RIGHT";
 
   const otherSideLabel = isShinGuard
     ? state.activeSurfaceId === "LEFT"
@@ -58,9 +53,7 @@ export function CustomizerControlPanel({
       : "Copiar para a esquerda"
     : "Copiar para o outro lado";
 
-  const otherSurface = config.surfaces.find(
-    (s) => s.id !== state.activeSurfaceId,
-  );
+  const otherSurface = config.surfaces.find((s) => s.id !== state.activeSurfaceId);
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
@@ -69,8 +62,7 @@ export function CustomizerControlPanel({
     }
   }
 
-  const currentLayer =
-    selectedLayer ?? activeLayers[activeLayers.length - 1] ?? null;
+  const currentLayer = selectedLayer;
 
   const scale = currentLayer?.scaleX ?? 1;
   const rotation = currentLayer?.rotation ?? 0;
@@ -85,7 +77,7 @@ export function CustomizerControlPanel({
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/png,image/jpeg,image/webp,application/pdf"
+          accept="image/png,image/jpeg,image/webp"
           onChange={handleFileSelect}
           className="hidden"
           id="customizer-file-input"
@@ -94,14 +86,14 @@ export function CustomizerControlPanel({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90"
+          className="customizer-upload mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90"
         >
           <Upload className="h-4 w-4" />
           <span>Carregar design</span>
         </button>
 
         <p className="mt-3 text-xs text-muted-foreground">
-          PNG, JPG, WEBP ou PDF. Arrasta e liberta também funciona.
+          PNG, JPG ou WEBP. Seleciona o design no produto para o ajustar.
         </p>
       </div>
 
@@ -132,43 +124,23 @@ export function CustomizerControlPanel({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={smartFit}
-            disabled={!currentLayer}
-            className={chip}
-          >
+          <button type="button" onClick={smartFit} disabled={!currentLayer} className={chip}>
             <Minimize className="h-3.5 w-3.5" />
             Ajustar
           </button>
-          <button
-            type="button"
-            onClick={coverFit}
-            disabled={!currentLayer}
-            className={chip}
-          >
+          <button type="button" onClick={coverFit} disabled={!currentLayer} className={chip}>
             <Maximize className="h-3.5 w-3.5" />
             Preencher
           </button>
           <button
             type="button"
-            onClick={() => alignSelected("horizontal")}
+            onClick={() => alignSelected("both")}
             disabled={!currentLayer}
-            aria-label="Centrar horizontalmente"
+            aria-label="Centrar"
             className={chip}
           >
             <AlignCenterVertical className="h-3.5 w-3.5" />
             Centrar
-          </button>
-          <button
-            type="button"
-            onClick={() => alignSelected("vertical")}
-            disabled={!currentLayer}
-            aria-label="Centrar verticalmente"
-            className={chip}
-          >
-            <AlignCenterHorizontal className="h-3.5 w-3.5" />
-            Alinhar
           </button>
         </div>
       </div>
@@ -177,11 +149,9 @@ export function CustomizerControlPanel({
       <div className="border-t border-border pt-8">
         <div className="flex items-baseline justify-between">
           <label htmlFor="size-slider" className="label-eyebrow">
-            Tamanho
+            Escala
           </label>
-          <span className="text-xs text-muted-foreground">
-            {Math.round(scale * 100)}%
-          </span>
+          <span className="text-xs text-muted-foreground">{Math.round(scale * 100)}%</span>
         </div>
         <input
           id="size-slider"
@@ -206,9 +176,7 @@ export function CustomizerControlPanel({
           <label htmlFor="rotation-slider" className="label-eyebrow">
             Rotação
           </label>
-          <span className="text-xs text-muted-foreground">
-            {Math.round(rotation)}°
-          </span>
+          <span className="text-xs text-muted-foreground">{Math.round(rotation)}°</span>
         </div>
         <input
           id="rotation-slider"

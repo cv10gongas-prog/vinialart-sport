@@ -22,11 +22,14 @@ export interface StoredDraftMeta {
   productId: string;
   activeSurfaceId: string;
   savedAt: number;
-  surfaces: Record<string, {
-    surfaceId: string;
-    selectedLayerId: string | null;
-    layers: (StoredImageLayer | TextLayer)[];
-  }>;
+  surfaces: Record<
+    string,
+    {
+      surfaceId: string;
+      selectedLayerId: string | null;
+      layers: (StoredImageLayer | TextLayer)[];
+    }
+  >;
 }
 
 function getStorageKey(productId: string): string {
@@ -120,6 +123,7 @@ export async function saveCustomizerDraft(
     window.localStorage.setItem(getStorageKey(productId), JSON.stringify(payload));
   } catch (err) {
     console.error("Error saving customizer draft to storage:", err);
+    throw err;
   }
 }
 
@@ -190,12 +194,18 @@ export async function rehydrateStoredDesign(
               createdUrls.push(blobUrl);
             }
           } catch (err) {
-            console.warn("Failed to load image blob from IndexedDB for key:", imgLayer.fileKey, err);
+            console.warn(
+              "Failed to load image blob from IndexedDB for key:",
+              imgLayer.fileKey,
+              err,
+            );
           }
         }
 
         if (!blobUrl) {
-          blobUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+          blobUrl =
+            "data:image/svg+xml;charset=utf-8," +
+            encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
               <rect width="200" height="200" fill="#222" />
               <text x="50%" y="50%" fill="#888" font-size="14" text-anchor="middle" dy=".3em">Imagem</text>
@@ -320,7 +330,9 @@ export async function clearCustomizerDraft(productId: string): Promise<void> {
             for (const layer of surf.layers) {
               if (layer.type === "image") {
                 const img = layer as StoredImageLayer;
-                const keysToCheck = [img.fileKey, img.originalFileKey, img.processedFileKey].filter(Boolean) as string[];
+                const keysToCheck = [img.fileKey, img.originalFileKey, img.processedFileKey].filter(
+                  Boolean,
+                ) as string[];
                 for (const k of keysToCheck) {
                   // Only delete if NOT referenced by any item in the cart!
                   if (!protectedKeys.has(k)) {

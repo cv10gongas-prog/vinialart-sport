@@ -547,12 +547,8 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  opacity={layer.opacity ?? 1}
-                  globalCompositeOperation={
-                    layer.blendMode === "multiply"
-                      ? "multiply"
-                      : "source-over"
-                  }
+                  opacity={1}
+                  globalCompositeOperation="source-over"
                   draggable={
                     !layer.locked && isEditMode
                   }
@@ -584,7 +580,7 @@ function KonvaStageInner({
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
-                  opacity={layer.opacity ?? 1}
+                  opacity={1}
                   draggable={
                     !layer.locked && isEditMode
                   }
@@ -667,46 +663,8 @@ function KonvaStageInner({
         )}
       </Layer>
 
-      {/* Sombra/luz do produto por cima da arte: o design parece impresso */}
-      <Layer name="overlay-layer" listening={false}>
-        <Group clipFunc={clipFunc}>
-          {shadeImg && (
-            <KonvaImage
-              image={shadeImg}
-              width={config.canvasWidth}
-              height={config.canvasHeight}
-              opacity={0.9}
-            />
-          )}
-          <Rect
+      <Layer name="overlay-layer" listening={false} />
 
-            x={paX}
-            y={paY}
-            width={paW}
-            height={paH}
-            fillLinearGradientStartPoint={{
-              x: 0,
-              y: 0,
-            }}
-            fillLinearGradientEndPoint={{
-              x: paW,
-              y: 0,
-            }}
-            fillLinearGradientColorStops={[
-              0,
-              "rgba(255,255,255,0)",
-              0.35,
-              "rgba(255,255,255,0.04)",
-              0.5,
-              "rgba(255,255,255,0.12)",
-              0.65,
-              "rgba(255,255,255,0.03)",
-              1,
-              "rgba(255,255,255,0)",
-            ]}
-          />
-        </Group>
-      </Layer>
     </Stage>
   );
 }

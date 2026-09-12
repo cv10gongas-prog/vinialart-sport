@@ -594,12 +594,8 @@ export function LiveSurfaceRenderer({
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}
-                      opacity={layer.opacity ?? 1}
-                      globalCompositeOperation={
-                        layer.blendMode === "multiply"
-                          ? "multiply"
-                          : "source-over"
-                      }
+                      opacity={1}
+                      globalCompositeOperation="source-over"
                     />
                   );
                 }

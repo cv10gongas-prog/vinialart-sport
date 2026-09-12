@@ -30,8 +30,7 @@ export function ProductCustomizer({
 }: ProductCustomizerProps) {
   const customizer = useProductCustomizer(config, { initialDesignJson });
 
-  const { state, setSurface, exportCustomerPreview, serializeDesign } =
-    customizer;
+  const { state, setSurface, exportCustomerPreview, serializeDesign } = customizer;
 
   const { addItem, updateItem } = useCart();
 
@@ -66,61 +65,52 @@ export function ProductCustomizer({
   }
 
   return (
-    <div className={cn("flex flex-col gap-8", className)}>
+    <div className={cn("customizer-shell flex flex-col gap-8", className)}>
       {/* TÍTULO + SUPERFÍCIES */}
-      <div className="flex flex-wrap items-end justify-between gap-6">
+      <div className="customizer-heading flex flex-wrap items-end justify-between gap-6">
         <div>
           <span className="label-eyebrow">Personalização</span>
-          <h1 className="mt-3 text-[2rem] leading-[0.95] sm:text-5xl">
-            {config.name}
-          </h1>
+          <h1 className="mt-3 text-[2rem] leading-[0.95] sm:text-5xl">{config.name}</h1>
         </div>
-
-        {config.surfaces.length > 1 && (
-          <div
-            role="tablist"
-            aria-label="Lados do produto"
-            className="inline-flex rounded-full border border-border p-1"
-          >
-            {config.surfaces.map((surface) => {
-              const active = state.activeSurfaceId === surface.id;
-              return (
-                <button
-                  key={surface.id}
-                  role="tab"
-                  aria-selected={active}
-                  type="button"
-                  onClick={() => setSurface(surface.id)}
-                  className={cn(
-                    "rounded-full px-5 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition-all duration-300",
-                    active
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {surface.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* PRODUTO GRANDE + RAIL DE CONTROLOS */}
-      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-16 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="relative overflow-hidden rounded-3xl bg-studio">
-          <div
-            className="relative mx-auto flex w-full items-center justify-center"
-            style={{
-              aspectRatio: `${config.canvasWidth} / ${config.canvasHeight}`,
-              maxHeight: "min(78vh, 720px)",
-            }}
-          >
+      <div className="customizer-layout">
+        <div className="customizer-product">
+          <div className="customizer-product-frame">
             <CanvasEditor config={config} customizer={customizer} />
           </div>
+          {config.surfaces.length > 1 && (
+            <div role="tablist" aria-label="Lados do produto" className="customizer-tabs">
+              {config.surfaces.map((surface) => {
+                const active = state.activeSurfaceId === surface.id;
+                return (
+                  <button
+                    key={surface.id}
+                    role="tab"
+                    aria-selected={active}
+                    type="button"
+                    onClick={() => setSurface(surface.id)}
+                    className={cn(
+                      "rounded-full px-5 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition-all duration-300",
+                      active
+                        ? "bg-foreground text-background"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {surface.id === "LEFT"
+                      ? "Esquerda"
+                      : surface.id === "RIGHT"
+                        ? "Direita"
+                        : surface.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-8 lg:sticky lg:top-28">
+        <div className="customizer-controls flex flex-col gap-6 lg:sticky lg:top-28">
           <CustomizerControlPanel customizer={customizer} />
 
           <div className="flex flex-col gap-3 border-t border-border pt-8">
@@ -151,9 +141,7 @@ export function ProductCustomizer({
               ) : (
                 <>
                   <ShoppingBag className="h-5 w-5" />
-                  <span>
-                    {cartItemId ? "Guardar alterações" : "Adicionar ao pedido"}
-                  </span>
+                  <span>{cartItemId ? "Guardar alterações" : "Adicionar ao pedido"}</span>
                 </>
               )}
             </button>

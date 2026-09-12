@@ -8,12 +8,11 @@ import { cn } from "@/lib/utils";
  * whole site shares one consistent silhouette.
  */
 export const sportButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full font-display text-[0.72rem] uppercase tracking-[0.18em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  "inline-flex items-center justify-center gap-2 rounded-md font-display text-[0.72rem] uppercase tracking-[0.18em] transition-all duration-300 ease-out disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   {
     variants: {
       variant: {
-        primary:
-          "bg-foreground text-background hover:bg-foreground/90 hover:shadow-lift",
+        primary: "bg-cyan text-accent-foreground hover:brightness-110",
         magenta:
           "bg-magenta text-primary-foreground hover:shadow-glow-magenta hover:brightness-110",
         cyan: "bg-cyan text-accent-foreground hover:shadow-glow-cyan hover:brightness-105",
@@ -29,8 +28,8 @@ export const sportButtonVariants = cva(
         lg: "h-14 px-9 text-[0.78rem]",
       },
       shape: {
-        slant: "rounded-full",
-        square: "rounded-full",
+        slant: "rounded-md",
+        square: "rounded-md",
       },
     },
     defaultVariants: { variant: "primary", size: "md", shape: "slant" },
@@ -47,10 +46,7 @@ export function SportButton({
   ...props
 }: ComponentProps<"button"> & Variants) {
   return (
-    <button
-      className={cn(sportButtonVariants({ variant, size, shape }), className)}
-      {...props}
-    />
+    <button className={cn(sportButtonVariants({ variant, size, shape }), className)} {...props} />
   );
 }
 
@@ -63,10 +59,5 @@ export const SportLink = createLink(function SportLinkInner({
   shape,
   ...props
 }: ComponentProps<"a"> & Variants) {
-  return (
-    <a
-      className={cn(sportButtonVariants({ variant, size, shape }), className)}
-      {...props}
-    />
-  );
+  return <a className={cn(sportButtonVariants({ variant, size, shape }), className)} {...props} />;
 });

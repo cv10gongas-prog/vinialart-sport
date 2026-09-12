@@ -1,25 +1,34 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { CatalogExamples } from "@/components/sport/CatalogExamples";
+import { QuoteRequestForm } from "@/components/sport/QuoteRequestForm";
+import { catalogExamples } from "@/lib/catalog-examples";
+import { useCart } from "@/lib/cart/store";
 import { PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { ServiceQuoteForm } from "@/components/sport/ServiceQuoteForm";
+import { productPresentationImage } from "@/lib/sport-presentation";
 import { flagWhite } from "@/lib/customizer/mockups";
 
 export const Route = createFileRoute("/adeptos")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { artigo?: string | undefined; cartItem?: string | undefined } => ({
+    artigo: typeof search["artigo"] === "string" ? search["artigo"] : undefined,
+    cartItem: typeof search["cartItem"] === "string" ? search["cartItem"] : undefined,
+  }),
   component: Adeptos,
   head: () => ({
     meta: [
       { title: "Artigos para Adeptos — VinilArt Sport" },
       {
         name: "description",
-        content:
-          "Bandeiras e artigos personalizados para adeptos, claques e apoio desportivo.",
+        content: "Bandeiras e artigos personalizados para adeptos, claques e apoio desportivo.",
       },
       { property: "og:title", content: "Artigos para Adeptos — VinilArt Sport" },
       {
         property: "og:description",
-        content:
-          "Bandeiras e artigos personalizados para adeptos, claques e grupos desportivos.",
+        content: "Bandeiras e artigos personalizados para adeptos, claques e grupos desportivos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -29,74 +38,61 @@ export const Route = createFileRoute("/adeptos")({
 });
 
 function Adeptos() {
-  const [showForm, setShowForm] = useState(false);
-
+  const { artigo, cartItem } = Route.useSearch();
+  const { items } = useCart();
+  const item = items.find((i) => i.id === cartItem);
+  const example = catalogExamples.find((e) => e.id === artigo);
+  const [other, setOther] = useState(false);
   return (
-    <PageShell>
-      <section className="mx-auto max-w-[1600px] px-5 pb-10 pt-14 sm:px-8 sm:pt-20">
-        <span className="label-eyebrow">Adeptos e claques</span>
-        <h1 className="mt-4 max-w-2xl text-[2.4rem] leading-[0.9] sm:text-6xl">
-          Artigos para adeptos
-        </h1>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-5 pb-16 sm:px-8">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="group overflow-hidden rounded-3xl bg-surface/60">
-            <div className="overflow-hidden bg-studio">
-              <img
-                src={flagWhite}
-                alt="Mockup neutro de bandeira"
-                className="aspect-[16/10] w-full object-contain p-8"
+    <PageShell className="brand-supporters">
+      <section className="product-container py-14">
+        <span className="label-eyebrow">Adeptos e clubes</span>
+        <h1 className="mt-4 text-4xl sm:text-6xl">Artigos para adeptos</h1>
+        <p className="mt-5 mb-10 max-w-xl text-muted-foreground">
+          Alguns exemplos de trabalhos, bases e artigos de catálogo. Personalização e condições sob
+          consulta.
+        </p>
+        {example || item || other ? (
+          <>
+            <div className="supporter-request">
+              <div>
+                {example && <img src={example.image} alt={`${example.name} — ${example.kind}`} />}
+                <Link
+                  to="/adeptos"
+                  search={{ artigo: undefined, cartItem: undefined }}
+                  onClick={() => setOther(false)}
+                  className="inline-block mt-5 text-cyan"
+                >
+                  ← Ver todos os exemplos
+                </Link>
+              </div>
+              <QuoteRequestForm
+                key={item?.id ?? example?.id ?? "other"}
+                productId="artigos-adeptos"
+                productName="Artigos para Adeptos"
+                example={example?.name ?? "Outro artigo"}
+                item={item}
+                mode="servico"
               />
             </div>
-            <div className="p-8">
-              <h2 className="text-2xl">Bandeira personalizada</h2>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Carrega o emblema, as cores e as mensagens do teu grupo e vê o
-                resultado diretamente na bandeira.
-              </p>
+          </>
+        ) : (
+          <>
+            <CatalogExamples />
+            <div className="supporter-links">
               <SportLink
-                to="/personalizar"
-                search={{ produto: "bandeira-personalizada" }}
+                to="/produto/$slug"
+                params={{ slug: "bandeira-personalizada" }}
+                search={{ cartItem: undefined, modo: undefined }}
                 size="lg"
-                variant="primary"
-                className="mt-8 w-full"
               >
-                Personalizar
+                Ver bandeira personalizada
               </SportLink>
+              <button className="order-secondary" onClick={() => setOther(true)}>
+                Pedir outro artigo
+              </button>
             </div>
-          </div>
-
-          <div className="flex flex-col justify-between rounded-3xl bg-surface/60 p-8">
-            <div>
-              <span className="label-eyebrow">Sob consulta</span>
-              <h2 className="mt-4 text-2xl">Outro artigo</h2>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Indica o artigo pretendido, a quantidade e as notas do teu
-                pedido. Preparamos a proposta para o teu grupo.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-              className="mt-8 flex h-12 w-full items-center justify-center rounded-full border border-border text-[0.7rem] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-foreground/40 hover:bg-foreground/5"
-            >
-              Pedido sob consulta
-            </button>
-          </div>
-        </div>
-
-        {showForm && (
-          <div className="mx-auto mt-16 max-w-3xl">
-            <ServiceQuoteForm
-              productId="artigos-adeptos"
-              productName="Artigos para Adeptos"
-              defaultItemOrService=""
-              serviceType="adeptos"
-            />
-          </div>
+          </>
         )}
       </section>
     </PageShell>

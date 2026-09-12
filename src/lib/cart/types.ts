@@ -8,6 +8,10 @@
 
 export type ServiceQuoteDetails = {
   itemOrServiceType: string;
+  userName?: string | undefined;
+  userContact?: string | undefined;
+  description?: string | undefined;
+  fileKey?: string | undefined;
   quantity?: string | number | undefined;
   approxDimensions?: string | undefined;
   notes?: string | undefined;
@@ -18,6 +22,7 @@ export type ServiceQuoteDetails = {
 export type CartItem = {
   /** Unique cart item ID (nanoid) */
   id: string;
+  mode?: "design" | "ajuda" | "servico" | undefined;
   /** Product slug from sport-data.ts */
   productId: string;
   /** Human-readable product name (denormalized for display) */

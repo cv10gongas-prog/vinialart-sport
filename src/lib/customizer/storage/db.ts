@@ -41,11 +41,7 @@ function openDB(): Promise<IDBDatabase> {
 /**
  * Saves a Blob in IndexedDB under a unique fileKey.
  */
-export async function saveImageBlob(
-  fileKey: string,
-  blob: Blob,
-  filename: string,
-): Promise<void> {
+export async function saveImageBlob(fileKey: string, blob: Blob, filename: string): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_IMAGES, "readwrite");
@@ -59,7 +55,12 @@ export async function saveImageBlob(
     };
     const request = store.put(record);
 
-    request.onsuccess = () => resolve();
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error("Falha ao guardar ficheiro."));
     request.onerror = () => reject(request.error);
   });
 }
@@ -67,9 +68,7 @@ export async function saveImageBlob(
 /**
  * Retrieves a Blob from IndexedDB by fileKey.
  */
-export async function getImageBlob(
-  fileKey: string,
-): Promise<StoredImageRecord | null> {
+export async function getImageBlob(fileKey: string): Promise<StoredImageRecord | null> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_IMAGES, "readonly");
@@ -93,7 +92,12 @@ export async function deleteImageBlob(fileKey: string): Promise<void> {
     const store = transaction.objectStore(STORE_IMAGES);
     const request = store.delete(fileKey);
 
-    request.onsuccess = () => resolve();
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error("Falha ao guardar ficheiro."));
     request.onerror = () => reject(request.error);
   });
 }
@@ -108,7 +112,12 @@ export async function clearAllImageBlobs(): Promise<void> {
     const store = transaction.objectStore(STORE_IMAGES);
     const request = store.clear();
 
-    request.onsuccess = () => resolve();
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error("Falha ao guardar ficheiro."));
     request.onerror = () => reject(request.error);
   });
 }

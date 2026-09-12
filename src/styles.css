@@ -1,6 +1,9 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "./home.css";
+@import "./sport-brand.css";
+@import "./product-commerce.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -159,19 +162,13 @@
     inset: 0;
     pointer-events: none;
     opacity: 0.18;
-    background-image: radial-gradient(
-      oklch(1 0 0 / 0.05) 1px,
-      transparent 1px
-    );
+    background-image: radial-gradient(oklch(1 0 0 / 0.05) 1px, transparent 1px);
     background-size: 4px 4px;
   }
 }
 
 @utility bg-tech-grid {
-  background-image: radial-gradient(
-    oklch(1 0 0 / 0.035) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(oklch(1 0 0 / 0.035) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -198,11 +195,7 @@
 /* Deep studio floor used behind large product shots */
 @utility bg-studio {
   background:
-    radial-gradient(
-      70% 60% at 50% 15%,
-      oklch(0.24 0.008 285) 0%,
-      transparent 70%
-    ),
+    radial-gradient(70% 60% at 50% 15%, oklch(0.24 0.008 285) 0%, transparent 70%),
     linear-gradient(to bottom, oklch(0.155 0.005 285), oklch(0.115 0.004 285));
 }
 

@@ -49,6 +49,7 @@ const errorClass = "mt-1 text-[0.65rem] text-destructive";
 
 function Contactos() {
   const [submitted, setSubmitted] = useState(false);
+  const [summary, setSummary] = useState("");
 
   const {
     register,
@@ -59,7 +60,13 @@ function Contactos() {
     defaultValues: { tipoPedido: "" },
   });
 
-  function onSubmit(_data: FormData) {
+  function onSubmit(data: FormData) {
+    setSummary(
+      Object.entries(data)
+        .filter(([, value]) => value)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("\n"),
+    );
     // NOTE: Form submission is not yet wired to a live backend.
     // Display an honest confirmation stating the order was prepared locally.
     setSubmitted(true);
@@ -74,8 +81,29 @@ function Contactos() {
             <CheckCircle className="mx-auto h-12 w-12 text-cyan" aria-hidden="true" />
             <h2 className="mt-6 text-2xl">Pedido preparado com sucesso.</h2>
             <p className="mt-4 text-sm text-muted-foreground">
-              O pedido foi preparado com sucesso. O envio online direto será ativado quando os dados de contacto e canais de receção da VinilArt Sport forem configurados.
+              O teu pedido está pronto para copiar e enviar à VinilArt Sport. Ainda não foi enviado.
             </p>
+            <textarea
+              aria-label="Resumo do pedido"
+              readOnly
+              value={summary}
+              rows={10}
+              className="mt-6 w-full rounded border border-border bg-background p-4 text-left text-sm"
+            />
+            <SportButton
+              className="mt-5"
+              onClick={() => {
+                const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "pedido-vinilart-sport.txt";
+                link.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              Descarregar pedido
+            </SportButton>
           </div>
         </section>
       </PageShell>
@@ -87,7 +115,7 @@ function Contactos() {
       <PageHero
         eyebrow="Contactos"
         title="Falar com a VinilArt Sport"
-        text="Conta-nos o que queres personalizar. Entramos em contacto para te apresentar uma proposta."
+        text="Conta-nos o que queres personalizar e prepara os detalhes do teu pedido."
       />
 
       <section className="mx-auto grid max-w-[1600px] gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -99,8 +127,14 @@ function Contactos() {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="nome" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-                Nome <span aria-hidden="true" className="text-destructive">*</span>
+              <label
+                htmlFor="nome"
+                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              >
+                Nome{" "}
+                <span aria-hidden="true" className="text-destructive">
+                  *
+                </span>
               </label>
               <input
                 id="nome"
@@ -119,8 +153,14 @@ function Contactos() {
               )}
             </div>
             <div>
-              <label htmlFor="email" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-                Email <span aria-hidden="true" className="text-destructive">*</span>
+              <label
+                htmlFor="email"
+                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              >
+                Email{" "}
+                <span aria-hidden="true" className="text-destructive">
+                  *
+                </span>
               </label>
               <input
                 id="email"
@@ -143,7 +183,10 @@ function Contactos() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="telefone" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="telefone"
+                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 Telefone <span className="text-muted-foreground/50">(opcional)</span>
               </label>
               <input
@@ -152,11 +195,14 @@ function Contactos() {
                 {...register("telefone")}
                 autoComplete="tel"
                 className={cn("mt-2", fieldClass)}
-                placeholder="+351 900 000 000"
+                placeholder="O teu contacto telefónico"
               />
             </div>
             <div>
-              <label htmlFor="clube" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+              <label
+                htmlFor="clube"
+                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              >
                 Clube / Empresa <span className="text-muted-foreground/50">(opcional)</span>
               </label>
               <input
@@ -169,8 +215,14 @@ function Contactos() {
           </div>
 
           <div>
-            <label htmlFor="tipoPedido" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Tipo de pedido <span aria-hidden="true" className="text-destructive">*</span>
+            <label
+              htmlFor="tipoPedido"
+              className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+            >
+              Tipo de pedido{" "}
+              <span aria-hidden="true" className="text-destructive">
+                *
+              </span>
             </label>
             <select
               id="tipoPedido"
@@ -178,11 +230,7 @@ function Contactos() {
               aria-required="true"
               aria-invalid={!!errors.tipoPedido}
               aria-describedby={errors.tipoPedido ? "tipo-error" : undefined}
-              className={cn(
-                "mt-2",
-                fieldClass,
-                errors.tipoPedido && "border-destructive",
-              )}
+              className={cn("mt-2", fieldClass, errors.tipoPedido && "border-destructive")}
             >
               <option value="">Seleciona…</option>
               <option value="Caneleiras">Caneleiras</option>
@@ -200,8 +248,14 @@ function Contactos() {
           </div>
 
           <div>
-            <label htmlFor="mensagem" className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Mensagem <span aria-hidden="true" className="text-destructive">*</span>
+            <label
+              htmlFor="mensagem"
+              className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+            >
+              Mensagem{" "}
+              <span aria-hidden="true" className="text-destructive">
+                *
+              </span>
             </label>
             <textarea
               id="mensagem"
@@ -238,17 +292,16 @@ function Contactos() {
         </form>
 
         <aside className="h-fit lg:sticky lg:top-28">
-          <p className="label-eyebrow">Dados de contacto</p>
+          <p className="label-eyebrow">Vamos pôr a tua ideia em jogo</p>
           <p className="mt-4 text-sm text-muted-foreground">
-            Email, telefone, morada e redes sociais a confirmar contigo antes de
-            publicar.
+            Prepara aqui o teu pedido. Podes descarregar o resumo e partilhá-lo com a VinilArt Sport
+            pelo teu canal habitual.
           </p>
 
           <div className="mt-10 border-t border-border pt-10">
             <p className="label-eyebrow">Encomendas de equipa</p>
             <p className="mt-4 text-sm text-muted-foreground">
-              Para clubes, envia a lista de nomes, números e tamanhos junto com o
-              pedido.
+              Para clubes, envia a lista de nomes, números e tamanhos junto com o pedido.
             </p>
           </div>
         </aside>
