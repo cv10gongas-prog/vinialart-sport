@@ -459,33 +459,24 @@ export const printSurfaceWhite = svgData(`
 `);
 
 /**
- * Overlay 3D cilíndrico de alta definição para garrafa térmica.
- * Projetado para modo multiply no canvas 480x480:
- * - Branco (#ffffff) a 28%: não altera a arte (brilho especular);
- * - Tons médios a escuros nos bordos: projetam sombra curva realista sobre logótipos e textos.
+ * Overlay 3D cilíndrico com transparências puras:
+ * - Centro 100% transparente para mostrar as cores reais e vivas do logótipo;
+ * - Brilho branco suave (opacity 0.22) para reflexo especular 3D;
+ * - Sombras pretas progressivas nos rebordos (opacity 0.32 e 0.36) para curvar o logótipo em volta do cilindro.
  */
 export const bottleShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
   <defs>
-    <linearGradient id="cylinderLighting" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#707884"/>
-      <stop offset="10%" stop-color="#a4abb8"/>
-      <stop offset="28%" stop-color="#ffffff"/>
-      <stop offset="46%" stop-color="#edf1f6"/>
-      <stop offset="74%" stop-color="#b8c0cc"/>
-      <stop offset="90%" stop-color="#838c9c"/>
-      <stop offset="100%" stop-color="#586270"/>
+    <linearGradient id="cylinderTransparency" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.34"/>
+      <stop offset="14%" stop-color="#000000" stop-opacity="0.08"/>
+      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="44%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#000000" stop-opacity="0.04"/>
+      <stop offset="88%" stop-color="#000000" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.38"/>
     </linearGradient>
   </defs>
-  <path d="M 218 106 
-           C 218 127, 180 131, 180 147 
-           L 180 401 
-           C 180 410, 190 414, 204 414 
-           L 276 414 
-           C 290 414, 300 410, 300 401 
-           L 300 147 
-           C 300 131, 262 127, 262 106 
-           Z" 
-        fill="url(#cylinderLighting)"/>
+  <rect x="180" y="147" width="120" height="254" rx="6" fill="url(#cylinderTransparency)"/>
 </svg>
 `);
