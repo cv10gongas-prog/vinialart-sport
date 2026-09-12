@@ -26,6 +26,9 @@ import {
   ChevronDown,
   Copy,
   Type,
+  AlignCenterHorizontal,
+  AlignCenterVertical,
+  Target,
 } from "lucide-react";
 import {
   Popover,
@@ -362,7 +365,7 @@ export function ProductDesignWorkspace({
             </div>
 
             {/* Floating Toolbar at bottom-4 left-1/2 -translate-x-1/2 z-40 */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-zinc-950/90 px-3 py-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.85)] backdrop-blur-md">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1 sm:gap-1.5 rounded-full border border-white/15 bg-zinc-950/90 px-3 py-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.85)] backdrop-blur-md max-w-[95vw] overflow-x-auto">
               {/* 1. Ajustar / Smart Fit */}
               <button
                 type="button"
@@ -370,16 +373,60 @@ export function ProductDesignWorkspace({
                   c.smartFit();
                 }}
                 disabled={!hasArtOnActiveSurface}
-                title="Ajustar à área útil imprimível"
-                aria-label="Ajustar à área útil"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+                title="Ajustar à área útil (conter)"
+                aria-label="Ajustar"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
               >
-                <Maximize2 size={16} />
+                <Target size={15} />
               </button>
 
-              <div className="h-4 w-px bg-white/10" />
+              {/* 2. Preencher / Cover Fit */}
+              <button
+                type="button"
+                onClick={() => {
+                  c.coverFit();
+                }}
+                disabled={!hasArtOnActiveSurface}
+                title="Preencher área útil (cobrir)"
+                aria-label="Preencher"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <Maximize2 size={15} />
+              </button>
 
-              {/* 2. Zoom - / + (Layer or Canvas) */}
+              <div className="h-4 w-px bg-white/10 shrink-0" />
+
+              {/* 3. Centrar Horizontalmente */}
+              <button
+                type="button"
+                onClick={() => {
+                  c.alignSelected("horizontal");
+                }}
+                disabled={!c.selectedLayer}
+                title="Centrar horizontalmente"
+                aria-label="Centrar horizontal"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <AlignCenterHorizontal size={15} />
+              </button>
+
+              {/* 4. Centrar Verticalmente */}
+              <button
+                type="button"
+                onClick={() => {
+                  c.alignSelected("vertical");
+                }}
+                disabled={!c.selectedLayer}
+                title="Centrar verticalmente"
+                aria-label="Centrar vertical"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <AlignCenterVertical size={15} />
+              </button>
+
+              <div className="h-4 w-px bg-white/10 shrink-0" />
+
+              {/* 5. Zoom - / + (Layer or Canvas) */}
               <button
                 type="button"
                 onClick={() => {
@@ -394,9 +441,9 @@ export function ProductDesignWorkspace({
                 disabled={!hasArtOnActiveSurface}
                 title={c.selectedLayer ? "Diminuir elemento selecionado" : "Diminuir Zoom"}
                 aria-label="Diminuir"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
               >
-                <ZoomOut size={16} />
+                <ZoomOut size={15} />
               </button>
               <button
                 type="button"
@@ -412,14 +459,14 @@ export function ProductDesignWorkspace({
                 disabled={!hasArtOnActiveSurface}
                 title={c.selectedLayer ? "Aumentar elemento selecionado" : "Aumentar Zoom"}
                 aria-label="Aumentar"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
               >
-                <ZoomIn size={16} />
+                <ZoomIn size={15} />
               </button>
 
-              <div className="h-4 w-px bg-white/10" />
+              <div className="h-4 w-px bg-white/10 shrink-0" />
 
-              {/* 3. Rodar Elemento Selecionado */}
+              {/* 6. Rodar Elemento Selecionado */}
               <button
                 type="button"
                 onClick={() => {
@@ -428,28 +475,28 @@ export function ProductDesignWorkspace({
                 disabled={!c.selectedLayer}
                 title="Rodar elemento (+15°)"
                 aria-label="Rodar elemento selecionado"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
               >
-                <RotateCw size={16} />
+                <RotateCw size={15} />
               </button>
 
-              {/* 4. Alternar Lado (se multi-superfície) */}
+              {/* 7. Alternar Lado (se multi-superfície) */}
               {config.surfaces.length > 1 && (
                 <>
-                  <div className="h-4 w-px bg-white/10" />
+                  <div className="h-4 w-px bg-white/10 shrink-0" />
                   <button
                     type="button"
                     onClick={toggleSurface}
                     title="Alternar entre superfícies (Frente/Costas ou Esquerda/Direita)"
                     aria-label="Alternar superfície"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400"
+                    className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400"
                   >
-                    <RefreshCw size={16} />
+                    <RefreshCw size={15} />
                   </button>
                 </>
               )}
 
-              {/* 5. Alternar Modo de Visualização (Pré-visualização realista sem guias nem bounding box) */}
+              {/* 8. Alternar Modo de Visualização (Pré-visualização realista sem guias nem bounding box) */}
               <button
                 type="button"
                 onClick={() => {
@@ -458,18 +505,18 @@ export function ProductDesignWorkspace({
                 }}
                 title={c.viewMode === "edit" ? "Ver maquete realista (ocultar guias e seletores)" : "Voltar ao modo de edição"}
                 aria-label="Alternar pré-visualização realista"
-                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
+                className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full transition-all ${
                   c.viewMode === "preview"
                     ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-400/50 shadow-[0_0_12px_rgba(0,200,255,0.4)]"
                     : "text-zinc-300 hover:bg-white/10 hover:text-cyan-400"
                 }`}
               >
-                <Eye size={16} />
+                <Eye size={15} />
               </button>
 
-              <div className="h-4 w-px bg-white/10" />
+              <div className="h-4 w-px bg-white/10 shrink-0" />
 
-              {/* 6. Eliminar Elemento / Reset */}
+              {/* 9. Eliminar Elemento / Reset */}
               <button
                 type="button"
                 onClick={() => {
@@ -482,9 +529,9 @@ export function ProductDesignWorkspace({
                 disabled={!hasArtOnActiveSurface}
                 title={c.selectedLayer ? "Eliminar camada selecionada" : "Remover arte da superfície"}
                 aria-label="Remover arte"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition-all hover:bg-red-500/20 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-all hover:bg-red-500/20 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none"
               >
-                <Trash2 size={16} />
+                <Trash2 size={15} />
               </button>
             </div>
           </div>

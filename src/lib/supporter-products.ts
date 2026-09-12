@@ -131,6 +131,15 @@ export const SACO_SILHOUETTE_PATH = `
   L 187.7 236.9 L 196.1 208.8 L 207.3 180.6 L 225.6 152.5 L 245.3 124.4 L 265.0 96.3 Z
 `;
 
+/** Silhueta de cor do bolso frontal da mochila (escala 800x800) */
+export const MOCHILA_SILHOUETTE_PATH = `
+  M 241 400
+  C 241 375, 558 375, 558 400
+  L 566 658
+  C 566 703, 233 703, 233 658
+  Z
+`;
+
 /** Silhueta de cor da t-shirt (escala 800x800 baseada no SVG 500x500 * 1.6) */
 export const TSHIRT_SILHOUETTE_PATH = `
   M 304 128
@@ -201,10 +210,10 @@ export const supporterDefinitions: {
     photo: "base-saco.jpg",
     base: "saco",
     area: {
-      xFraction: 110 / 480,
-      yFraction: 108 / 480,
-      widthFraction: 260 / 480,
-      heightFraction: 287 / 480,
+      xFraction: 125 / 480,
+      yFraction: 130 / 480,
+      widthFraction: 230 / 480,
+      heightFraction: 245 / 480,
       shape: { type: "rounded", cornerRadius: 16 },
     },
     silhouettePath: SACO_SILHOUETTE_PATH,
@@ -216,13 +225,14 @@ export const supporterDefinitions: {
     photo: "base-mochila.jpg",
     base: "mochila",
     area: {
-      xFraction: 166 / 480,
-      yFraction: 131 / 480,
-      widthFraction: 93 / 480,
-      heightFraction: 205 / 480,
-      shape: { type: "rounded", cornerRadius: 12 },
+      xFraction: 155 / 480,
+      yFraction: 248 / 480,
+      widthFraction: 170 / 480,
+      heightFraction: 152 / 480,
+      shape: { type: "rounded", cornerRadius: 14 },
     },
-    note: "Área útil ampla em toda a face do bolso frontal, delimitada pelos fechos e costuras.",
+    silhouettePath: MOCHILA_SILHOUETTE_PATH,
+    note: "Área útil frontal central no bolso da mochila, delimitada pelos fechos e costuras.",
   },
   {
     id: "tshirt",
@@ -230,11 +240,11 @@ export const supporterDefinitions: {
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
     area: {
-      xFraction: 0.28,
-      yFraction: 0.25,
-      widthFraction: 0.44,
-      heightFraction: 0.46,
-      shape: { type: "rounded", cornerRadius: 10 },
+      xFraction: 0.30,
+      yFraction: 0.28,
+      widthFraction: 0.40,
+      heightFraction: 0.42,
+      shape: { type: "rounded", cornerRadius: 8 },
     },
     silhouettePath: TSHIRT_SILHOUETTE_PATH,
     note: "Área de personalização peitoral e frontal ampla, com margem à gola e às costuras.",

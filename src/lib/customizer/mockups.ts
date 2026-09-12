@@ -573,3 +573,27 @@ export const capShadeOverlay = svgData(`
   <rect width="480" height="480" fill="url(#capVisorShadowFront)"/>
 </svg>
 `);
+
+/**
+ * Overlay de sombreamento suave e volume anatómico da mochila e bolso frontal
+ */
+export const mochilaShadeOverlay = svgData(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <linearGradient id="mochilaShadowSide" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="88%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="mochilaShadowTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.12"/>
+      <stop offset="18%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="480" fill="url(#mochilaShadowSide)"/>
+  <rect width="480" height="480" fill="url(#mochilaShadowTop)"/>
+</svg>
+`);
