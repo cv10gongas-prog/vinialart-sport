@@ -109,13 +109,14 @@ export const supporterDefinitions: {
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
     area: {
-      xFraction: 0.30,
-      yFraction: 0.28,
-      widthFraction: 0.40,
-      heightFraction: 0.40,
-      shape: { type: "rounded", cornerRadius: 8 },
+      // Cobertura completa das mangas (0.13 a 0.87) e corpo inteiro (0.14 a 0.90)
+      xFraction: 0.13,
+      yFraction: 0.14,
+      widthFraction: 0.74,
+      heightFraction: 0.76,
+      shape: { type: "silhouette" },
     },
-    note: "Área de estampa elegante e centrada no peito da camisola.",
+    note: "Personalização total: corpo frontal e mangas.",
   },
   {
     id: "bracadeira",
