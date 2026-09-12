@@ -137,13 +137,14 @@ export const supporterDefinitions: {
     photo: "base-calcoes.jpg",
     base: "calcoes",
     area: {
-      xFraction: 0.52,
-      yFraction: 0.50,
-      widthFraction: 0.26,
-      heightFraction: 0.30,
-      shape: { type: "rounded", cornerRadius: 8 },
+      // Área ampla que enquadra as duas pernas sem cortes indesejados
+      xFraction: 0.20,
+      yFraction: 0.26,
+      widthFraction: 0.60,
+      heightFraction: 0.52,
+      shape: { type: "rounded", cornerRadius: 10 },
     },
-    note: "Área de personalização na perna direita para número ou emblema.",
+    note: "Personalização frontal: número e emblema nas pernas.",
   },
 ];
 
