@@ -9,7 +9,7 @@ function svgData(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-/** Silhuetas — fonte única de verdade. */
+/** Silhuetas — fonte única de verdade (grelha padrão 800x800). */
 export const SHIN_GUARD_PATH = `
   M400 45
   C495 45 580 85 585 190
@@ -73,6 +73,44 @@ export const FLAG_PATH = `
   L730 550
   C680 565 590 515 490 550
   C360 595 240 505 106 550
+  Z
+`;
+
+export const SHORTS_PATH = `
+  M 208 137
+  C 300 132, 500 132, 592 137
+  L 597 200
+  C 620 333, 647 483, 677 680
+  C 633 687, 567 690, 453 683
+  C 433 583, 413 483, 400 408
+  C 387 483, 367 583, 347 683
+  C 233 690, 167 687, 123 680
+  C 153 483, 180 333, 203 200
+  Z
+`;
+
+export const BRACADEIRA_PATH = `
+  M 90 300
+  H 710
+  A 10 10 0 0 1 720 310
+  V 490
+  A 10 10 0 0 1 710 500
+  H 90
+  A 10 10 0 0 1 80 490
+  V 310
+  A 10 10 0 0 1 90 300
+  Z
+`;
+
+export const BOTTLE_PATH = `
+  M 364 177
+  C 364 212, 300 218, 300 245
+  L 300 668
+  C 300 684, 316 690, 340 690
+  L 460 690
+  C 484 690, 500 684, 500 668
+  L 500 245
+  C 500 218, 436 212, 436 177
   Z
 `;
 
@@ -420,19 +458,34 @@ export const printSurfaceWhite = svgData(`
 </svg>
 `);
 
+/**
+ * Overlay 3D cilíndrico de alta definição para garrafa térmica.
+ * Projetado para modo multiply no canvas 480x480:
+ * - Branco (#ffffff) a 28%: não altera a arte (brilho especular);
+ * - Tons médios a escuros nos bordos: projetam sombra curva realista sobre logótipos e textos.
+ */
 export const bottleShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
   <defs>
     <linearGradient id="cylinderLighting" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.32"/>
-      <stop offset="14%" stop-color="#000000" stop-opacity="0.08"/>
-      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.28"/>
-      <stop offset="42%" stop-color="#ffffff" stop-opacity="0.05"/>
-      <stop offset="70%" stop-color="#000000" stop-opacity="0.04"/>
-      <stop offset="90%" stop-color="#000000" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.36"/>
+      <stop offset="0%" stop-color="#707884"/>
+      <stop offset="10%" stop-color="#a4abb8"/>
+      <stop offset="28%" stop-color="#ffffff"/>
+      <stop offset="46%" stop-color="#edf1f6"/>
+      <stop offset="74%" stop-color="#b8c0cc"/>
+      <stop offset="90%" stop-color="#838c9c"/>
+      <stop offset="100%" stop-color="#586270"/>
     </linearGradient>
   </defs>
-  <rect x="186" y="127" width="88" height="285" rx="3" fill="url(#cylinderLighting)"/>
+  <path d="M 218 106 
+           C 218 127, 180 131, 180 147 
+           L 180 401 
+           C 180 410, 190 414, 204 414 
+           L 276 414 
+           C 290 414, 300 410, 300 401 
+           L 300 147 
+           C 300 131, 262 127, 262 106 
+           Z" 
+        fill="url(#cylinderLighting)"/>
 </svg>
 `);
