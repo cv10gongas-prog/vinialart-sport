@@ -1,26 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
   <defs>
-    <!-- Sombra suave por baixo dos calções -->
     <radialGradient id="dropGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.45"/>
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </radialGradient>
-
-    <!-- Gradiente do tecido desportivo branco neutro -->
     <linearGradient id="fabricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
       <stop offset="40%" stop-color="#f8fafc"/>
       <stop offset="75%" stop-color="#e2e8f0"/>
       <stop offset="100%" stop-color="#cbd5e1"/>
     </linearGradient>
-
-    <!-- Gradiente do cós elástico -->
     <linearGradient id="waistbandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
       <stop offset="50%" stop-color="#f1f5f9"/>
       <stop offset="100%" stop-color="#e2e8f0"/>
     </linearGradient>
-
     <filter id="shortsShadow" x="-15%" y="-10%" width="130%" height="125%">
       <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.4"/>
     </filter>
@@ -30,39 +24,41 @@
   <ellipse cx="240" cy="425" rx="175" ry="15" fill="url(#dropGlow)"/>
 
   <g filter="url(#shortsShadow)">
-    <!-- Corpo principal dos calções de futebol (corte largo e anatómico) -->
-    <path d="M 108 80 
-             C 180 74, 300 74, 372 80 
-             C 388 140, 404 220, 412 300 
-             C 416 350, 418 395, 412 414 
-             C 370 422, 315 420, 266 414 
-             C 255 365, 246 310, 240 270 
-             C 234 310, 225 365, 214 414 
-             C 165 420, 110 422, 68 414 
-             C 62 395, 64 350, 68 300 
-             C 76 220, 92 140, 108 80 Z" 
+    <!-- Corpo anatómico com recorte exato na virilha -->
+    <path d="M 125 82 
+             C 180 79, 300 79, 355 82 
+             L 358 120 
+             C 372 200, 388 290, 406 408 
+             C 380 412, 340 414, 272 410 
+             C 260 350, 248 290, 240 245 
+             C 232 290, 220 350, 208 410 
+             C 140 414, 100 412, 74 408 
+             C 92 290, 108 200, 122 120 
+             Z" 
           fill="url(#fabricGradient)" 
           stroke="#94a3b8" 
           stroke-width="2" 
           stroke-linejoin="round"/>
 
-    <!-- Cós elástico desportivo com pespontos de reforço -->
-    <path d="M 108 80 C 180 74, 300 74, 372 80 L 376 118 C 300 114, 180 114, 104 118 Z" 
+    <!-- Cós elástico -->
+    <path d="M 125 82 C 180 79, 300 79, 355 82 L 358 120 C 300 116, 180 116, 122 120 Z" 
           fill="url(#waistbandGradient)" 
           stroke="#94a3b8" 
           stroke-width="1.8"/>
-    <path d="M 106 93 C 180 87, 300 87, 374 93" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
-    <path d="M 105 106 C 180 100, 300 100, 375 106" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 124 95 C 180 91, 300 91, 356 95" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 123 108 C 180 104, 300 104, 357 108" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
 
-    <!-- Costura central e bainhas inferiores -->
-    <path d="M 240 118 L 240 270" stroke="#94a3b8" stroke-width="2"/>
-    <path d="M 72 405 C 115 411, 165 410, 210 405" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
-    <path d="M 270 405 C 315 410, 365 411, 408 405" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+    <!-- Costura central até à virilha -->
+    <path d="M 240 120 L 240 245" stroke="#94a3b8" stroke-width="2"/>
 
-    <!-- Cordões ajustáveis frontais -->
-    <path d="M 233 114 C 229 140, 222 165, 218 185" stroke="#475569" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-    <rect x="215" y="180" width="5" height="11" rx="1.5" fill="#94a3b8" transform="rotate(-10 217 185)"/>
-    <path d="M 247 114 C 251 140, 258 165, 262 185" stroke="#475569" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-    <rect x="260" y="180" width="5" height="11" rx="1.5" fill="#94a3b8" transform="rotate(10 263 185)"/>
+    <!-- Pespontos das bainhas -->
+    <path d="M 78 402 C 120 408, 165 406, 204 404" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 276 404 C 315 406, 360 408, 402 402" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+
+    <!-- Cordões ajustáveis -->
+    <path d="M 234 116 C 230 142, 224 165, 220 185" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="217" y="180" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(-10 219 185)"/>
+    <path d="M 246 116 C 250 142, 256 165, 260 185" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="258" y="180" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(10 261 185)"/>
   </g>
 </svg>
