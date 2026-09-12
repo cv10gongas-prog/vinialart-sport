@@ -580,20 +580,27 @@ export const capShadeOverlay = svgData(`
 export const mochilaShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
   <defs>
+    <!-- Sombra suave no contorno lateral da aba frontal -->
     <linearGradient id="mochilaShadowSide" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.16"/>
-      <stop offset="12%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="88%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.14"/>
+      <stop offset="10%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="90%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.14"/>
     </linearGradient>
+    <!-- Sombra suave sob os puxadores do fecho no topo -->
     <linearGradient id="mochilaShadowTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.12"/>
-      <stop offset="18%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="80%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.15"/>
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.18"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0.04"/>
+      <stop offset="35%" stop-color="#000000" stop-opacity="0"/>
     </linearGradient>
+    <!-- Realce central sutil da textura do tecido -->
+    <radialGradient id="mochilaHighlightCenter" cx="50%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="480" height="480" fill="url(#mochilaShadowSide)"/>
-  <rect width="480" height="480" fill="url(#mochilaShadowTop)"/>
+  <rect x="154" y="85" width="166" height="317" rx="12" fill="url(#mochilaShadowSide)"/>
+  <rect x="154" y="85" width="166" height="317" rx="12" fill="url(#mochilaShadowTop)"/>
+  <rect x="154" y="85" width="166" height="317" rx="12" fill="url(#mochilaHighlightCenter)"/>
 </svg>
 `);
