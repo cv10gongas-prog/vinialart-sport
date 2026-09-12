@@ -15,10 +15,6 @@ import type {
 import { nanoid } from "./nanoid";
 
 // ---------------------------------------------------------------------------
-// ID generation — imported from dedicated module
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
 // Mathematical Core: Fit & Alignment
 // ---------------------------------------------------------------------------
 
@@ -35,23 +31,6 @@ export interface FitArtworkResult {
   scale: number;      // aspect ratio scale factor
 }
 
-/**
- * Função matemática central única de fit para artworks no customizador:
- *
- * scale = mode === 'cover'
- *   ? max(printArea.width / imageWidth, printArea.height / imageHeight)
- *   : min(printArea.width / imageWidth, printArea.height / imageHeight);
- *
- * renderedWidth = imageWidth * scale;
- * renderedHeight = imageHeight * scale;
- *
- * topLeftX = printArea.x + (printArea.width - renderedWidth) / 2;
- * topLeftY = printArea.y + (printArea.height - renderedHeight) / 2;
- *
- * Center (Konva x,y com offsetX = renderedWidth / 2, offsetY = renderedHeight / 2):
- * centerX = printArea.x + printArea.width / 2;
- * centerY = printArea.y + printArea.height / 2;
- */
 export function fitArtworkToPrintArea(
   imageWidth: number,
   imageHeight: number,
@@ -74,7 +53,7 @@ export function fitArtworkToPrintArea(
       ? Math.max(paW / safeW, paH / safeH)
       : Math.min(paW / safeW, paH / safeH);
 
-  // Apply initial scale fraction preserving proportional bounds
+  // Garante escala proporcional estritamente dentro da printArea
   const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 1.0);
 
   const renderedWidth = safeW * scale;
@@ -115,7 +94,7 @@ export function createImageLayer(
   canvasHeight: number,
   printArea: PrintArea,
   zIndex: number,
-  initialScaleFraction: number = 0.50,
+  initialScaleFraction: number = 0.85,
 ): ImageLayer {
   const fit = fitArtworkToPrintArea(
     naturalWidth,
@@ -134,8 +113,8 @@ export function createImageLayer(
     name: filename || "Imagem",
     x: fit.x,
     y: fit.y,
-    scaleX: fit.scaleX,
-    scaleY: fit.scaleY,
+    scaleX: 1,
+    scaleY: 1,
     rotation: fit.rotation,
     zIndex,
     visible: true,
@@ -198,7 +177,7 @@ export function createTextLayer(
 }
 
 // ---------------------------------------------------------------------------
-// Smart Fit (Contain & Cover) — pure aspect-ratio preserving transforms
+// Smart Fit (Contain & Cover)
 // ---------------------------------------------------------------------------
 
 export function smartFitLayer(
@@ -259,34 +238,18 @@ export function coverFitLayer(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Layer sorting (by zIndex)
-// ---------------------------------------------------------------------------
-
 export function sortedLayers(layers: DesignLayer[]): DesignLayer[] {
   return [...layers].sort((a, b) => a.zIndex - b.zIndex);
 }
-
-// ---------------------------------------------------------------------------
-// Maximum zIndex helper
-// ---------------------------------------------------------------------------
 
 export function nextZIndex(layers: DesignLayer[]): number {
   if (layers.length === 0) return 1;
   return Math.max(...layers.map((l) => l.zIndex)) + 1;
 }
 
-// ---------------------------------------------------------------------------
-// CSS color → Konva-compatible hex or oklch string
-// ---------------------------------------------------------------------------
-
 export function toCssColor(value: string): string {
   return value;
 }
-
-// ---------------------------------------------------------------------------
-// Serialization helpers
-// ---------------------------------------------------------------------------
 
 export type SerializedDesign = {
   productId: string;
