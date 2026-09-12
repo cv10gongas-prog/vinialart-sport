@@ -478,3 +478,35 @@ export const bottleShadeOverlay = svgData(`
   <rect x="149" y="77" width="182" height="345" rx="8" fill="url(#cylinderTransparency)"/>
 </svg>
 `);
+
+/**
+ * Overlay de iluminação e curvatura do painel frontal em espuma do boné trucker frontal
+ */
+export const capShadeOverlay = svgData(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <!-- Brilho central suave no bojo da espuma frontal -->
+    <radialGradient id="capHighlightFront" cx="50%" cy="42%" r="48%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.22"/>
+    </radialGradient>
+    <!-- Sombra lateral suave para dar volume 3D convexo e curvatura natural -->
+    <linearGradient id="capSideCurvature" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.18"/>
+      <stop offset="15%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="85%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.18"/>
+    </linearGradient>
+    <!-- Sombra suave inferior na junção com a pala -->
+    <linearGradient id="capVisorShadowFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#000000" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.20"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="480" fill="url(#capHighlightFront)"/>
+  <rect width="480" height="480" fill="url(#capSideCurvature)"/>
+  <rect width="480" height="480" fill="url(#capVisorShadowFront)"/>
+</svg>
+`);

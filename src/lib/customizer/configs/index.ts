@@ -10,6 +10,7 @@ import { caneleirasConfig } from "./caneleiras";
 
 import {
   bottleShadeOverlay,
+  capShadeOverlay,
   flagShadeOverlay,
   flagWhite,
   jerseyShadeOverlay,
@@ -244,6 +245,7 @@ export const productCustomizerConfigs: Record<
         mockup: {
           baseSrc: `/catalog/editor/${d.base}.svg`,
           ...(d.id === "garrafa" ? { overlaySrc: bottleShadeOverlay } : {}),
+          ...(d.id === "bone" ? { overlaySrc: capShadeOverlay } : {}),
           ...(d.silhouettePath ? { silhouettePath: d.silhouettePath } : {}),
         },
         printArea: d.area,

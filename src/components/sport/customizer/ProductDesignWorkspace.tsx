@@ -449,9 +449,27 @@ export function ProductDesignWorkspace({
                 </>
               )}
 
+              {/* 5. Alternar Modo de Visualização (Pré-visualização realista sem guias nem bounding box) */}
+              <button
+                type="button"
+                onClick={() => {
+                  c.setViewMode(c.viewMode === "edit" ? "preview" : "edit");
+                  c.selectLayer(null);
+                }}
+                title={c.viewMode === "edit" ? "Ver maquete realista (ocultar guias e seletores)" : "Voltar ao modo de edição"}
+                aria-label="Alternar pré-visualização realista"
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
+                  c.viewMode === "preview"
+                    ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-400/50 shadow-[0_0_12px_rgba(0,200,255,0.4)]"
+                    : "text-zinc-300 hover:bg-white/10 hover:text-cyan-400"
+                }`}
+              >
+                <Eye size={16} />
+              </button>
+
               <div className="h-4 w-px bg-white/10" />
 
-              {/* 5. Eliminar Elemento / Reset */}
+              {/* 6. Eliminar Elemento / Reset */}
               <button
                 type="button"
                 onClick={() => {

@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 interface ProductLivePreviewProps {
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string;
   onOpenPresentation?: () => void;
   className?: string;
 }
@@ -38,6 +39,7 @@ interface ProductLivePreviewProps {
 export function ProductLivePreview({
   config,
   customizer,
+  baseColor,
   onOpenPresentation,
   className,
 }: ProductLivePreviewProps) {
@@ -113,6 +115,7 @@ export function ProductLivePreview({
           surface={activeSurface}
           config={config}
           customizer={customizer}
+          baseColor={baseColor}
           KonvaLib={KonvaLib}
         />
 
@@ -148,6 +151,7 @@ interface ProductPresentationModalProps {
   onClose: () => void;
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string;
   onAddToCart: () => void;
   cartItemId?: string | undefined;
 }
@@ -157,6 +161,7 @@ export function ProductPresentationModal({
   onClose,
   config,
   customizer,
+  baseColor,
   onAddToCart,
   cartItemId,
 }: ProductPresentationModalProps) {
@@ -339,6 +344,7 @@ export function ProductPresentationModal({
                               surface={surface}
                               config={config}
                               customizer={customizer}
+                              baseColor={baseColor}
                               KonvaLib={KonvaLib}
                             />
                           </div>
@@ -364,6 +370,7 @@ export function ProductPresentationModal({
                       surface={primarySurface}
                       config={config}
                       customizer={customizer}
+                      baseColor={baseColor}
                       KonvaLib={KonvaLib}
                     />
                   </div>
@@ -385,6 +392,7 @@ export function ProductPresentationModal({
                           surface={surface}
                           config={config}
                           customizer={customizer}
+                          baseColor={baseColor}
                           KonvaLib={KonvaLib}
                         />
                       </div>
@@ -439,15 +447,17 @@ export function LiveSurfaceRenderer({
   surface,
   config,
   customizer,
+  baseColor,
   KonvaLib,
 }: {
   surface: Surface;
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
+  baseColor?: string | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   KonvaLib: any;
 }) {
-  const { Stage, Layer, Image: KonvaImage, Text, Rect, Group } = KonvaLib;
+  const { Stage, Layer, Image: KonvaImage, Text, Rect, Group, Path: KonvaPath } = KonvaLib;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(config.canvasWidth);
 
@@ -564,11 +574,34 @@ export function LiveSurfaceRenderer({
         <Stage width={config.canvasWidth} height={config.canvasHeight}>
           {/* Base Neutral Mockup */}
           <Layer listening={false}>
+            {baseColor && baseColor.toLowerCase() !== "#ffffff" && (
+              surface.mockup?.silhouettePath ? (
+                <KonvaPath
+                  data={surface.mockup.silhouettePath}
+                  scaleX={config.canvasWidth / 800}
+                  scaleY={config.canvasHeight / 800}
+                  fill={baseColor}
+                />
+              ) : (
+                <Rect
+                  x={0}
+                  y={0}
+                  width={config.canvasWidth}
+                  height={config.canvasHeight}
+                  fill={baseColor}
+                />
+              )
+            )}
             {mockupImg && (
               <KonvaImage
                 image={mockupImg}
                 width={config.canvasWidth}
                 height={config.canvasHeight}
+                globalCompositeOperation={
+                  baseColor && baseColor.toLowerCase() !== "#ffffff"
+                    ? "multiply"
+                    : "source-over"
+                }
               />
             )}
           </Layer>
@@ -589,8 +622,6 @@ export function LiveSurfaceRenderer({
                       y={layer.y}
                       width={layer.width}
                       height={layer.height}
-                      offsetX={layer.width / 2}
-                      offsetY={layer.height / 2}
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}

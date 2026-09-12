@@ -299,8 +299,6 @@ export function SingleSurfacePreviewCanvas({
                       y={layer.y}
                       width={layer.width}
                       height={layer.height}
-                      offsetX={layer.width / 2}
-                      offsetY={layer.height / 2}
                       scaleX={layer.scaleX}
                       scaleY={layer.scaleY}
                       rotation={layer.rotation}
