@@ -74,7 +74,7 @@ export function fitArtworkToPrintArea(
       ? Math.max(paW / safeW, paH / safeH)
       : Math.min(paW / safeW, paH / safeH);
 
-  // Apply moderate initial scale fraction (e.g. 0.40 for elegant chest/center placement)
+  // Apply initial scale fraction preserving proportional bounds
   const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 1.0);
 
   const renderedWidth = safeW * scale;
@@ -115,9 +115,8 @@ export function createImageLayer(
   canvasHeight: number,
   printArea: PrintArea,
   zIndex: number,
-  initialScaleFraction: number = 0.40,
+  initialScaleFraction: number = 0.50,
 ): ImageLayer {
-  // Novo upload: escala inicial elegante (40% da área de impressão), centrado na printArea, mantendo aspect ratio
   const fit = fitArtworkToPrintArea(
     naturalWidth,
     naturalHeight,
@@ -171,7 +170,6 @@ export function createTextLayer(
   const areaW = printArea.widthFraction * canvasWidth;
   const areaH = printArea.heightFraction * canvasHeight;
 
-  // Initial estimate to place text comfortably near the center of the print area
   const approxWidth = text.length * fontSize * 0.55;
   const x = Math.max(areaX + 10, areaX + (areaW - approxWidth) / 2);
   const y = areaY + (areaH - fontSize) / 2;
@@ -203,9 +201,6 @@ export function createTextLayer(
 // Smart Fit (Contain & Cover) — pure aspect-ratio preserving transforms
 // ---------------------------------------------------------------------------
 
-/**
- * Ajustar à área: executa a mesma fórmula matemática central única com 'contain'.
- */
 export function smartFitLayer(
   layer: ImageLayer,
   printArea: PrintArea,
@@ -235,9 +230,6 @@ export function smartFitLayer(
   };
 }
 
-/**
- * Preencher área: executa a mesma fórmula matemática central única com 'cover'.
- */
 export function coverFitLayer(
   layer: ImageLayer,
   printArea: PrintArea,
@@ -288,10 +280,6 @@ export function nextZIndex(layers: DesignLayer[]): number {
 // CSS color → Konva-compatible hex or oklch string
 // ---------------------------------------------------------------------------
 
-/**
- * Konva uses canvas fillStyle which supports modern CSS colors including oklch.
- * We pass the oklch values directly — modern browsers handle it fine.
- */
 export function toCssColor(value: string): string {
   return value;
 }
@@ -315,14 +303,12 @@ export type SerializedDesign = {
         rotation: number;
         zIndex: number;
         visible: boolean;
-        // image-specific
         srcUrl?: string;
         filename?: string;
         naturalWidth?: number;
         naturalHeight?: number;
         width?: number;
         height?: number;
-        // text-specific
         text?: string;
         fontSize?: number;
         fontFamily?: string;
@@ -334,11 +320,6 @@ export type SerializedDesign = {
   >;
 };
 
-/**
- * Export a human-readable JSON snapshot of the design.
- * Note: srcUrl contains blob: URLs that are session-only.
- * For persistent storage, replace srcUrl with a server upload URL first.
- */
 export function serializeDesign(
   productId: string,
   surfaces: Record<string, { layers: DesignLayer[] }>,
