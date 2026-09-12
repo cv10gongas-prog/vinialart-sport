@@ -3,22 +3,13 @@
  *
  * Não representam materiais, técnicas de produção ou especificações físicas.
  * Servem apenas como bases visuais brancas para o personalizador online.
- *
- * Regras:
- * - o produto é sempre neutro (branco) e nunca traz arte "queimada";
- * - a arte do cliente é desenhada pelo Konva por cima da base;
- * - os ficheiros `*Overlay` só contêm sombra/luz transparente e são
- *   desenhados ACIMA da arte, para o design parecer aplicado no produto.
- *
- * IMPORTANTE: os contornos (silhuetas) não podem mudar — as áreas de
- * impressão em `configs/` dependem destas coordenadas.
  */
 
 function svgData(svg: string): string {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-/** Silhuetas — fonte única de verdade. Não alterar. */
+/** Silhuetas — fonte única de verdade. */
 export const SHIN_GUARD_PATH = `
   M400 45
   C495 45 580 85 585 190
@@ -85,7 +76,6 @@ export const FLAG_PATH = `
   Z
 `;
 
-/** Fundo de estúdio + filtros partilhados. */
 const studioDefs = `
   <defs>
     <radialGradient id="bg" cx="50%" cy="38%" r="72%">
@@ -93,45 +83,36 @@ const studioDefs = `
       <stop offset="48%" stop-color="#111419"/>
       <stop offset="100%" stop-color="#05070a"/>
     </radialGradient>
-
     <linearGradient id="floor" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
     </linearGradient>
-
-    <!-- Superfície branca com curvatura: luz em cima/esquerda, queda à direita -->
     <linearGradient id="shell" x1="6%" y1="0%" x2="96%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
       <stop offset="34%" stop-color="#fbfcfe"/>
       <stop offset="72%" stop-color="#eef1f6"/>
       <stop offset="100%" stop-color="#dfe4ec"/>
     </linearGradient>
-
     <radialGradient id="shellCurve" cx="38%" cy="26%" r="78%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
       <stop offset="58%" stop-color="#ffffff" stop-opacity="0.1"/>
       <stop offset="100%" stop-color="#8d97a8" stop-opacity="0.28"/>
     </radialGradient>
-
     <linearGradient id="rim" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
       <stop offset="55%" stop-color="#c3ccd9" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#5b6b7b" stop-opacity="0.6"/>
     </linearGradient>
-
     <filter id="soften" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="14"/>
     </filter>
-
     <filter id="softenSmall" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="6"/>
     </filter>
-
     <filter id="dropShadow" x="-40%" y="-30%" width="180%" height="180%">
       <feDropShadow dx="0" dy="26" stdDeviation="24" flood-color="#000000" flood-opacity="0.7"/>
       <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
-
     <filter id="weave" x="0%" y="0%" width="100%" height="100%">
       <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="n"/>
       <feColorMatrix in="n" type="matrix"
@@ -150,35 +131,21 @@ const contactShadow = (cx: number, cy: number, rx: number) => `
   <ellipse cx="${cx}" cy="${cy - 4}" rx="${rx * 0.6}" ry="${rx * 0.09}" fill="#000000" opacity="0.8" filter="url(#softenSmall)"/>
 `;
 
-/* -------------------------------------------------------------------------- */
-/* Caneleiras                                                                 */
-/* -------------------------------------------------------------------------- */
-
 const shinGuardBody = `
   <g filter="url(#dropShadow)">
-    <!-- espessura / bordo traseiro -->
     <path d="${SHIN_GUARD_BACKING_PATH}" fill="#20262f"/>
     <path d="${SHIN_GUARD_BACKING_PATH}" fill="none" stroke="#3a4351" stroke-width="2"/>
-
-    <!-- corpo -->
     <path d="${SHIN_GUARD_PATH}" fill="url(#shell)"/>
     <path d="${SHIN_GUARD_PATH}" fill="url(#shellCurve)" opacity="0.85"/>
     <path d="${SHIN_GUARD_PATH}" fill="none" stroke="url(#rim)" stroke-width="3"/>
-
-    <!-- textura muito ligeira -->
     <g clip-path="url(#shinClip)" opacity="0.5">
       <rect x="200" y="30" width="400" height="720" filter="url(#weave)"/>
     </g>
-
-    <!-- bordo interior iluminado + oclusão nas laterais -->
     <g clip-path="url(#shinClip)">
       <path d="${SHIN_GUARD_PATH}" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="8" filter="url(#softenSmall)"/>
       <path d="${SHIN_GUARD_PATH}" fill="none" stroke="#7b8698" stroke-opacity="0.55" stroke-width="20" filter="url(#soften)"/>
-      <!-- brilho longitudinal central -->
       <ellipse cx="352" cy="330" rx="70" ry="290" fill="#ffffff" opacity="0.55" filter="url(#soften)"/>
-      <!-- sombra do lado direito (curvatura) -->
       <ellipse cx="575" cy="390" rx="90" ry="330" fill="#5f6b7d" opacity="0.5" filter="url(#soften)"/>
-      <!-- contacto inferior -->
       <ellipse cx="400" cy="742" rx="150" ry="46" fill="#6b7688" opacity="0.55" filter="url(#soften)"/>
     </g>
   </g>
@@ -200,7 +167,6 @@ export const shinGuardSingleWhite = svgData(`
 </svg>
 `);
 
-/** Sombreado transparente desenhado ACIMA da arte (produto com design). */
 export const shinGuardShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
   <defs>
@@ -257,7 +223,6 @@ export const shinGuardBackWhite = svgData(`
   </defs>
   ${studioBackdrop(800, 800)}
   ${contactShadow(400, 752, 170)}
-
   <g filter="url(#dropShadow)">
     <path d="${SHIN_GUARD_BACKING_PATH}" fill="#e6eaf1"/>
     <path d="${SHIN_GUARD_PATH}" fill="url(#backShade)"/>
@@ -271,44 +236,29 @@ export const shinGuardBackWhite = svgData(`
 </svg>
 `);
 
-/* -------------------------------------------------------------------------- */
-/* Equipamento                                                                */
-/* -------------------------------------------------------------------------- */
-
 function jerseyBody(path: string, collar: string): string {
   return `
   <g filter="url(#dropShadow)">
     <path d="${path}" fill="url(#shell)"/>
     <path d="${path}" fill="url(#shellCurve)" opacity="0.7"/>
-
     <g clip-path="url(#jerseyClip)">
-      <!-- textura de malha discreta -->
       <rect x="100" y="100" width="600" height="660" filter="url(#weave)" opacity="0.7"/>
-
-      <!-- volume: laterais, ombros e queda -->
       <ellipse cx="150" cy="470" rx="95" ry="300" fill="#8a94a4" opacity="0.5" filter="url(#soften)"/>
       <ellipse cx="655" cy="470" rx="95" ry="300" fill="#8a94a4" opacity="0.55" filter="url(#soften)"/>
       <ellipse cx="400" cy="180" rx="230" ry="70" fill="#ffffff" opacity="0.75" filter="url(#soften)"/>
       <ellipse cx="400" cy="720" rx="260" ry="60" fill="#7f8a9b" opacity="0.5" filter="url(#soften)"/>
-
-      <!-- dobras suaves -->
       <path d="M330 300 C318 430 322 560 336 700" fill="none" stroke="#8b95a6" stroke-opacity="0.5" stroke-width="16" filter="url(#soften)"/>
       <path d="M470 320 C482 450 478 570 464 700" fill="none" stroke="#8b95a6" stroke-opacity="0.45" stroke-width="14" filter="url(#soften)"/>
       <path d="M300 250 C280 330 275 420 288 520" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="10" filter="url(#soften)"/>
-
-      <!-- axilas / cavas -->
       <ellipse cx="262" cy="318" rx="60" ry="42" fill="#7d8798" opacity="0.55" filter="url(#soften)"/>
       <ellipse cx="540" cy="318" rx="60" ry="42" fill="#7d8798" opacity="0.55" filter="url(#soften)"/>
     </g>
-
-    <!-- costuras e bainhas -->
     <path d="${path}" fill="none" stroke="#c8d0dc" stroke-width="2" stroke-linejoin="round"/>
     <path d="M275 145 L255 315" stroke="#d5dbe4" stroke-width="2" fill="none"/>
     <path d="M525 145 L550 315" stroke="#d5dbe4" stroke-width="2" fill="none"/>
     <path d="M185 350 L130 220" stroke="#cfd6e0" stroke-width="3" fill="none"/>
     <path d="M615 350 L670 220" stroke="#cfd6e0" stroke-width="3" fill="none"/>
     <path d="M250 706 C320 716 480 716 550 706" fill="none" stroke="#cfd6e0" stroke-width="3"/>
-
     ${collar}
   </g>
   `;
@@ -377,10 +327,6 @@ export const jerseyShadeOverlay = svgData(`
 </svg>
 `);
 
-/* -------------------------------------------------------------------------- */
-/* Bandeira                                                                   */
-/* -------------------------------------------------------------------------- */
-
 export const flagWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
   ${studioDefs}
@@ -394,27 +340,21 @@ export const flagWhite = svgData(`
     </linearGradient>
   </defs>
   ${studioBackdrop(800, 800)}
-
   <ellipse cx="420" cy="700" rx="290" ry="34" fill="#000000" opacity="0.5" filter="url(#soften)"/>
-
   <g filter="url(#dropShadow)">
     <rect x="90" y="96" width="16" height="632" rx="8" fill="url(#pole)"/>
     <circle cx="98" cy="96" r="13" fill="#dfe5ee" stroke="#4b5462" stroke-width="2"/>
-
     <path d="${FLAG_PATH}" fill="url(#shell)"/>
     <g clip-path="url(#flagClip)">
       <rect x="100" y="80" width="640" height="500" filter="url(#weave)" opacity="0.8"/>
-      <!-- ondulação: vales e cristas -->
       <path d="M200 60 C250 220 230 420 210 620" fill="none" stroke="#8d97a8" stroke-opacity="0.6" stroke-width="46" filter="url(#soften)"/>
       <path d="M300 60 C340 240 330 430 310 620" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="40" filter="url(#soften)"/>
       <path d="M430 60 C470 240 460 430 440 620" fill="none" stroke="#8d97a8" stroke-opacity="0.55" stroke-width="44" filter="url(#soften)"/>
       <path d="M560 60 C600 240 590 430 570 620" fill="none" stroke="#ffffff" stroke-opacity="0.8" stroke-width="38" filter="url(#soften)"/>
       <path d="M680 60 C710 240 700 430 686 620" fill="none" stroke="#8d97a8" stroke-opacity="0.5" stroke-width="40" filter="url(#soften)"/>
-      <!-- sombra junto ao mastro -->
       <rect x="106" y="60" width="60" height="540" fill="#7d8798" opacity="0.5" filter="url(#soften)"/>
     </g>
     <path d="${FLAG_PATH}" fill="none" stroke="#c8d0dc" stroke-width="2"/>
-
     <circle cx="120" cy="160" r="6" fill="#6c7684" stroke="#e6eaf1" stroke-width="2"/>
     <circle cx="120" cy="340" r="6" fill="#6c7684" stroke="#e6eaf1" stroke-width="2"/>
     <circle cx="120" cy="520" r="6" fill="#6c7684" stroke="#e6eaf1" stroke-width="2"/>
@@ -441,10 +381,6 @@ export const flagShadeOverlay = svgData(`
 </svg>
 `);
 
-/* -------------------------------------------------------------------------- */
-/* Superfícies neutras (adeptos / impressão)                                   */
-/* -------------------------------------------------------------------------- */
-
 export const supporterItemWhite = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
   ${studioDefs}
@@ -453,7 +389,6 @@ export const supporterItemWhite = svgData(`
   </defs>
   ${studioBackdrop(800, 800)}
   ${contactShadow(400, 646, 220)}
-
   <g filter="url(#dropShadow)">
     <rect x="150" y="180" width="500" height="440" rx="20" fill="url(#shell)"/>
     <g clip-path="url(#panelClip)">
@@ -474,7 +409,6 @@ export const printSurfaceWhite = svgData(`
   </defs>
   ${studioBackdrop(800, 800)}
   ${contactShadow(400, 716, 235)}
-
   <g filter="url(#dropShadow)">
     <rect x="175" y="100" width="450" height="600" rx="8" fill="url(#shell)"/>
     <g clip-path="url(#sheetClip)">
@@ -486,22 +420,15 @@ export const printSurfaceWhite = svgData(`
 </svg>
 `);
 
-/**
- * Overlay cilíndrico realista para a garrafa desportiva.
- * Luz de reflexo vertical e sombras de curvatura nas bordas esquerda e direita.
- */
 export const bottleShadeOverlay = svgData(`
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
   <defs>
     <linearGradient id="cylinderLighting" x1="0%" y1="0%" x2="100%" y2="0%">
-      <!-- Sombra lateral esquerda (borda do cilindro) -->
       <stop offset="0%" stop-color="#000000" stop-opacity="0.32"/>
       <stop offset="14%" stop-color="#000000" stop-opacity="0.08"/>
-      <!-- Brilho / reflexo longitudinal central-esquerdo -->
       <stop offset="28%" stop-color="#ffffff" stop-opacity="0.28"/>
       <stop offset="42%" stop-color="#ffffff" stop-opacity="0.05"/>
       <stop offset="70%" stop-color="#000000" stop-opacity="0.04"/>
-      <!-- Queda de luz suave na curva direita -->
       <stop offset="90%" stop-color="#000000" stop-opacity="0.18"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0.36"/>
     </linearGradient>
