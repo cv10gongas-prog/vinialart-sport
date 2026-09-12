@@ -231,12 +231,14 @@ export function useProductCustomizer(
       blobUrlsRef.current.add(srcUrl);
       const img = new window.Image();
       await new Promise<void>((resolve, reject) => { img.onload=()=>resolve(); img.onerror=()=>reject(new Error("Não foi possível ler a imagem.")); img.src=srcUrl; });
-      const layer = createImageLayer(surfaceId, srcUrl, file.name, img.naturalWidth, img.naturalHeight, config.canvasWidth, config.canvasHeight, surface.printArea, 0);
+      const existingLayers = state.surfaces[surfaceId]?.layers ?? [];
+      const zIndex = replace ? 0 : nextZIndex(existingLayers);
+      const layer = createImageLayer(surfaceId, srcUrl, file.name, img.naturalWidth, img.naturalHeight, config.canvasWidth, config.canvasHeight, surface.printArea, zIndex);
       layer.fileKey=fileKey; layer.originalFileKey=fileKey; layer.originalSrcUrl=srcUrl;
       if(replace) dispatch({type:"RESET_SURFACE",surfaceId});
       dispatch({type:"SET_ACTIVE_SURFACE",surfaceId});
       dispatch({type:"ADD_IMAGE_LAYER",surfaceId,layer});
-    }, [state.activeSurfaceId, config],
+    }, [state.activeSurfaceId, state.surfaces, config],
   );
 
   const syncSurface = useCallback((sourceSurfaceId: string, targetSurfaceId: string) => {

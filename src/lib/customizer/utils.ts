@@ -31,6 +31,8 @@ export interface FitArtworkResult {
   scale: number;      // aspect ratio scale
 }
 
+export const DEFAULT_CONTAIN_SCALE = 0.85;
+
 export function fitArtworkToPrintArea(
   imageWidth: number,
   imageHeight: number,
@@ -38,7 +40,7 @@ export function fitArtworkToPrintArea(
   canvasWidth: number,
   canvasHeight: number,
   mode: "contain" | "cover" = "contain",
-  initialScaleFraction: number = 0.85,
+  initialScaleFraction: number = DEFAULT_CONTAIN_SCALE,
 ): FitArtworkResult {
   const paX = printArea.xFraction * canvasWidth;
   const paY = printArea.yFraction * canvasHeight;
@@ -55,7 +57,7 @@ export function fitArtworkToPrintArea(
       ? Math.max(paW / safeW, paH / safeH)
       : Math.min(paW / safeW, paH / safeH);
 
-  const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : 0.85);
+  const scale = baseScale * (initialScaleFraction > 0 ? initialScaleFraction : DEFAULT_CONTAIN_SCALE);
 
   const renderedWidth = safeW * scale;
   const renderedHeight = safeH * scale;
@@ -91,7 +93,7 @@ export function createImageLayer(
   canvasHeight: number,
   printArea: PrintArea,
   zIndex: number,
-  initialScaleFraction: number = 0.85,
+  initialScaleFraction: number = DEFAULT_CONTAIN_SCALE,
 ): ImageLayer {
   const fit = fitArtworkToPrintArea(
     naturalWidth,
@@ -193,7 +195,7 @@ export function smartFitLayer(
     canvasWidth,
     canvasHeight,
     "contain",
-    0.85,
+    DEFAULT_CONTAIN_SCALE,
   );
 
   return {

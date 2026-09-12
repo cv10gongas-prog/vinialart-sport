@@ -9,6 +9,10 @@ import type {
   DesignLayer,
   ProductCustomizerConfig,
 } from "@/lib/customizer/types";
+import {
+  fitArtworkToPrintArea,
+  DEFAULT_CONTAIN_SCALE,
+} from "@/lib/customizer/utils";
 
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 
@@ -248,22 +252,27 @@ function KonvaStageInner({
           const realRatio = img.naturalWidth / img.naturalHeight;
 
           if (Math.abs(currentRatio - realRatio) > 0.03 || !layer.naturalWidth) {
-            const baseScale = Math.min(paW / img.naturalWidth, paH / img.naturalHeight);
-            const scale = baseScale * 0.85;
-            const newW = img.naturalWidth * scale;
-            const newH = img.naturalHeight * scale;
+            const fit = fitArtworkToPrintArea(
+              img.naturalWidth,
+              img.naturalHeight,
+              printArea,
+              config.canvasWidth,
+              config.canvasHeight,
+              "contain",
+              DEFAULT_CONTAIN_SCALE,
+            );
 
             dispatch({
               type: "UPDATE_LAYER",
               surfaceId: state.activeSurfaceId,
               layerId: layer.id,
               changes: {
-                width: newW,
-                height: newH,
+                width: fit.width,
+                height: fit.height,
                 naturalWidth: img.naturalWidth,
                 naturalHeight: img.naturalHeight,
-                x: paX + (paW - newW) / 2,
-                y: paY + (paH - newH) / 2,
+                x: fit.x,
+                y: fit.y,
                 scaleX: 1,
                 scaleY: 1,
               },

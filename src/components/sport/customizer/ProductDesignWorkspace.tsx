@@ -18,6 +18,14 @@ import {
   RotateCw,
   Plus,
   Palette,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+  ChevronUp,
+  ChevronDown,
+  Copy,
+  Type,
 } from "lucide-react";
 import {
   Popover,
@@ -138,14 +146,9 @@ export function ProductDesignWorkspace({
     }
   }, [same, signature, c.state.activeSurfaceId, config, c.syncSurface]);
 
-  // Handle direct upload for active surface (supports up to 4 layers)
+  // Handle direct upload for active surface
   async function handleFileUpload(file: File | undefined, surfaceId: string, replace = false) {
     if (!file) return;
-    const currentCount = c.state.surfaces[surfaceId]?.layers.length ?? 0;
-    if (!replace && currentCount >= 4) {
-      setError("Limite de 4 imagens/logos por superfície atingido.");
-      return;
-    }
     setBusy(true);
     setError("");
     setAddedSuccess(false);
@@ -721,58 +724,155 @@ export function ProductDesignWorkspace({
                   </div>
                 )}
 
-                {/* Multi-Layer List & Management (Até 4 camadas) */}
+                {/* Multi-Layer List & Management (Camadas Ilimitadas) */}
                 {c.activeLayers.length > 0 && (
                   <div className="space-y-2 border-b border-white/10 pb-3">
                     <div className="flex items-center justify-between text-[0.68rem] font-mono text-zinc-400">
                       <span className="flex items-center gap-1.5 uppercase tracking-wider">
                         <Layers size={12} className="text-cyan-400" />
-                        <span>Elementos ({c.activeLayers.length}/4)</span>
+                        <span>Camadas ({c.activeLayers.length})</span>
                       </span>
                       <span className="text-[0.62rem] text-zinc-500">
-                        Clica num elemento para ajustar
+                        Topo da lista = Frente
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5">
-                      {c.activeLayers.map((l, index) => {
-                        const isSelected = c.selectedLayer?.id === l.id;
-                        const label =
-                          l.type === "image"
-                            ? l.filename || `Imagem ${index + 1}`
-                            : l.text || `Texto ${index + 1}`;
-                        return (
-                          <div
-                            key={l.id}
-                            className={`group flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-all ${
-                              isSelected
-                                ? "border-cyan-400 bg-cyan-500/20 text-cyan-300 font-semibold shadow-[0_0_10px_rgba(0,200,255,0.2)]"
-                                : "border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:bg-white/10"
-                            }`}
-                          >
-                            <button
-                              type="button"
+                    <div className="flex flex-col gap-1.5 max-h-60 overflow-y-auto pr-1">
+                      {/* Visual stack convention: highest zIndex (top of visual stack) on top */}
+                      {[...c.activeLayers]
+                        .map((layer, originalIndex) => ({ layer, originalIndex }))
+                        .reverse()
+                        .map(({ layer: l, originalIndex }) => {
+                          const isSelected = c.selectedLayer?.id === l.id;
+                          const isTop = originalIndex === c.activeLayers.length - 1;
+                          const isBottom = originalIndex === 0;
+                          const label =
+                            l.type === "image"
+                              ? l.filename || `Imagem ${originalIndex + 1}`
+                              : (l as any).text || `Texto ${originalIndex + 1}`;
+
+                          return (
+                            <div
+                              key={l.id}
                               onClick={() => c.selectLayer(l.id)}
-                              className="max-w-[130px] truncate text-[0.68rem] text-left"
-                              title={label}
+                              className={`group flex items-center justify-between gap-2 rounded-xl border p-2 text-xs transition-all cursor-pointer ${
+                                isSelected
+                                  ? "border-cyan-400 bg-cyan-500/15 text-white shadow-[0_0_12px_rgba(0,200,255,0.15)] ring-1 ring-cyan-400/40"
+                                  : "border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:bg-white/[0.06]"
+                              }`}
                             >
-                              {index + 1}. {label}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                c.deleteLayer(l.id);
-                              }}
-                              className="text-zinc-500 hover:text-red-400 transition-colors p-0.5"
-                              title="Remover elemento"
-                              aria-label={`Remover elemento ${index + 1}`}
-                            >
-                              <X size={11} />
-                            </button>
-                          </div>
-                        );
-                      })}
+                              {/* Left: Thumbnail & Name */}
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-zinc-900/80 overflow-hidden">
+                                  {l.type === "image" ? (
+                                    <img
+                                      src={(l as any).srcUrl}
+                                      alt={label}
+                                      className="h-full w-full object-contain"
+                                    />
+                                  ) : (
+                                    <Type size={14} className="text-cyan-400" />
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p
+                                    className="truncate text-xs font-medium text-white"
+                                    title={label}
+                                  >
+                                    {label}
+                                  </p>
+                                  <div className="flex items-center gap-1.5 text-[0.62rem] text-zinc-400 font-mono">
+                                    <span>#{originalIndex + 1}</span>
+                                    {l.locked && (
+                                      <span className="text-amber-400/90 font-semibold">• Bloqueada</span>
+                                    )}
+                                    {!l.visible && (
+                                      <span className="text-zinc-500 font-semibold">• Oculta</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Right: Quick Action Controls */}
+                              <div
+                                className="flex items-center gap-0.5 shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {/* Reorder Up (Move forward) */}
+                                <button
+                                  type="button"
+                                  disabled={isTop}
+                                  onClick={() => c.reorderLayer(l.id, "up")}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-20 disabled:pointer-events-none"
+                                  title="Mover para cima (Frente)"
+                                  aria-label="Mover para cima"
+                                >
+                                  <ChevronUp size={14} />
+                                </button>
+
+                                {/* Reorder Down (Move backward) */}
+                                <button
+                                  type="button"
+                                  disabled={isBottom}
+                                  onClick={() => c.reorderLayer(l.id, "down")}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-20 disabled:pointer-events-none"
+                                  title="Mover para baixo (Trás)"
+                                  aria-label="Mover para baixo"
+                                >
+                                  <ChevronDown size={14} />
+                                </button>
+
+                                {/* Visibility Toggle */}
+                                <button
+                                  type="button"
+                                  onClick={() => c.toggleVisibility(l.id)}
+                                  className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-white/10 ${
+                                    l.visible ? "text-zinc-400 hover:text-white" : "text-zinc-600 hover:text-zinc-400"
+                                  }`}
+                                  title={l.visible ? "Ocultar elemento" : "Mostrar elemento"}
+                                  aria-label={l.visible ? "Ocultar camada" : "Mostrar camada"}
+                                >
+                                  {l.visible ? <Eye size={13} /> : <EyeOff size={13} />}
+                                </button>
+
+                                {/* Lock Toggle */}
+                                <button
+                                  type="button"
+                                  onClick={() => c.toggleLock(l.id)}
+                                  className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-white/10 ${
+                                    l.locked ? "text-amber-400 hover:text-amber-300" : "text-zinc-400 hover:text-white"
+                                  }`}
+                                  title={l.locked ? "Desbloquear elemento" : "Bloquear elemento"}
+                                  aria-label={l.locked ? "Desbloquear camada" : "Bloquear camada"}
+                                >
+                                  {l.locked ? <Lock size={13} /> : <Unlock size={13} />}
+                                </button>
+
+                                {/* Duplicate Layer */}
+                                <button
+                                  type="button"
+                                  onClick={() => c.duplicateLayer(l.id)}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-cyan-300"
+                                  title="Duplicar elemento"
+                                  aria-label="Duplicar camada"
+                                >
+                                  <Copy size={13} />
+                                </button>
+
+                                {/* Delete Layer */}
+                                <button
+                                  type="button"
+                                  onClick={() => c.deleteLayer(l.id)}
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-red-500/20 hover:text-red-400"
+                                  title="Eliminar elemento"
+                                  aria-label="Eliminar camada"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
                   </div>
                 )}
@@ -807,28 +907,26 @@ export function ProductDesignWorkspace({
                     </label>
                   ) : (
                     <div className="flex items-center gap-2">
-                      {c.activeLayers.length < 4 && (
-                        <label className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-dashed border-cyan-400/40 bg-cyan-500/10 px-3 py-2.5 text-center cursor-pointer transition-colors hover:border-cyan-400 hover:bg-cyan-500/20">
-                          <Plus size={14} className="text-cyan-400" />
-                          <span className="text-xs font-semibold text-cyan-300">
-                            Adicionar outra imagem / logo
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/png,image/jpeg,image/webp,application/pdf"
-                            disabled={busy}
-                            onChange={(e) => {
-                              void handleFileUpload(
-                                e.target.files?.[0],
-                                c.state.activeSurfaceId,
-                                false,
-                              );
-                              e.target.value = "";
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                      )}
+                      <label className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-dashed border-cyan-400/40 bg-cyan-500/10 px-3 py-2.5 text-center cursor-pointer transition-colors hover:border-cyan-400 hover:bg-cyan-500/20">
+                        <Plus size={14} className="text-cyan-400" />
+                        <span className="text-xs font-semibold text-cyan-300">
+                          Adicionar outra imagem / logo
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,application/pdf"
+                          disabled={busy}
+                          onChange={(e) => {
+                            void handleFileUpload(
+                              e.target.files?.[0],
+                              c.state.activeSurfaceId,
+                              false,
+                            );
+                            e.target.value = "";
+                          }}
+                          className="hidden"
+                        />
+                      </label>
                       <label className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-center cursor-pointer transition-colors hover:border-white/25 hover:bg-white/10">
                         <Upload size={13} className="text-zinc-400" />
                         <span className="text-xs text-zinc-300">

@@ -16,7 +16,7 @@
 // Print Area & Clip Shapes
 // ---------------------------------------------------------------------------
 
-export type ClipShapeType = "rect" | "rounded" | "contour" | "svg-path";
+export type ClipShapeType = "rect" | "rounded" | "contour" | "svg-path" | "silhouette";
 
 export interface ClipShape {
   type: ClipShapeType;
