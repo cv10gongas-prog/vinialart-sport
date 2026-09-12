@@ -480,6 +480,69 @@ export const bottleShadeOverlay = svgData(`
 `);
 
 /**
+ * Overlay de pregas, sombra da virilha e volume anatómico dos calções desportivos
+ */
+export const shortsShadeOverlay = svgData(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <!-- Sombra suave sob o cós elástico -->
+    <linearGradient id="shortsWaistShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.25"/>
+      <stop offset="15%" stop-color="#000000" stop-opacity="0.08"/>
+      <stop offset="35%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Sombra central da virilha e vinco entre as pernas -->
+    <radialGradient id="shortsCrotchShadow" cx="50%" cy="58%" r="35%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Volume lateral arredondado das pernas -->
+    <linearGradient id="shortsLegVolume" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="88%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.16"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="480" fill="url(#shortsWaistShadow)"/>
+  <rect width="480" height="480" fill="url(#shortsCrotchShadow)"/>
+  <rect width="480" height="480" fill="url(#shortsLegVolume)"/>
+</svg>
+`);
+
+/**
+ * Overlay de pregas, sombras e textura suave do tecido do saco
+ */
+export const sacoShadeOverlay = svgData(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <!-- Sombra suave na área dos cordões e franzido superior -->
+    <linearGradient id="sacoTopFolds" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.14"/>
+      <stop offset="25%" stop-color="#000000" stop-opacity="0.06"/>
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Sombra suave nas curvas laterais do saco cheio -->
+    <linearGradient id="sacoSideVolume" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.12"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="88%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+    </linearGradient>
+    <!-- Realce central sutil do tecido branco -->
+    <radialGradient id="sacoCenterLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="480" fill="url(#sacoTopFolds)"/>
+  <rect width="480" height="480" fill="url(#sacoSideVolume)"/>
+  <rect width="480" height="480" fill="url(#sacoCenterLight)"/>
+</svg>
+`);
+
+/**
  * Overlay de iluminação e curvatura do painel frontal em espuma do boné trucker frontal
  */
 export const capShadeOverlay = svgData(`

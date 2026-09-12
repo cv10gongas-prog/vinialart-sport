@@ -119,6 +119,35 @@ export const CAP_SILHOUETTE_PATH = `
   L 166.7 233.3 L 188.3 200.0 L 220.0 173.3 L 256.7 155.0 L 303.3 143.3 L 350.0 138.3 Z
 `;
 
+/** Silhueta de cor do tecido do saco (escala 800x800) */
+export const SACO_SILHOUETTE_PATH = `
+  M 388.0 96.3 L 511.1 96.3 L 543.4 124.4 L 564.5 152.5 L 580.0 180.6 L 591.3 208.8
+  L 601.1 236.9 L 608.1 265.0 L 613.8 293.1 L 619.4 321.3 L 623.6 349.4 L 626.4 377.5
+  L 629.2 405.6 L 632.0 433.8 L 634.8 461.9 L 637.7 490.0 L 640.5 518.1 L 644.7 546.3
+  L 648.9 574.4 L 655.9 602.5 L 663.0 630.6 L 670.0 658.8 L 677.0 686.9 L 658.8 715.0
+  L 417.6 715.0 L 176.4 715.0 L 113.1 686.9 L 132.8 658.8 L 134.2 630.6 L 145.5 602.5
+  L 153.9 574.4 L 155.3 546.3 L 159.5 518.1 L 162.3 490.0 L 163.8 461.9 L 166.6 433.8
+  L 168.0 405.6 L 170.8 377.5 L 173.6 349.4 L 176.4 321.3 L 179.2 293.1 L 182.0 265.0
+  L 187.7 236.9 L 196.1 208.8 L 207.3 180.6 L 225.6 152.5 L 245.3 124.4 L 265.0 96.3 Z
+`;
+
+/** Silhueta de cor da t-shirt (escala 800x800 baseada no SVG 500x500 * 1.6) */
+export const TSHIRT_SILHOUETTE_PATH = `
+  M 304 128
+  C 340 156, 460 156, 496 128
+  L 624 184
+  L 696 328
+  L 600 376
+  L 552 296
+  L 560 704
+  C 480 716, 320 716, 240 704
+  L 248 296
+  L 200 376
+  L 104 328
+  L 176 184
+  Z
+`;
+
 export const supporterDefinitions: {
   id: string;
   name: string;
@@ -172,12 +201,13 @@ export const supporterDefinitions: {
     photo: "base-saco.jpg",
     base: "saco",
     area: {
-      xFraction: 104 / 480,
-      yFraction: 72 / 480,
-      widthFraction: 272 / 480,
-      heightFraction: 336 / 480,
-      shape: { type: "rounded", cornerRadius: 18 },
+      xFraction: 110 / 480,
+      yFraction: 108 / 480,
+      widthFraction: 260 / 480,
+      heightFraction: 287 / 480,
+      shape: { type: "rounded", cornerRadius: 16 },
     },
+    silhouettePath: SACO_SILHOUETTE_PATH,
     note: "Área útil ampla no painel frontal principal, delimitada pelas costuras e cordões.",
   },
   {
@@ -186,13 +216,13 @@ export const supporterDefinitions: {
     photo: "base-mochila.jpg",
     base: "mochila",
     area: {
-      xFraction: 164 / 480,
-      yFraction: 105 / 480,
-      widthFraction: 100 / 480,
-      heightFraction: 236 / 480,
-      shape: { type: "rounded", cornerRadius: 14 },
+      xFraction: 166 / 480,
+      yFraction: 131 / 480,
+      widthFraction: 93 / 480,
+      heightFraction: 205 / 480,
+      shape: { type: "rounded", cornerRadius: 12 },
     },
-    note: "Área útil expandida a toda a face do bolso frontal, delimitada pelos fechos e costuras.",
+    note: "Área útil ampla em toda a face do bolso frontal, delimitada pelos fechos e costuras.",
   },
   {
     id: "tshirt",
@@ -200,13 +230,14 @@ export const supporterDefinitions: {
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
     area: {
-      xFraction: 0.13,
-      yFraction: 0.14,
-      widthFraction: 0.74,
-      heightFraction: 0.76,
-      shape: { type: "silhouette" },
+      xFraction: 0.28,
+      yFraction: 0.25,
+      widthFraction: 0.44,
+      heightFraction: 0.46,
+      shape: { type: "rounded", cornerRadius: 10 },
     },
-    note: "Personalização total: corpo frontal e mangas.",
+    silhouettePath: TSHIRT_SILHOUETTE_PATH,
+    note: "Área de personalização peitoral e frontal ampla, com margem à gola e às costuras.",
   },
   {
     id: "bracadeira",
