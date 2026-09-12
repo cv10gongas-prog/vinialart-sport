@@ -216,7 +216,6 @@ function KonvaStageInner({
     img.src = shadeSrc;
   }, [shadeSrc]);
 
-
   useEffect(() => {
     activeLayers.forEach((layer) => {
       if (layer.type !== "image") return;
@@ -238,7 +237,6 @@ function KonvaStageInner({
 
       img.src = layer.srcUrl;
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeLayers]);
 
@@ -300,10 +298,6 @@ function KonvaStageInner({
 
   const isEditMode = customizer.viewMode === "edit";
 
-  /**
-   * Guides stay discreet: they only appear while a layer is selected or when
-   * the surface is still empty, so the mockup reads like a real product photo.
-   */
   const showGuides =
     Boolean(selectedLayer) || activeLayers.length === 0;
 
@@ -403,7 +397,6 @@ function KonvaStageInner({
     [selectLayer],
   );
 
-  /** Live magnetic snapping to the print area centre while dragging. */
   const handleDragMove = useCallback(
     (layer: DesignLayer) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -414,15 +407,8 @@ function KonvaStageInner({
         const nodeW = node.width() * node.scaleX();
         const nodeH = node.height() * node.scaleY();
 
-        const cx =
-          layer.type === "image"
-            ? node.x()
-            : node.x() + nodeW / 2;
-
-        const cy =
-          layer.type === "image"
-            ? node.y()
-            : node.y() + nodeH / 2;
+        const cx = node.x() + nodeW / 2;
+        const cy = node.y() + nodeH / 2;
 
         let snapV = false;
         let snapH = false;
@@ -500,7 +486,6 @@ function KonvaStageInner({
       onTap={handleStageClick}
     >
       <Layer name="mockup-layer" listening={false}>
-        {/* Base color tinting underlay: strictly clipped to the product silhouette */}
         {baseColor && baseColor.toLowerCase() !== "#ffffff" && (
           activeSurface.mockup?.silhouettePath ? (
             <KonvaPath
@@ -584,8 +569,6 @@ function KonvaStageInner({
                   y={layer.y}
                   width={layer.width}
                   height={layer.height}
-                  offsetX={layer.width / 2}
-                  offsetY={layer.height / 2}
                   scaleX={layer.scaleX}
                   scaleY={layer.scaleY}
                   rotation={layer.rotation}
