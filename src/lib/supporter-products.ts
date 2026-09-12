@@ -137,14 +137,14 @@ export const supporterDefinitions: {
     photo: "base-calcoes.jpg",
     base: "calcoes",
     area: {
-      // Área ampla que enquadra as duas pernas sem cortes indesejados
-      xFraction: 0.20,
-      yFraction: 0.26,
-      widthFraction: 0.60,
-      heightFraction: 0.52,
-      shape: { type: "rounded", cornerRadius: 10 },
+      // Começa exatamente abaixo do elástico (y=122/480) e ajusta às laterais das pernas (x=102/480 a 378/480)
+      xFraction: 0.21,
+      yFraction: 0.25,
+      widthFraction: 0.58,
+      heightFraction: 0.58,
+      shape: { type: "rounded", cornerRadius: 12 },
     },
-    note: "Personalização frontal: número e emblema nas pernas.",
+    note: "Área frontal útil para número e emblema do clube.",
   },
 ];
 
