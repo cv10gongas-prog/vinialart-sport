@@ -1,41 +1,62 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
   <defs>
-    <linearGradient id="fabric" x1="0%" y1="0%" x2="100%" y2="100%">
+    <radialGradient id="groundGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fabricShade" x1="10%" y1="0%" x2="90%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="60%" stop-color="#f4f6fa"/>
+      <stop offset="35%" stop-color="#f8fafc"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="waistShade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#f1f5f9"/>
       <stop offset="100%" stop-color="#e2e8f0"/>
     </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#000000" flood-opacity="0.5"/>
+    <filter id="softShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
   </defs>
 
+  <!-- Sombra no chão -->
+  <ellipse cx="240" cy="412" rx="150" ry="16" fill="url(#groundGlow)"/>
+
   <g filter="url(#softShadow)">
-    <!-- Corpo principal dos calções (branco de estúdio) -->
-    <path d="M 140 100 
-             L 340 100 
-             L 370 380 
-             L 265 380 
-             L 240 230 
-             L 215 380 
-             L 110 380 
-             Z" 
-          fill="url(#fabric)" 
-          stroke="#cbd5e1" 
-          stroke-width="2.5" 
+    <!-- Silhueta anatómica dos calções desportivos -->
+    <path d="M 148 85 
+             C 200 82, 280 82, 332 85 
+             C 344 130, 356 200, 364 270 
+             C 370 325, 374 365, 370 385 
+             C 338 392, 298 390, 268 382 
+             C 255 345, 246 290, 240 252 
+             C 234 290, 225 345, 212 382 
+             C 182 390, 142 392, 110 385 
+             C 106 365, 110 325, 116 270 
+             C 124 200, 136 130, 148 85 Z" 
+          fill="url(#fabricShade)" 
+          stroke="#94a3b8" 
+          stroke-width="2" 
           stroke-linejoin="round"/>
 
-    <!-- Elástico do cós / Cintura -->
-    <path d="M 140 100 L 340 100 L 336 142 L 144 142 Z" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
-    <line x1="142" y1="121" x2="338" y2="121" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <!-- Cós elástico / Cintura com costuras de reforço -->
+    <path d="M 148 85 C 200 82, 280 82, 332 85 L 336 122 C 280 119, 200 119, 144 122 Z" 
+          fill="url(#waistShade)" 
+          stroke="#94a3b8" 
+          stroke-width="1.8"/>
+    <path d="M 146 97 C 200 94, 280 94, 334 97" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 145 110 C 200 107, 280 107, 335 110" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
 
-    <!-- Costuras internas e entrepernas -->
-    <path d="M 240 142 L 240 230" stroke="#94a3b8" stroke-width="2"/>
-    <path d="M 110 380 L 215 380" stroke="#94a3b8" stroke-width="3"/>
-    <path d="M 265 380 L 370 380" stroke="#94a3b8" stroke-width="3"/>
+    <!-- Costuras centrais e entrepernas -->
+    <path d="M 240 122 L 240 252" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M 112 376 C 140 382, 180 382, 210 374" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 270 374 C 300 382, 340 382, 368 376" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
 
-    <!-- Cordões da cintura -->
-    <path d="M 232 135 C 230 160 228 175 224 190" fill="none" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M 248 135 C 250 160 252 175 256 190" fill="none" stroke="#64748b" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Cordões com ponteiras -->
+    <path d="M 233 118 C 230 145, 224 168, 220 188" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="217" y="184" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(-8 219 189)"/>
+    <path d="M 247 118 C 250 145, 256 168, 260 188" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="258" y="184" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(8 261 189)"/>
   </g>
 </svg>
