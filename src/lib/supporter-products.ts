@@ -34,7 +34,7 @@ export const CAP_CROWN_POINTS: number[] = [
   0.45, 0.01,
 ];
 
-/** Contorno anatómico exato dos calções */
+/** Contorno anatómico dos calções para as linhas-guia */
 export const SHORTS_CONTOUR_POINTS: number[] = [
   0.154, 0.012,
   0.319, 0.003,
@@ -62,13 +62,33 @@ export const SHORTS_CONTOUR_POINTS: number[] = [
   0.145, 0.125,
 ];
 
-/** Silhueta para recorte de cor dos calções */
-export const SHORTS_SILHOUETTE_PATH =
-  "M 125 82 C 180 79, 300 79, 355 82 L 358 120 C 372 200, 388 290, 406 408 C 380 412, 340 414, 272 410 C 260 350, 248 290, 240 245 C 232 290, 220 350, 208 410 C 140 414, 100 412, 74 408 C 92 290, 108 200, 122 120 Z";
+/** Silhueta de cor dos calções na escala padrão de 800x800 do Konva */
+export const SHORTS_SILHOUETTE_PATH = `
+  M 208 137
+  C 300 132, 500 132, 592 137
+  L 597 200
+  C 620 333, 647 483, 677 680
+  C 633 687, 567 690, 453 683
+  C 433 583, 413 483, 400 408
+  C 387 483, 367 583, 347 683
+  C 233 690, 167 687, 123 680
+  C 153 483, 180 333, 203 200
+  Z
+`;
 
-/** Silhueta para recorte de cor da braçadeira (impede a cor de vazar para o fundo) */
-export const BRACADEIRA_SILHOUETTE_PATH =
-  "M 54 182 h 372 a 6 6 0 0 1 6 6 v 104 a 6 6 0 0 1 -6 6 h -372 a 6 6 0 0 1 -6 -6 v -104 a 6 6 0 0 1 6 -6 z";
+/** Silhueta de cor da braçadeira na escala padrão de 800x800 do Konva */
+export const BRACADEIRA_SILHOUETTE_PATH = `
+  M 90 300
+  H 710
+  A 10 10 0 0 1 720 310
+  V 490
+  A 10 10 0 0 1 710 500
+  H 90
+  A 10 10 0 0 1 80 490
+  V 310
+  A 10 10 0 0 1 90 300
+  Z
+`;
 
 export const supporterDefinitions: {
   id: string;
@@ -160,11 +180,11 @@ export const supporterDefinitions: {
     photo: "bracadeira-em-uso.jpg",
     base: "bracadeira",
     area: {
-      // Caixa milimétrica útil sobre a fita elástica (dentro das costuras)
-      xFraction: 88 / 480,
-      yFraction: 196 / 480,
-      widthFraction: 304 / 480,
-      heightFraction: 88 / 480,
+      // Área útil entre a presilha esquerda e o fecho de velcro (x=84 a 396, y=192 a 288 em 480px)
+      xFraction: 86 / 480,
+      yFraction: 194 / 480,
+      widthFraction: 308 / 480,
+      heightFraction: 92 / 480,
       shape: { type: "rounded", cornerRadius: 4 },
     },
     silhouettePath: BRACADEIRA_SILHOUETTE_PATH,
