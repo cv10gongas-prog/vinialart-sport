@@ -62,7 +62,7 @@ export const SHORTS_CONTOUR_POINTS: number[] = [
   0.145, 0.125,
 ];
 
-/** Silhueta de cor dos calções na escala padrão de 800x800 do Konva */
+/** Silhueta de cor dos calções na escala de 800x800 */
 export const SHORTS_SILHOUETTE_PATH = `
   M 208 137
   C 300 132, 500 132, 592 137
@@ -90,7 +90,7 @@ export const BRACADEIRA_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor da garrafa na escala de 800x800 (pinta apenas o corpo lacado) */
+/** Silhueta de cor da garrafa na escala de 800x800 (apenas o corpo lacado) */
 export const BOTTLE_SILHOUETTE_PATH = `
   M 364 177
   C 364 212, 300 218, 300 245
@@ -120,16 +120,16 @@ export const supporterDefinitions: {
     photo: "base-garrafa.jpg",
     base: "garrafa",
     area: {
-      // Centrada perfeitamente no corpo cilíndrico (x=192 a 288, y=150 a 390 em 480px)
+      // Corpo frontal cilíndrico centrado (x=192 a 288, y=162 a 386 em 480px)
       xFraction: 192 / 480,
-      yFraction: 150 / 480,
+      yFraction: 162 / 480,
       widthFraction: 96 / 480,
-      heightFraction: 240 / 480,
-      shape: { type: "rounded", cornerRadius: 4 },
+      heightFraction: 224 / 480,
+      shape: { type: "rounded", cornerRadius: 6 },
     },
     projection: "cylinder",
     silhouettePath: BOTTLE_SILHOUETTE_PATH,
-    note: "Gravação frontal cilíndrica com acabamento 3D em aço inox.",
+    note: "Gravação frontal com acabamento cilíndrico em aço inoxidável.",
     isDirectCustomizable: true,
   },
   {
