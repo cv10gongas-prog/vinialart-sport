@@ -89,10 +89,10 @@ export const equipamentoConfig = buildConfig(
         silhouettePath: JERSEY_PATH,
       },
       printArea: {
-        xFraction: 0.28,
-        yFraction: 0.24,
-        widthFraction: 0.44,
-        heightFraction: 0.40,
+        xFraction: 0.32,
+        yFraction: 0.26,
+        widthFraction: 0.36,
+        heightFraction: 0.34,
         shape: {
           type: "rounded",
           cornerRadius: 8,
@@ -109,10 +109,10 @@ export const equipamentoConfig = buildConfig(
         silhouettePath: JERSEY_BACK_PATH,
       },
       printArea: {
-        xFraction: 0.28,
+        xFraction: 0.32,
         yFraction: 0.24,
-        widthFraction: 0.44,
-        heightFraction: 0.40,
+        widthFraction: 0.36,
+        heightFraction: 0.38,
         shape: {
           type: "rounded",
           cornerRadius: 8,
@@ -193,10 +193,10 @@ export const estampagemConfig = buildConfig(
         overlaySrc: jerseyShadeOverlay,
       },
       printArea: {
-        xFraction: 0.31,
-        yFraction: 0.25,
-        widthFraction: 0.38,
-        heightFraction: 0.43,
+        xFraction: 0.32,
+        yFraction: 0.26,
+        widthFraction: 0.36,
+        heightFraction: 0.34,
         shape: {
           type: "rounded",
           cornerRadius: 12,
