@@ -34,6 +34,34 @@ export const CAP_CROWN_POINTS: number[] = [
   0.45, 0.01,
 ];
 
+/** Contorno anatómico exato dos calções (inclui a subida da virilha entre as pernas) */
+export const SHORTS_CONTOUR_POINTS: number[] = [
+  0.154, 0.012, // Cós topo esquerdo
+  0.319, 0.003,
+  0.500, 0.000, // Cós centro topo
+  0.681, 0.003,
+  0.846, 0.012, // Cós topo direito
+  0.855, 0.125, // Cós lateral direita
+  0.898, 0.363, // Anca direita
+  0.946, 0.631, // Perna direita exterior
+  0.982, 0.839,
+  1.000, 0.982, // Canto exterior da bainha direita
+  0.801, 1.000, // Meio da bainha direita
+  0.596, 0.988, // Canto interior da bainha direita
+  0.560, 0.810, // Perna direita interior (a subir)
+  0.524, 0.631,
+  0.500, 0.497, // VÉRTICE DA VIRILHA / ENTREPERNAS
+  0.476, 0.631,
+  0.440, 0.810, // Perna esquerda interior (a descer)
+  0.404, 0.988, // Canto interior da bainha esquerda
+  0.199, 1.000, // Meio da bainha esquerda
+  0.000, 0.982, // Canto exterior da bainha esquerda
+  0.018, 0.839,
+  0.054, 0.631, // Perna esquerda exterior (a subir)
+  0.102, 0.363, // Anca esquerda
+  0.145, 0.125, // Cós lateral esquerda
+];
+
 export const supporterDefinitions: {
   id: string;
   name: string;
@@ -137,14 +165,16 @@ export const supporterDefinitions: {
     photo: "base-calcoes.jpg",
     base: "calcoes",
     area: {
-      // Começa exatamente abaixo do elástico (y=122/480) e ajusta às laterais das pernas (x=102/480 a 378/480)
-      xFraction: 0.21,
-      yFraction: 0.25,
-      widthFraction: 0.58,
-      heightFraction: 0.58,
-      shape: { type: "rounded", cornerRadius: 12 },
+      xFraction: 74 / 480,
+      yFraction: 78 / 480,
+      widthFraction: 332 / 480,
+      heightFraction: 336 / 480,
+      shape: {
+        type: "contour",
+        points: SHORTS_CONTOUR_POINTS,
+      },
     },
-    note: "Área frontal útil para número e emblema do clube.",
+    note: "Personalização total: número e emblema com contorno anatómico dos calções.",
   },
 ];
 
