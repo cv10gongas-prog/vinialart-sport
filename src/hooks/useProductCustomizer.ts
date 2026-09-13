@@ -830,8 +830,10 @@ export function useProductCustomizer(
           Math.abs(selectedLayer.scaleY || 1)
         : selectedLayer.fontSize * Math.abs(selectedLayer.scaleY || 1);
 
-      const nextX = isImage ? centerX : centerX - widthPx / 2;
-      const nextY = isImage ? centerY : centerY - heightPx / 2;
+      // x/y são o canto superior esquerdo do elemento no Konva.
+      // Centrar diretamente em centerX/centerY deslocava imagens meia largura/altura.
+      const nextX = centerX - widthPx / 2;
+      const nextY = centerY - heightPx / 2;
 
       const changes: Partial<DesignLayer> = {};
       if (mode === "horizontal" || mode === "both") changes.x = nextX;

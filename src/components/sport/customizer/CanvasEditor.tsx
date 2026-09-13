@@ -682,7 +682,8 @@ function KonvaStageInner({
           <Transformer
             name="selection-transformer"
             ref={transformerRef}
-            borderStroke="#00c8ed"
+            // Seleção branca para não se confundir com o limite azul imprimível.
+            borderStroke="rgba(255,255,255,0.95)"
             borderStrokeWidth={1}
             borderDash={[3, 3]}
             anchorFill="#ffffff"

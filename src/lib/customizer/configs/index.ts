@@ -62,6 +62,31 @@ const fonts = [
   "Georgia",
 ];
 
+/**
+ * Área imprimível real do equipamento.
+ * Os pontos seguem a silhueta do mockup (incluindo gola, mangas e corpo),
+ * normalizados dentro da bounding box da própria camisola.
+ */
+const JERSEY_FRONT_PRINT_CONTOUR: number[] = [
+  0.2685, 0.0492, 0.4074, 0.0000, 0.4373, 0.0236, 0.4779, 0.0354,
+  0.5221, 0.0354, 0.5627, 0.0236, 0.5926, 0.0000, 0.7315, 0.0492,
+  1.0000, 0.1721, 0.8981, 0.3852, 0.7685, 0.3279, 0.7778, 0.9754,
+  0.7631, 0.9811, 0.7227, 0.9876, 0.6618, 0.9937, 0.5858, 0.9982,
+  0.5000, 1.0000, 0.4142, 0.9982, 0.3382, 0.9937, 0.2773, 0.9876,
+  0.2369, 0.9811, 0.2222, 0.9754, 0.2315, 0.3279, 0.1019, 0.3852,
+  0.0000, 0.1721,
+];
+
+const JERSEY_BACK_PRINT_CONTOUR: number[] = [
+  0.2685, 0.0333, 0.3981, 0.0000, 0.4353, 0.0120, 0.4779, 0.0180,
+  0.5221, 0.0180, 0.5647, 0.0120, 0.6019, 0.0000, 0.7315, 0.0333,
+  1.0000, 0.1583, 0.8981, 0.3750, 0.7685, 0.3167, 0.7778, 0.9750,
+  0.7631, 0.9808, 0.7227, 0.9874, 0.6618, 0.9936, 0.5858, 0.9982,
+  0.5000, 1.0000, 0.4142, 0.9982, 0.3382, 0.9936, 0.2773, 0.9874,
+  0.2369, 0.9808, 0.2222, 0.9750, 0.2315, 0.3167, 0.1019, 0.3750,
+  0.0000, 0.1583,
+];
+
 function buildConfig(
   id: string,
   name: string,
@@ -93,13 +118,14 @@ export const equipamentoConfig = buildConfig(
         silhouettePath: JERSEY_PATH,
       },
       printArea: {
-        xFraction: 0.31,
-        yFraction: 0.29,
-        widthFraction: 0.38,
-        heightFraction: 0.38,
+        // Bounding box exata da silhueta frontal no mockup 800x800.
+        xFraction: 130 / 800,
+        yFraction: 115 / 800,
+        widthFraction: 540 / 800,
+        heightFraction: 610 / 800,
         shape: {
-          type: "rounded",
-          cornerRadius: 8,
+          type: "contour",
+          points: JERSEY_FRONT_PRINT_CONTOUR,
         },
       },
     },
@@ -113,13 +139,14 @@ export const equipamentoConfig = buildConfig(
         silhouettePath: JERSEY_BACK_PATH,
       },
       printArea: {
-        xFraction: 0.31,
-        yFraction: 0.24,
-        widthFraction: 0.38,
-        heightFraction: 0.40,
+        // Costas independentes, alinhadas à silhueta traseira do mockup.
+        xFraction: 130 / 800,
+        yFraction: 125 / 800,
+        widthFraction: 540 / 800,
+        heightFraction: 600 / 800,
         shape: {
-          type: "rounded",
-          cornerRadius: 8,
+          type: "contour",
+          points: JERSEY_BACK_PRINT_CONTOUR,
         },
       },
     },
