@@ -59,47 +59,36 @@ export function CanvasEditor({
   customizer,
   baseColor,
 }: CanvasEditorProps) {
-  const [mounted, setMounted] =
-    useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [KonvaLib, setKonvaLib] =
-    useState<any>(null);
+  const [KonvaLib, setKonvaLib] = useState<any>(null);
 
-  const stageViewportRef =
-    useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const [size, setSize] =
-    useState<{
-      width: number;
-      height: number;
-    }>({
-      width: 0,
-      height: 0,
-    });
+  const [size, setSize] = useState<{
+    width: number;
+    height: number;
+  }>({
+    width: 0,
+    height: 0,
+  });
 
   useEffect(() => {
     setMounted(true);
 
-    import("react-konva").then(
-      setKonvaLib,
-    );
+    import("react-konva").then(setKonvaLib);
   }, []);
 
   useEffect(() => {
-    const element =
-      stageViewportRef.current;
+    const element = containerRef.current;
 
     if (!element) return;
 
     const measure = () => {
-      const rect =
-        element.getBoundingClientRect();
+      const rect = element.getBoundingClientRect();
 
-      if (
-        rect.width > 0 &&
-        rect.height > 0
-      ) {
+      if (rect.width > 0 && rect.height > 0) {
         setSize({
           width: rect.width,
           height: rect.height,
@@ -109,389 +98,91 @@ export function CanvasEditor({
 
     measure();
 
-    const observer =
-      new ResizeObserver(measure);
-
+    const observer = new ResizeObserver(measure);
     observer.observe(element);
 
-    window.addEventListener(
-      "resize",
-      measure,
-    );
+    window.addEventListener("resize", measure);
 
     return () => {
       observer.disconnect();
-
-      window.removeEventListener(
-        "resize",
-        measure,
-      );
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
-  /*
-   * IMPORTANTE:
-   * As barras NÃO retiram espaço ao canvas.
-   * O canvas continua a usar praticamente a área toda.
-   */
   const PADDING = 18;
 
-  const availableWidth =
-    Math.max(
-      0,
-      size.width - PADDING * 2,
-    );
+  const availableWidth = Math.max(
+    0,
+    size.width - PADDING * 2,
+  );
 
-  const availableHeight =
-    Math.max(
-      0,
-      size.height - PADDING * 2,
-    );
+  const availableHeight = Math.max(
+    0,
+    size.height - PADDING * 2,
+  );
 
   const baseScale =
-    availableWidth > 0 &&
-    availableHeight > 0
+    availableWidth > 0 && availableHeight > 0
       ? Math.min(
-          availableWidth /
-            config.canvasWidth,
-
-          availableHeight /
-            config.canvasHeight,
+          availableWidth / config.canvasWidth,
+          availableHeight / config.canvasHeight,
         )
       : 0;
 
-  const zoom =
-    customizer.zoom ?? 1;
+  const zoom = customizer.zoom ?? 1;
+  const totalScale = baseScale * zoom;
 
-  const totalScale =
-    baseScale * zoom;
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
 
-  const selectedLayer =
-    customizer.selectedLayer;
+      event.preventDefault();
 
-  const controlsVisible =
-    Boolean(selectedLayer) &&
-    customizer.viewMode === "edit";
-
-  const selectedScale =
-    selectedLayer
-      ? Math.max(
-          0.1,
-          Math.abs(
-            selectedLayer.scaleX ??
-              1,
-          ),
-        )
-      : 1;
-
-  const selectedScalePercent =
-    Math.round(
-      selectedScale * 100,
-    );
-
-  const selectedRotation =
-    Math.round(
-      selectedLayer?.rotation ??
-        0,
-    );
-
-  const sliderScaleValue =
-    Math.min(
-      800,
-      Math.max(
-        10,
-        selectedScalePercent,
-      ),
-    );
-
-  const updateSelectedScale =
-    useCallback(
-      (percent: number) => {
-        const layer =
-          customizer.selectedLayer;
-
-        if (
-          !layer ||
-          layer.locked
-        ) {
-          return;
-        }
-
-        const scale =
-          Math.min(
-            8,
-            Math.max(
-              0.1,
-              percent / 100,
-            ),
-          );
-
-        customizer.updateLayer(
-          layer.id,
-          {
-            scaleX: scale,
-            scaleY: scale,
-          },
-        );
-      },
-      [customizer],
-    );
-
-  const updateSelectedRotation =
-    useCallback(
-      (rotation: number) => {
-        const layer =
-          customizer.selectedLayer;
-
-        if (
-          !layer ||
-          layer.locked
-        ) {
-          return;
-        }
-
-        customizer.updateLayer(
-          layer.id,
-          {
-            rotation,
-          },
-        );
-      },
-      [customizer],
-    );
-
-  const handleWheel =
-    useCallback(
-      (
-        event: React.WheelEvent,
-      ) => {
-        if (
-          !event.ctrlKey &&
-          !event.metaKey
-        ) {
-          return;
-        }
-
-        event.preventDefault();
-
-        if (event.deltaY < 0) {
-          customizer.zoomIn();
-        } else {
-          customizer.zoomOut();
-        }
-      },
-      [customizer],
-    );
+      if (event.deltaY < 0) {
+        customizer.zoomIn();
+      } else {
+        customizer.zoomOut();
+      }
+    },
+    [customizer],
+  );
 
   return (
     <div
+      ref={containerRef}
       onWheel={handleWheel}
       className="relative h-full min-h-[300px] w-full min-w-0 overflow-hidden"
       style={{
         touchAction: "none",
       }}
     >
-      {/* CANVAS — ocupa novamente praticamente a altura TODA */}
-      <div
-        ref={stageViewportRef}
-        className="absolute inset-0"
-      >
-        {!mounted ||
-        !KonvaLib ||
-        baseScale === 0 ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-mono text-[0.65rem] uppercase tracking-widest text-muted-foreground">
-              A carregar editor…
-            </span>
-          </div>
-        ) : (
+      {!mounted || !KonvaLib || baseScale === 0 ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-mono text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+            A carregar editor…
+          </span>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="absolute inset-0 flex items-center justify-center transition-transform duration-200"
             style={{
-              /*
-               * Com as barras visíveis, só deslocamos a peça
-               * ligeiramente para cima.
-               *
-               * NÃO reduzimos o scale.
-               */
-              transform: controlsVisible
-                ? "translateY(-32px)"
-                : "translateY(0px)",
+              width: config.canvasWidth,
+              height: config.canvasHeight,
+              flex: "0 0 auto",
+              transformOrigin: "center center",
+              transform: `scale(${totalScale})`,
+              transition: "transform 150ms ease-out",
             }}
           >
-            <div
-              style={{
-                width:
-                  config.canvasWidth,
-
-                height:
-                  config.canvasHeight,
-
-                flex: "0 0 auto",
-
-                transformOrigin:
-                  "center center",
-
-                transform: `scale(${totalScale})`,
-
-                transition:
-                  "transform 150ms ease-out",
-              }}
-            >
-              <KonvaStageInner
-                config={config}
-                customizer={
-                  customizer
-                }
-                baseColor={
-                  baseColor
-                }
-                KonvaLib={
-                  KonvaLib
-                }
-              />
-            </div>
+            <KonvaStageInner
+              config={config}
+              customizer={customizer}
+              baseColor={baseColor}
+              KonvaLib={KonvaLib}
+            />
           </div>
-        )}
-      </div>
-
-      {/* BARRAS — flutuam por cima da zona inferior, sem encolher o canvas */}
-      {controlsVisible &&
-        selectedLayer && (
-          <div className="absolute bottom-[78px] left-1/2 z-30 w-[min(86%,540px)] -translate-x-1/2 rounded-xl border border-white/10 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)] backdrop-blur-md">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* TAMANHO */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
-                    Tamanho
-                  </span>
-
-                  <span className="min-w-[48px] text-right font-mono text-[0.65rem] font-semibold text-cyan-300">
-                    {selectedScalePercent}%
-                  </span>
-                </div>
-
-                <input
-                  type="range"
-                  min={10}
-                  max={800}
-                  step={1}
-                  value={
-                    sliderScaleValue
-                  }
-                  disabled={
-                    selectedLayer.locked
-                  }
-                  onChange={(event) =>
-                    updateSelectedScale(
-                      Number(
-                        event.target
-                          .value,
-                      ),
-                    )
-                  }
-                  className="
-                    h-1.5
-                    w-full
-                    cursor-pointer
-                    appearance-none
-                    rounded-full
-                    bg-white/10
-                    outline-none
-
-                    [&::-webkit-slider-thumb]:h-3.5
-                    [&::-webkit-slider-thumb]:w-3.5
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:border
-                    [&::-webkit-slider-thumb]:border-cyan-200
-                    [&::-webkit-slider-thumb]:bg-cyan-400
-                    [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(34,211,238,0.6)]
-
-                    [&::-moz-range-thumb]:h-3.5
-                    [&::-moz-range-thumb]:w-3.5
-                    [&::-moz-range-thumb]:rounded-full
-                    [&::-moz-range-thumb]:border
-                    [&::-moz-range-thumb]:border-cyan-200
-                    [&::-moz-range-thumb]:bg-cyan-400
-
-                    disabled:cursor-not-allowed
-                    disabled:opacity-40
-                  "
-                  aria-label="Tamanho do elemento selecionado"
-                />
-              </div>
-
-              {/* ROTAÇÃO */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
-                    Rotação
-                  </span>
-
-                  <span className="min-w-[48px] text-right font-mono text-[0.65rem] font-semibold text-cyan-300">
-                    {selectedRotation}°
-                  </span>
-                </div>
-
-                <input
-                  type="range"
-                  min={-180}
-                  max={180}
-                  step={1}
-                  value={Math.min(
-                    180,
-                    Math.max(
-                      -180,
-                      selectedRotation,
-                    ),
-                  )}
-                  disabled={
-                    selectedLayer.locked
-                  }
-                  onChange={(event) =>
-                    updateSelectedRotation(
-                      Number(
-                        event.target
-                          .value,
-                      ),
-                    )
-                  }
-                  className="
-                    h-1.5
-                    w-full
-                    cursor-pointer
-                    appearance-none
-                    rounded-full
-                    bg-white/10
-                    outline-none
-
-                    [&::-webkit-slider-thumb]:h-3.5
-                    [&::-webkit-slider-thumb]:w-3.5
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:border
-                    [&::-webkit-slider-thumb]:border-cyan-200
-                    [&::-webkit-slider-thumb]:bg-cyan-400
-                    [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(34,211,238,0.6)]
-
-                    [&::-moz-range-thumb]:h-3.5
-                    [&::-moz-range-thumb]:w-3.5
-                    [&::-moz-range-thumb]:rounded-full
-                    [&::-moz-range-thumb]:border
-                    [&::-moz-range-thumb]:border-cyan-200
-                    [&::-moz-range-thumb]:bg-cyan-400
-
-                    disabled:cursor-not-allowed
-                    disabled:opacity-40
-                  "
-                  aria-label="Rotação do elemento selecionado"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }
@@ -528,61 +219,37 @@ function KonvaStageInner({
   } = customizer;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const transformerRef =
-    useRef<any>(null);
+  const transformerRef = useRef<any>(null);
 
-  const [
-    mockupImg,
-    setMockupImg,
-  ] =
-    useState<HTMLImageElement | null>(
-      null,
-    );
+  const [mockupImg, setMockupImg] =
+    useState<HTMLImageElement | null>(null);
 
-  const [
-    shadeImg,
-    setShadeImg,
-  ] =
-    useState<HTMLImageElement | null>(
-      null,
-    );
+  const [shadeImg, setShadeImg] =
+    useState<HTMLImageElement | null>(null);
 
-  const [
-    layerImgs,
-    setLayerImgs,
-  ] = useState<
-    Record<
-      string,
-      HTMLImageElement
-    >
+  const [layerImgs, setLayerImgs] = useState<
+    Record<string, HTMLImageElement>
   >({});
 
-  const [snap, setSnap] =
-    useState<{
-      v: boolean;
-      h: boolean;
-    }>({
-      v: false,
-      h: false,
-    });
+  const [snap, setSnap] = useState<{
+    v: boolean;
+    h: boolean;
+  }>({
+    v: false,
+    h: false,
+  });
 
   useEffect(() => {
-    const img =
-      new window.Image();
+    const img = new window.Image();
 
     img.onload = () => {
       setMockupImg(img);
     };
 
-    img.src =
-      activeSurface.mockupSrc;
-  }, [
-    activeSurface.mockupSrc,
-  ]);
+    img.src = activeSurface.mockupSrc;
+  }, [activeSurface.mockupSrc]);
 
-  const shadeSrc =
-    activeSurface.mockup
-      ?.overlaySrc;
+  const shadeSrc = activeSurface.mockup?.overlaySrc;
 
   useEffect(() => {
     if (!shadeSrc) {
@@ -590,8 +257,7 @@ function KonvaStageInner({
       return;
     }
 
-    const img =
-      new window.Image();
+    const img = new window.Image();
 
     img.onload = () => {
       setShadeImg(img);
@@ -600,147 +266,96 @@ function KonvaStageInner({
     img.src = shadeSrc;
   }, [shadeSrc]);
 
-  const {
-    printArea,
-  } = activeSurface;
+  const { printArea } = activeSurface;
 
   const paX =
-    printArea.xFraction *
-    config.canvasWidth;
+    printArea.xFraction * config.canvasWidth;
 
   const paY =
-    printArea.yFraction *
-    config.canvasHeight;
+    printArea.yFraction * config.canvasHeight;
 
   const paW =
-    printArea.widthFraction *
-    config.canvasWidth;
+    printArea.widthFraction * config.canvasWidth;
 
   const paH =
-    printArea.heightFraction *
-    config.canvasHeight;
+    printArea.heightFraction * config.canvasHeight;
 
-  const centerX =
-    paX + paW / 2;
+  const centerX = paX + paW / 2;
+  const centerY = paY + paH / 2;
 
-  const centerY =
-    paY + paH / 2;
-
-  const shape =
-    printArea.shape;
+  const shape = printArea.shape;
 
   const svgPathData =
-    shape?.type ===
-    "svg-path"
+    shape?.type === "svg-path"
       ? shape.svgPath
       : undefined;
 
   useEffect(() => {
-    activeLayers.forEach(
-      (layer) => {
+    activeLayers.forEach((layer) => {
+      if (layer.type !== "image") return;
+
+      const current = layerImgs[layer.id];
+
+      if (
+        current &&
+        current.src === layer.srcUrl
+      ) {
+        return;
+      }
+
+      const img = new window.Image();
+
+      img.onload = () => {
+        setLayerImgs((previous) => ({
+          ...previous,
+          [layer.id]: img,
+        }));
+
         if (
-          layer.type !==
-          "image"
+          img.naturalWidth > 0 &&
+          img.naturalHeight > 0
         ) {
-          return;
-        }
+          const currentRatio =
+            layer.width / (layer.height || 1);
 
-        const current =
-          layerImgs[layer.id];
-
-        if (
-          current &&
-          current.src ===
-            layer.srcUrl
-        ) {
-          return;
-        }
-
-        const img =
-          new window.Image();
-
-        img.onload = () => {
-          setLayerImgs(
-            (previous) => ({
-              ...previous,
-
-              [layer.id]:
-                img,
-            }),
-          );
+          const realRatio =
+            img.naturalWidth / img.naturalHeight;
 
           if (
-            img.naturalWidth >
-              0 &&
-            img.naturalHeight >
-              0
+            Math.abs(currentRatio - realRatio) > 0.03 ||
+            !layer.naturalWidth
           ) {
-            const currentRatio =
-              layer.width /
-              (layer.height ||
-                1);
+            const fit = fitArtworkToPrintArea(
+              img.naturalWidth,
+              img.naturalHeight,
+              printArea,
+              config.canvasWidth,
+              config.canvasHeight,
+              "contain",
+              DEFAULT_CONTAIN_SCALE,
+            );
 
-            const realRatio =
-              img.naturalWidth /
-              img.naturalHeight;
-
-            if (
-              Math.abs(
-                currentRatio -
-                  realRatio,
-              ) > 0.03 ||
-              !layer.naturalWidth
-            ) {
-              const fit =
-                fitArtworkToPrintArea(
-                  img.naturalWidth,
-                  img.naturalHeight,
-                  printArea,
-                  config.canvasWidth,
-                  config.canvasHeight,
-                  "contain",
-                  DEFAULT_CONTAIN_SCALE,
-                );
-
-              dispatch({
-                type: "UPDATE_LAYER",
-
-                surfaceId:
-                  state.activeSurfaceId,
-
-                layerId:
-                  layer.id,
-
-                changes: {
-                  width:
-                    fit.width,
-
-                  height:
-                    fit.height,
-
-                  naturalWidth:
-                    img.naturalWidth,
-
-                  naturalHeight:
-                    img.naturalHeight,
-
-                  x: fit.x,
-
-                  y: fit.y,
-
-                  scaleX: 1,
-
-                  scaleY: 1,
-                },
-              });
-            }
+            dispatch({
+              type: "UPDATE_LAYER",
+              surfaceId: state.activeSurfaceId,
+              layerId: layer.id,
+              changes: {
+                width: fit.width,
+                height: fit.height,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                x: fit.x,
+                y: fit.y,
+                scaleX: 1,
+                scaleY: 1,
+              },
+            });
           }
-        };
+        }
+      };
 
-        img.src =
-          layer.srcUrl;
-      },
-    );
+      img.src = layer.srcUrl;
+    });
   }, [
     activeLayers,
     layerImgs,
@@ -768,9 +383,7 @@ function KonvaStageInner({
       selectedLayer.locked ||
       !selectedLayer.visible
     ) {
-      transformerRef.current.nodes(
-        [],
-      );
+      transformerRef.current.nodes([]);
 
       transformerRef.current
         .getLayer()
@@ -779,21 +392,15 @@ function KonvaStageInner({
       return;
     }
 
-    const node =
-      stageRef.current.findOne(
-        `#${selectedLayer.id}`,
-      );
+    const node = stageRef.current.findOne(
+      `#${selectedLayer.id}`,
+    );
 
     if (node) {
-      transformerRef.current.nodes(
-        [node],
-      );
-
+      transformerRef.current.nodes([node]);
       transformerRef.current.update();
     } else {
-      transformerRef.current.nodes(
-        [],
-      );
+      transformerRef.current.nodes([]);
     }
 
     transformerRef.current
@@ -807,8 +414,7 @@ function KonvaStageInner({
     selectedLayer?.y,
     selectedLayer?.width,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (selectedLayer as any)
-      ?.height,
+    (selectedLayer as any)?.height,
     selectedLayer?.scaleX,
     selectedLayer?.scaleY,
     selectedLayer?.rotation,
@@ -819,8 +425,7 @@ function KonvaStageInner({
   ]);
 
   const isEditMode =
-    customizer.viewMode ===
-    "edit";
+    customizer.viewMode === "edit";
 
   const showGuides =
     Boolean(selectedLayer) ||
@@ -829,39 +434,27 @@ function KonvaStageInner({
   const sortedLayers = [
     ...activeLayers,
   ]
-    .filter(
-      (layer) =>
-        layer.visible,
-    )
+    .filter((layer) => layer.visible)
     .sort(
-      (a, b) =>
-        a.zIndex - b.zIndex,
+      (a, b) => a.zIndex - b.zIndex,
     );
 
   const contourPoints =
-    shape?.type ===
-      "contour" &&
+    shape?.type === "contour" &&
     shape.points
-      ? shape.points.reduce<
-          number[]
-        >(
+      ? shape.points.reduce<number[]>(
           (
             result,
             value,
             index,
           ) => {
-            if (
-              index % 2 ===
-              0
-            ) {
+            if (index % 2 === 0) {
               result.push(
-                paX +
-                  value * paW,
+                paX + value * paW,
               );
             } else {
               result.push(
-                paY +
-                  value * paH,
+                paY + value * paH,
               );
             }
 
@@ -871,133 +464,114 @@ function KonvaStageInner({
         )
       : null;
 
-  const clipFunc =
-    useCallback(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ctx: any) => {
-        if (
-          shape?.type ===
-            "svg-path" &&
-          shape.svgPath
-        ) {
-          const scaledPath =
-            createScaledSvgPath(
-              shape.svgPath,
-
-              config.canvasWidth,
-
-              config.canvasHeight,
-            );
-
-          if (scaledPath) {
-            return [
-              scaledPath,
-              "nonzero",
-            ] as [
-              Path2D,
-              CanvasFillRule,
-            ];
-          }
-        }
-
-        if (
-          shape?.type ===
-            "contour" &&
-          shape.points &&
-          shape.points.length >=
-            6
-        ) {
-          const points =
-            shape.points;
-
-          ctx.beginPath();
-
-          ctx.moveTo(
-            paX +
-              (points[0] ??
-                0) *
-                paW,
-
-            paY +
-              (points[1] ??
-                0) *
-                paH,
+  const clipFunc = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (ctx: any) => {
+      if (
+        shape?.type === "svg-path" &&
+        shape.svgPath
+      ) {
+        const scaledPath =
+          createScaledSvgPath(
+            shape.svgPath,
+            config.canvasWidth,
+            config.canvasHeight,
           );
 
-          for (
-            let index = 2;
-            index <
-            points.length;
-            index += 2
-          ) {
-            ctx.lineTo(
-              paX +
-                (points[
-                  index
-                ] ??
-                  0) *
-                  paW,
-
-              paY +
-                (points[
-                  index + 1
-                ] ??
-                  0) *
-                  paH,
-            );
-          }
-
-          ctx.closePath();
-
-          return;
+        if (scaledPath) {
+          return [
+            scaledPath,
+            "nonzero",
+          ] as [
+            Path2D,
+            CanvasFillRule,
+          ];
         }
+      }
 
-        if (
-          shape?.type ===
-          "rounded"
-        ) {
-          const radius =
-            typeof shape.cornerRadius ===
-            "number"
-              ? shape.cornerRadius
-              : 12;
-
-          ctx.beginPath();
-
-          ctx.roundRect(
-            paX,
-            paY,
-            paW,
-            paH,
-            radius,
-          );
-
-          ctx.closePath();
-
-          return;
-        }
+      if (
+        shape?.type === "contour" &&
+        shape.points &&
+        shape.points.length >= 6
+      ) {
+        const points = shape.points;
 
         ctx.beginPath();
 
-        ctx.rect(
+        ctx.moveTo(
+          paX +
+            (points[0] ?? 0) *
+              paW,
+          paY +
+            (points[1] ?? 0) *
+              paH,
+        );
+
+        for (
+          let index = 2;
+          index < points.length;
+          index += 2
+        ) {
+          ctx.lineTo(
+            paX +
+              (points[index] ?? 0) *
+                paW,
+            paY +
+              (points[index + 1] ?? 0) *
+                paH,
+          );
+        }
+
+        ctx.closePath();
+
+        return;
+      }
+
+      if (
+        shape?.type === "rounded"
+      ) {
+        const radius =
+          typeof shape.cornerRadius ===
+          "number"
+            ? shape.cornerRadius
+            : 12;
+
+        ctx.beginPath();
+
+        ctx.roundRect(
           paX,
           paY,
           paW,
           paH,
+          radius,
         );
 
         ctx.closePath();
-      },
-      [
-        shape,
+
+        return;
+      }
+
+      ctx.beginPath();
+
+      ctx.rect(
         paX,
         paY,
         paW,
         paH,
-        config.canvasWidth,
-        config.canvasHeight,
-      ],
-    );
+      );
+
+      ctx.closePath();
+    },
+    [
+      shape,
+      paX,
+      paY,
+      paW,
+      paH,
+      config.canvasWidth,
+      config.canvasHeight,
+    ],
+  );
 
   const handleStageClick =
     useCallback(
@@ -1018,9 +592,7 @@ function KonvaStageInner({
       (layerId: string) =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (event: any) => {
-          event.cancelBubble =
-            true;
-
+          event.cancelBubble = true;
           selectLayer(layerId);
         },
       [selectLayer],
@@ -1028,14 +600,11 @@ function KonvaStageInner({
 
   const handleDragMove =
     useCallback(
-      (layer: DesignLayer) =>
+      (_layer: DesignLayer) =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (event: any) => {
-          const node =
-            event.target;
-
-          const tolerance =
-            10;
+          const node = event.target;
+          const tolerance = 10;
 
           const nodeW =
             node.width() *
@@ -1046,68 +615,51 @@ function KonvaStageInner({
             node.scaleY();
 
           const cx =
-            node.x() +
-            nodeW / 2;
+            node.x() + nodeW / 2;
 
           const cy =
-            node.y() +
-            nodeH / 2;
+            node.y() + nodeH / 2;
 
-          let snapV =
-            false;
-
-          let snapH =
-            false;
+          let snapV = false;
+          let snapH = false;
 
           if (
             Math.abs(
-              cx -
-                centerX,
+              cx - centerX,
             ) < tolerance
           ) {
             node.x(
               node.x() +
-                (centerX -
-                  cx),
+                (centerX - cx),
             );
 
-            snapV =
-              true;
+            snapV = true;
           }
 
           if (
             Math.abs(
-              cy -
-                centerY,
+              cy - centerY,
             ) < tolerance
           ) {
             node.y(
               node.y() +
-                (centerY -
-                  cy),
+                (centerY - cy),
             );
 
-            snapH =
-              true;
+            snapH = true;
           }
 
-          setSnap(
-            (previous) =>
-              previous.v ===
-                snapV &&
-              previous.h ===
-                snapH
-                ? previous
-                : {
-                    v: snapV,
-                    h: snapH,
-                  },
+          setSnap((previous) =>
+            previous.v === snapV &&
+            previous.h === snapH
+              ? previous
+              : {
+                  v: snapV,
+                  h: snapH,
+                },
           );
         },
-      [
-        centerX,
-        centerY,
-      ],
+      [centerX, centerY],
     );
 
   const handleDragEnd =
@@ -1120,24 +672,17 @@ function KonvaStageInner({
             h: false,
           });
 
-          if (
-            layer.locked
-          ) {
+          if (layer.locked) {
             return;
           }
 
           dispatch({
             type: "UPDATE_LAYER",
-
             surfaceId:
               state.activeSurfaceId,
-
-            layerId:
-              layer.id,
-
+            layerId: layer.id,
             changes: {
               x: event.target.x(),
-
               y: event.target.y(),
             },
           });
@@ -1153,35 +698,24 @@ function KonvaStageInner({
       (layer: DesignLayer) =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (event: any) => {
-          if (
-            layer.locked
-          ) {
+          if (layer.locked) {
             return;
           }
 
-          const node =
-            event.target;
+          const node = event.target;
 
           dispatch({
             type: "UPDATE_LAYER",
-
             surfaceId:
               state.activeSurfaceId,
-
-            layerId:
-              layer.id,
-
+            layerId: layer.id,
             changes: {
               x: node.x(),
-
               y: node.y(),
-
               scaleX:
                 node.scaleX(),
-
               scaleY:
                 node.scaleY(),
-
               rotation:
                 ((node.rotation() +
                   180) %
@@ -1201,18 +735,10 @@ function KonvaStageInner({
   return (
     <Stage
       ref={stageRef}
-      width={
-        config.canvasWidth
-      }
-      height={
-        config.canvasHeight
-      }
-      onClick={
-        handleStageClick
-      }
-      onTap={
-        handleStageClick
-      }
+      width={config.canvasWidth}
+      height={config.canvasHeight}
+      onClick={handleStageClick}
+      onTap={handleStageClick}
     >
       <Layer
         name="mockup-layer"
@@ -1236,9 +762,7 @@ function KonvaStageInner({
                 config.canvasHeight /
                 SVG_REFERENCE_SIZE
               }
-              fill={
-                baseColor
-              }
+              fill={baseColor}
             />
           ) : (
             <Rect
@@ -1250,17 +774,13 @@ function KonvaStageInner({
               height={
                 config.canvasHeight
               }
-              fill={
-                baseColor
-              }
+              fill={baseColor}
             />
           ))}
 
         {mockupImg && (
           <KonvaImage
-            image={
-              mockupImg
-            }
+            image={mockupImg}
             width={
               config.canvasWidth
             }
@@ -1293,9 +813,7 @@ function KonvaStageInner({
       >
         {svgPathData ? (
           <KonvaPath
-            data={
-              svgPathData
-            }
+            data={svgPathData}
             scaleX={
               config.canvasWidth /
               SVG_REFERENCE_SIZE
@@ -1306,27 +824,17 @@ function KonvaStageInner({
             }
             stroke="rgba(0, 200, 255, 0.75)"
             strokeWidth={2}
-            dash={[
-              6,
-              5,
-            ]}
+            dash={[6, 5]}
             lineJoin="round"
             listening={false}
           />
         ) : contourPoints ? (
           <Line
-            points={
-              contourPoints
-            }
+            points={contourPoints}
             closed
             stroke="rgba(0, 200, 255, 0.75)"
-            strokeWidth={
-              1.5
-            }
-            dash={[
-              5,
-              5,
-            ]}
+            strokeWidth={1.5}
+            dash={[5, 5]}
             lineJoin="round"
           />
         ) : (
@@ -1343,23 +851,14 @@ function KonvaStageInner({
                 : 8
             }
             stroke="rgba(0, 200, 255, 0.75)"
-            strokeWidth={
-              1.5
-            }
-            dash={[
-              5,
-              5,
-            ]}
+            strokeWidth={1.5}
+            dash={[5, 5]}
           />
         )}
       </Layer>
 
       <Layer name="design-layer">
-        <Group
-          clipFunc={
-            clipFunc
-          }
-        >
+        <Group clipFunc={clipFunc}>
           {sortedLayers.map(
             (layer) => {
               if (
@@ -1367,9 +866,7 @@ function KonvaStageInner({
                 "image"
               ) {
                 const image =
-                  layerImgs[
-                    layer.id
-                  ];
+                  layerImgs[layer.id];
 
                 if (!image) {
                   return null;
@@ -1377,21 +874,11 @@ function KonvaStageInner({
 
                 return (
                   <KonvaImage
-                    key={
-                      layer.id
-                    }
-                    id={
-                      layer.id
-                    }
-                    image={
-                      image
-                    }
-                    x={
-                      layer.x
-                    }
-                    y={
-                      layer.y
-                    }
+                    key={layer.id}
+                    id={layer.id}
+                    image={image}
+                    x={layer.x}
+                    y={layer.y}
                     width={
                       layer.width
                     }
@@ -1438,21 +925,11 @@ function KonvaStageInner({
               ) {
                 return (
                   <Text
-                    key={
-                      layer.id
-                    }
-                    id={
-                      layer.id
-                    }
-                    text={
-                      layer.text
-                    }
-                    x={
-                      layer.x
-                    }
-                    y={
-                      layer.y
-                    }
+                    key={layer.id}
+                    id={layer.id}
+                    text={layer.text}
+                    x={layer.x}
+                    y={layer.y}
                     width={
                       layer.width
                     }
@@ -1516,20 +993,12 @@ function KonvaStageInner({
                 centerX,
                 paY,
                 centerX,
-                paY +
-                  paH,
+                paY + paH,
               ]}
               stroke="rgba(255,255,255,0.65)"
-              strokeWidth={
-                1.5
-              }
-              dash={[
-                6,
-                4,
-              ]}
-              listening={
-                false
-              }
+              strokeWidth={1.5}
+              dash={[6, 4]}
+              listening={false}
             />
           )}
 
@@ -1539,53 +1008,30 @@ function KonvaStageInner({
               points={[
                 paX,
                 centerY,
-                paX +
-                  paW,
+                paX + paW,
                 centerY,
               ]}
               stroke="rgba(255,255,255,0.65)"
-              strokeWidth={
-                1.5
-              }
-              dash={[
-                6,
-                4,
-              ]}
-              listening={
-                false
-              }
+              strokeWidth={1.5}
+              dash={[6, 4]}
+              listening={false}
             />
           )}
 
         {isEditMode && (
           <Transformer
             name="selection-transformer"
-            ref={
-              transformerRef
-            }
+            ref={transformerRef}
             borderStroke="rgba(255,255,255,0.95)"
-            borderStrokeWidth={
-              1
-            }
-            borderDash={[
-              3,
-              3,
-            ]}
+            borderStrokeWidth={1}
+            borderDash={[3, 3]}
             anchorFill="#ffffff"
             anchorStroke="#00c8ed"
-            anchorStrokeWidth={
-              1
-            }
-            anchorSize={
-              9
-            }
-            anchorCornerRadius={
-              5
-            }
+            anchorStrokeWidth={1}
+            anchorSize={9}
+            anchorCornerRadius={5}
             rotateEnabled
-            rotateAnchorOffset={
-              24
-            }
+            rotateAnchorOffset={24}
             rotationSnaps={[
               0,
               15,
@@ -1612,9 +1058,7 @@ function KonvaStageInner({
               330,
               345,
             ]}
-            rotationSnapTolerance={
-              6
-            }
+            rotationSnapTolerance={6}
             keepRatio
             enabledAnchors={[
               "top-left",
@@ -1650,9 +1094,7 @@ function KonvaStageInner({
       >
         {shadeImg && (
           <KonvaImage
-            image={
-              shadeImg
-            }
+            image={shadeImg}
             width={
               config.canvasWidth
             }
