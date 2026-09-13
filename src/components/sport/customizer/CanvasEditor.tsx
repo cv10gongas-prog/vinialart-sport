@@ -38,24 +38,15 @@ function createScaledSvgPath(
   }
 
   try {
-    const sourcePath =
-      new Path2D(svgPath);
+    const sourcePath = new Path2D(svgPath);
+    const scaledPath = new Path2D();
 
-    const scaledPath =
-      new Path2D();
-
-    const matrix =
-      new DOMMatrix().scale(
-        canvasWidth /
-          SVG_REFERENCE_SIZE,
-        canvasHeight /
-          SVG_REFERENCE_SIZE,
-      );
-
-    scaledPath.addPath(
-      sourcePath,
-      matrix,
+    const matrix = new DOMMatrix().scale(
+      canvasWidth / SVG_REFERENCE_SIZE,
+      canvasHeight / SVG_REFERENCE_SIZE,
     );
+
+    scaledPath.addPath(sourcePath, matrix);
 
     return scaledPath;
   } catch {
@@ -197,7 +188,7 @@ export function CanvasEditor({
 
   const sliderScaleValue =
     Math.min(
-      400,
+      800,
       Math.max(
         10,
         selectedScalePercent,
@@ -219,7 +210,7 @@ export function CanvasEditor({
 
         const scale =
           Math.min(
-            4,
+            8,
             Math.max(
               0.1,
               percent / 100,
@@ -286,7 +277,7 @@ export function CanvasEditor({
   return (
     <div
       onWheel={handleWheel}
-      className="relative flex h-full min-h-[300px] w-full min-w-0 flex-col overflow-hidden"
+      className="relative flex h-full min-h-[300px] w-full min-w-0 flex-col overflow-hidden pb-[72px]"
       style={{
         touchAction: "none",
       }}
@@ -344,26 +335,23 @@ export function CanvasEditor({
       {selectedLayer &&
         customizer.viewMode ===
           "edit" && (
-          <div className="relative z-30 mx-auto mb-1 mt-2 w-[min(92%,580px)] shrink-0 rounded-2xl border border-white/10 bg-zinc-950/90 px-4 py-3 shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md">
+          <div className="relative z-30 mx-auto mt-3 w-[min(88%,560px)] shrink-0 rounded-xl border border-white/10 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-zinc-400">
+                  <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
                     Tamanho
                   </span>
 
-                  <span className="min-w-[48px] text-right font-mono text-[0.68rem] font-semibold text-cyan-300">
-                    {
-                      selectedScalePercent
-                    }
-                    %
+                  <span className="min-w-[48px] text-right font-mono text-[0.65rem] font-semibold text-cyan-300">
+                    {selectedScalePercent}%
                   </span>
                 </div>
 
                 <input
                   type="range"
                   min={10}
-                  max={400}
+                  max={800}
                   step={1}
                   value={
                     sliderScaleValue
@@ -379,22 +367,46 @@ export function CanvasEditor({
                       ),
                     )
                   }
-                  className="h-2 w-full cursor-pointer accent-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="
+                    h-1.5
+                    w-full
+                    cursor-pointer
+                    appearance-none
+                    rounded-full
+                    bg-white/10
+                    outline-none
+
+                    [&::-webkit-slider-thumb]:h-3.5
+                    [&::-webkit-slider-thumb]:w-3.5
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:border
+                    [&::-webkit-slider-thumb]:border-cyan-200
+                    [&::-webkit-slider-thumb]:bg-cyan-400
+                    [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(34,211,238,0.6)]
+
+                    [&::-moz-range-thumb]:h-3.5
+                    [&::-moz-range-thumb]:w-3.5
+                    [&::-moz-range-thumb]:rounded-full
+                    [&::-moz-range-thumb]:border
+                    [&::-moz-range-thumb]:border-cyan-200
+                    [&::-moz-range-thumb]:bg-cyan-400
+
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
                   aria-label="Tamanho do elemento selecionado"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-zinc-400">
+                  <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
                     Rotação
                   </span>
 
-                  <span className="min-w-[48px] text-right font-mono text-[0.68rem] font-semibold text-cyan-300">
-                    {
-                      selectedRotation
-                    }
-                    °
+                  <span className="min-w-[48px] text-right font-mono text-[0.65rem] font-semibold text-cyan-300">
+                    {selectedRotation}°
                   </span>
                 </div>
 
@@ -421,7 +433,34 @@ export function CanvasEditor({
                       ),
                     )
                   }
-                  className="h-2 w-full cursor-pointer accent-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="
+                    h-1.5
+                    w-full
+                    cursor-pointer
+                    appearance-none
+                    rounded-full
+                    bg-white/10
+                    outline-none
+
+                    [&::-webkit-slider-thumb]:h-3.5
+                    [&::-webkit-slider-thumb]:w-3.5
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:border
+                    [&::-webkit-slider-thumb]:border-cyan-200
+                    [&::-webkit-slider-thumb]:bg-cyan-400
+                    [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(34,211,238,0.6)]
+
+                    [&::-moz-range-thumb]:h-3.5
+                    [&::-moz-range-thumb]:w-3.5
+                    [&::-moz-range-thumb]:rounded-full
+                    [&::-moz-range-thumb]:border
+                    [&::-moz-range-thumb]:border-cyan-200
+                    [&::-moz-range-thumb]:bg-cyan-400
+
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
                   aria-label="Rotação do elemento selecionado"
                 />
               </div>
