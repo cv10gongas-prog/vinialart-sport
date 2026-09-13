@@ -1,10 +1,6 @@
 import type { Product } from "./sport-data";
 import type { PrintArea } from "./customizer/types";
 
-/**
- * Contorno do painel frontal branco do boné.
- * Coordenadas normalizadas dentro da bounding box da coroa frontal.
- */
 export const CAP_CROWN_POINTS: number[] = [
   0.5000, 0.0000,
   0.5924, 0.0044,
@@ -44,10 +40,6 @@ export const CAP_CROWN_POINTS: number[] = [
   0.4076, 0.0044,
 ];
 
-/**
- * Contorno completo do corpo personalizável da garrafa.
- * Inclui os ombros e todo o corpo até à base.
- */
 export const BOTTLE_CONTOUR_POINTS: number[] = [
   0.3200, 0.0000,
   0.6800, 0.0000,
@@ -61,10 +53,6 @@ export const BOTTLE_CONTOUR_POINTS: number[] = [
   0.3200, 0.0682,
 ];
 
-/**
- * Contorno completo do tecido frontal do saco.
- * O utilizador pode deslocar arte por praticamente toda a peça.
- */
 export const SACO_CONTOUR_POINTS: number[] = [
   0.4875, 0.0000,
   0.7058, 0.0000,
@@ -88,36 +76,27 @@ export const SACO_CONTOUR_POINTS: number[] = [
   0.2694, 0.0000,
 ];
 
-/**
- * Contorno completo da T-shirt.
- * É esta a regra correta:
- * a área útil é a camisola inteira, incluindo mangas e corpo.
- */
 export const TSHIRT_CONTOUR_POINTS: number[] = [
   0.3378, 0.0000,
   0.4189, 0.0486,
   0.5000, 0.0811,
   0.5811, 0.0486,
   0.6622, 0.0000,
-
   0.8784, 0.0946,
   1.0000, 0.3378,
   0.8378, 0.4189,
   0.7568, 0.2838,
-
   0.7703, 0.9730,
   0.6351, 0.9946,
   0.5000, 1.0000,
   0.3649, 0.9946,
   0.2297, 0.9730,
-
   0.2432, 0.2838,
   0.1622, 0.4189,
   0.0000, 0.3378,
   0.1216, 0.0946,
 ];
 
-/** Contorno anatómico completo dos calções */
 export const SHORTS_CONTOUR_POINTS: number[] = [
   0.154, 0.012,
   0.319, 0.003,
@@ -145,10 +124,6 @@ export const SHORTS_CONTOUR_POINTS: number[] = [
   0.145, 0.125,
 ];
 
-/**
- * Contorno completo do painel frontal efetivamente personalizável
- * da mochila.
- */
 export const MOCHILA_CONTOUR_POINTS: number[] = [
   0.5000, 0.0350,
   0.6200, 0.0350,
@@ -203,7 +178,6 @@ export const MOCHILA_CONTOUR_POINTS: number[] = [
   0.3800, 0.0350,
 ];
 
-/** Silhueta de cor dos calções na escala de 800x800 */
 export const SHORTS_SILHOUETTE_PATH = `
   M 208 137
   C 300 132, 500 132, 592 137
@@ -217,7 +191,6 @@ export const SHORTS_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor da braçadeira na escala de 800x800 */
 export const BRACADEIRA_SILHOUETTE_PATH = `
   M 90 300
   H 710
@@ -231,7 +204,6 @@ export const BRACADEIRA_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor da garrafa */
 export const BOTTLE_SILHOUETTE_PATH = `
   M 364 177
   C 364 212, 300 218, 300 245
@@ -244,7 +216,6 @@ export const BOTTLE_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor do painel frontal branco do boné */
 export const CAP_SILHOUETTE_PATH = `
   M 398.3 136.7
   L 446.7 138.3
@@ -285,7 +256,6 @@ export const CAP_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor do tecido do saco */
 export const SACO_SILHOUETTE_PATH = `
   M 388.0 96.3
   L 511.1 96.3
@@ -338,7 +308,6 @@ export const SACO_SILHOUETTE_PATH = `
   Z
 `;
 
-/** Silhueta de cor do painel frontal da mochila */
 export const MOCHILA_SILHOUETTE_PATH = `
   M 396.12 160.65
   L 429.31 160.65
@@ -394,10 +363,6 @@ export const MOCHILA_SILHOUETTE_PATH = `
   Z
 `;
 
-/**
- * Silhueta completa da T-shirt.
- * Escala 800x800, equivalente ao SVG 500x500.
- */
 export const TSHIRT_SILHOUETTE_PATH = `
   M 304 128
   C 340 156, 460 156, 496 128
@@ -436,37 +401,33 @@ export const supporterDefinitions: {
       widthFraction: 200 / 800,
       heightFraction: 513 / 800,
       shape: {
-        type: "contour",
-        points: BOTTLE_CONTOUR_POINTS,
+        type: "svg-path",
+        svgPath: BOTTLE_SILHOUETTE_PATH,
       },
     },
     projection: "cylinder",
     silhouettePath: BOTTLE_SILHOUETTE_PATH,
-    note:
-      "Personalização em todo o corpo útil da garrafa, incluindo a zona dos ombros até à base.",
+    note: "Personalização em todo o corpo útil da garrafa.",
     isDirectCustomizable: true,
   },
-
   {
     id: "bone",
     name: "Boné",
     photo: "bone-personalizado.jpg",
     base: "bone",
     area: {
-      xFraction: 82 / 480,
-      yFraction: 82 / 480,
-      widthFraction: 314 / 480,
-      heightFraction: 229 / 480,
+      xFraction: 136.7 / 800,
+      yFraction: 136.7 / 800,
+      widthFraction: 523.3 / 800,
+      heightFraction: 381.6 / 800,
       shape: {
-        type: "contour",
-        points: CAP_CROWN_POINTS,
+        type: "svg-path",
+        svgPath: CAP_SILHOUETTE_PATH,
       },
     },
     silhouettePath: CAP_SILHOUETTE_PATH,
-    note:
-      "Personalização em todo o painel frontal fisicamente imprimível do boné.",
+    note: "Personalização em todo o painel frontal útil do boné.",
   },
-
   {
     id: "saco",
     name: "Saco",
@@ -478,35 +439,31 @@ export const supporterDefinitions: {
       widthFraction: 563.9 / 800,
       heightFraction: 618.7 / 800,
       shape: {
-        type: "contour",
-        points: SACO_CONTOUR_POINTS,
+        type: "svg-path",
+        svgPath: SACO_SILHOUETTE_PATH,
       },
     },
     silhouettePath: SACO_SILHOUETTE_PATH,
-    note:
-      "Personalização em toda a superfície frontal do tecido do saco.",
+    note: "Personalização em toda a superfície frontal do saco.",
   },
-
   {
     id: "mochila",
     name: "Mochila",
     photo: "base-mochila.jpg",
     base: "mochila",
     area: {
-      xFraction: 0.3223,
-      yFraction: 0.1777,
-      widthFraction: 0.3457,
-      heightFraction: 0.6602,
+      xFraction: 257.84 / 800,
+      yFraction: 142.16 / 800,
+      widthFraction: 276.56 / 800,
+      heightFraction: 528.16 / 800,
       shape: {
-        type: "contour",
-        points: MOCHILA_CONTOUR_POINTS,
+        type: "svg-path",
+        svgPath: MOCHILA_SILHOUETTE_PATH,
       },
     },
     silhouettePath: MOCHILA_SILHOUETTE_PATH,
-    note:
-      "Personalização em todo o painel frontal útil da mochila, limitado pelos fechos e costuras.",
+    note: "Personalização em todo o painel frontal útil da mochila.",
   },
-
   {
     id: "tshirt",
     name: "T-shirt",
@@ -518,15 +475,13 @@ export const supporterDefinitions: {
       widthFraction: 592 / 800,
       heightFraction: 588 / 800,
       shape: {
-        type: "contour",
-        points: TSHIRT_CONTOUR_POINTS,
+        type: "svg-path",
+        svgPath: TSHIRT_SILHOUETTE_PATH,
       },
     },
     silhouettePath: TSHIRT_SILHOUETTE_PATH,
-    note:
-      "Personalização total da T-shirt: mangas, peito, laterais e corpo até à bainha.",
+    note: "Personalização total da T-shirt: mangas, peito, laterais e corpo.",
   },
-
   {
     id: "bracadeira",
     name: "Braçadeira",
@@ -543,29 +498,26 @@ export const supporterDefinitions: {
       },
     },
     silhouettePath: BRACADEIRA_SILHOUETTE_PATH,
-    note:
-      "Personalização em toda a faixa central de tecido imprimível da braçadeira.",
+    note: "Personalização em toda a faixa central imprimível da braçadeira.",
     isDirectCustomizable: true,
   },
-
   {
     id: "calcoes",
     name: "Calções",
     photo: "base-calcoes.jpg",
     base: "calcoes",
     area: {
-      xFraction: 74 / 480,
-      yFraction: 78 / 480,
-      widthFraction: 332 / 480,
-      heightFraction: 336 / 480,
+      xFraction: 123 / 800,
+      yFraction: 132 / 800,
+      widthFraction: 554 / 800,
+      heightFraction: 558 / 800,
       shape: {
-        type: "contour",
-        points: SHORTS_CONTOUR_POINTS,
+        type: "svg-path",
+        svgPath: SHORTS_SILHOUETTE_PATH,
       },
     },
     silhouettePath: SHORTS_SILHOUETTE_PATH,
-    note:
-      "Personalização em toda a superfície frontal dos calções.",
+    note: "Personalização em toda a superfície frontal dos calções.",
   },
 ];
 
