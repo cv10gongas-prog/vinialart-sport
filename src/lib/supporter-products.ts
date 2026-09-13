@@ -225,7 +225,6 @@ export const supporterDefinitions: {
     photo: "base-garrafa.jpg",
     base: "garrafa",
     area: {
-      // Área útil abrangendo de ponta a ponta conforme o teu desenho
       xFraction: 0.31,
       yFraction: 0.16,
       widthFraction: 0.38,
@@ -294,10 +293,10 @@ export const supporterDefinitions: {
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
     area: {
-      xFraction: 0.31,
-      yFraction: 0.29,
-      widthFraction: 0.38,
-      heightFraction: 0.43,
+      xFraction: 0.34,
+      yFraction: 0.31,
+      widthFraction: 0.32,
+      heightFraction: 0.36,
       shape: { type: "rounded", cornerRadius: 8 },
     },
     silhouettePath: TSHIRT_SILHOUETTE_PATH,
