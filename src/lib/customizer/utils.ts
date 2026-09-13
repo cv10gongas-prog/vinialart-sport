@@ -225,6 +225,7 @@ export function coverFitLayer(
     canvasWidth,
     canvasHeight,
     "cover",
+    1,
   );
 
   return {
