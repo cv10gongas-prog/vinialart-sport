@@ -4,15 +4,16 @@ import type {
   Surface,
 } from "@/lib/customizer/types";
 
-import { supporterDefinitions } from "@/lib/supporter-products";
+import {
+  supporterDefinitions,
+  TSHIRT_CONTOUR_POINTS,
+} from "@/lib/supporter-products";
 
 import { caneleirasConfig } from "./caneleiras";
 
 import {
   bottleShadeOverlay,
   capShadeOverlay,
-  flagShadeOverlay,
-  flagWhite,
   jerseyShadeOverlay,
   jerseyBackWhite,
   jerseyFrontWhite,
@@ -63,8 +64,8 @@ const fonts = [
 ];
 
 /**
- * Área imprimível real do equipamento.
- * Os pontos seguem a silhueta do mockup, incluindo gola, mangas e corpo.
+ * Contorno aprovado do Equipamento Personalizado.
+ * NÃO reduzir novamente para uma caixa no peito.
  */
 const JERSEY_FRONT_PRINT_CONTOUR: number[] = [
   0.2685, 0.0492,
@@ -139,6 +140,10 @@ function buildConfig(
   };
 }
 
+/* -------------------------------------------------------------------------- */
+/* EQUIPAMENTO PERSONALIZADO — APROVADO                                       */
+/* -------------------------------------------------------------------------- */
+
 export const equipamentoConfig = buildConfig(
   "equipamento-personalizado",
   "Equipamento Personalizado",
@@ -163,6 +168,7 @@ export const equipamentoConfig = buildConfig(
         },
       },
     },
+
     {
       id: "BACK",
       label: "Costas",
@@ -185,6 +191,10 @@ export const equipamentoConfig = buildConfig(
     },
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* BANDEIRA                                                                   */
+/* -------------------------------------------------------------------------- */
 
 export const FLAG_CONTOUR_POINTS: number[] = [
   0, 0.0288,
@@ -279,6 +289,10 @@ export const bandeiraConfig = buildConfig(
   ],
 );
 
+/* -------------------------------------------------------------------------- */
+/* ARTIGOS PARA ADEPTOS                                                       */
+/* -------------------------------------------------------------------------- */
+
 export const adeptosConfig = buildConfig(
   "artigos-adeptos",
   "Artigos para Adeptos",
@@ -291,10 +305,14 @@ export const adeptosConfig = buildConfig(
         baseSrc: supporterItemWhite,
       },
       printArea: {
-        xFraction: 0.15,
-        yFraction: 0.39,
-        widthFraction: 0.7,
-        heightFraction: 0.21,
+        /*
+         * O mockup físico ocupa x=150..650 e y=180..620
+         * dentro da grelha 800x800.
+         */
+        xFraction: 150 / 800,
+        yFraction: 180 / 800,
+        widthFraction: 500 / 800,
+        heightFraction: 440 / 800,
         shape: {
           type: "rounded",
           cornerRadius: 12,
@@ -303,6 +321,10 @@ export const adeptosConfig = buildConfig(
     },
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* ESTAMPAGEM — CAMISOLA COMPLETA                                             */
+/* -------------------------------------------------------------------------- */
 
 export const estampagemConfig = buildConfig(
   "estampagem",
@@ -316,18 +338,28 @@ export const estampagemConfig = buildConfig(
         baseSrc: "/catalog/editor/estampagem.svg",
       },
       printArea: {
-        xFraction: 0.34,
-        yFraction: 0.31,
-        widthFraction: 0.32,
-        heightFraction: 0.36,
+        /*
+         * O SVG de estampagem usa exatamente a mesma geometria-base
+         * de camisola da T-shirt.
+         *
+         * Logo: mangas + peito + corpo inteiro.
+         */
+        xFraction: 104 / 800,
+        yFraction: 128 / 800,
+        widthFraction: 592 / 800,
+        heightFraction: 588 / 800,
         shape: {
-          type: "rounded",
-          cornerRadius: 10,
+          type: "contour",
+          points: TSHIRT_CONTOUR_POINTS,
         },
       },
     },
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* IMPRESSÃO                                                                  */
+/* -------------------------------------------------------------------------- */
 
 export const impressaoConfig = buildConfig(
   "impressao",
@@ -341,18 +373,26 @@ export const impressaoConfig = buildConfig(
         baseSrc: printSurfaceWhite,
       },
       printArea: {
-        xFraction: 0.21,
-        yFraction: 0.12,
-        widthFraction: 0.58,
-        heightFraction: 0.76,
+        /*
+         * Folha física completa do mockup:
+         * x=175..625 / y=100..700 em 800x800.
+         */
+        xFraction: 175 / 800,
+        yFraction: 100 / 800,
+        widthFraction: 450 / 800,
+        heightFraction: 600 / 800,
         shape: {
           type: "rounded",
-          cornerRadius: 4,
+          cornerRadius: 5,
         },
       },
     },
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* CONFIGS GERADAS A PARTIR DE SUPPORTER PRODUCTS                             */
+/* -------------------------------------------------------------------------- */
 
 export const productCustomizerConfigs: Record<
   string,
@@ -363,16 +403,37 @@ export const productCustomizerConfigs: Record<
       const surface: Surface = {
         id: "FRONT",
         label: d.id === "garrafa" ? "Corpo" : "Frente",
+
         mockupSrc: `/catalog/editor/${d.base}.svg`,
+
         mockup: {
           baseSrc: `/catalog/editor/${d.base}.svg`,
-          ...(d.id === "garrafa" ? { overlaySrc: bottleShadeOverlay } : {}),
-          ...(d.id === "bone" ? { overlaySrc: capShadeOverlay } : {}),
-          ...(d.id === "saco" ? { overlaySrc: sacoShadeOverlay } : {}),
-          ...(d.id === "mochila" ? { overlaySrc: mochilaShadeOverlay } : {}),
-          ...(d.id === "calcoes" ? { overlaySrc: shortsShadeOverlay } : {}),
-          ...(d.silhouettePath ? { silhouettePath: d.silhouettePath } : {}),
+
+          ...(d.id === "garrafa"
+            ? { overlaySrc: bottleShadeOverlay }
+            : {}),
+
+          ...(d.id === "bone"
+            ? { overlaySrc: capShadeOverlay }
+            : {}),
+
+          ...(d.id === "saco"
+            ? { overlaySrc: sacoShadeOverlay }
+            : {}),
+
+          ...(d.id === "mochila"
+            ? { overlaySrc: mochilaShadeOverlay }
+            : {}),
+
+          ...(d.id === "calcoes"
+            ? { overlaySrc: shortsShadeOverlay }
+            : {}),
+
+          ...(d.silhouettePath
+            ? { silhouettePath: d.silhouettePath }
+            : {}),
         },
+
         printArea: d.area,
       };
 
