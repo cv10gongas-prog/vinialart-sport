@@ -136,6 +136,10 @@ function buildConfig(
   };
 }
 
+/* -------------------------------------------------------------------------- */
+/* EQUIPAMENTO — NÃO MEXER: ESTÁ APROVADO                                    */
+/* -------------------------------------------------------------------------- */
+
 export const equipamentoConfig = buildConfig(
   "equipamento-personalizado",
   "Equipamento Personalizado",
@@ -183,6 +187,10 @@ export const equipamentoConfig = buildConfig(
   ],
 );
 
+/* -------------------------------------------------------------------------- */
+/* BANDEIRA                                                                   */
+/* -------------------------------------------------------------------------- */
+
 export const bandeiraConfig = buildConfig(
   "bandeira-personalizada",
   "Bandeira Personalizada",
@@ -206,6 +214,10 @@ export const bandeiraConfig = buildConfig(
     },
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* ARTIGOS PARA ADEPTOS                                                       */
+/* -------------------------------------------------------------------------- */
 
 export const adeptosConfig = buildConfig(
   "artigos-adeptos",
@@ -232,31 +244,45 @@ export const adeptosConfig = buildConfig(
   ],
 );
 
+/* -------------------------------------------------------------------------- */
+/* ESTAMPAGEM — FRENTE + COSTAS, CAMISOLA INTEIRA                            */
+/* -------------------------------------------------------------------------- */
+
+const estampagemSurface = (
+  id: "FRONT" | "BACK",
+  label: string,
+): Surface => ({
+  id,
+  label,
+  mockupSrc: "/catalog/editor/estampagem.svg",
+  mockup: {
+    baseSrc: "/catalog/editor/estampagem.svg",
+    silhouettePath: TSHIRT_SILHOUETTE_PATH,
+  },
+  printArea: {
+    xFraction: 104 / 800,
+    yFraction: 128 / 800,
+    widthFraction: 592 / 800,
+    heightFraction: 588 / 800,
+    shape: {
+      type: "svg-path",
+      svgPath: TSHIRT_SILHOUETTE_PATH,
+    },
+  },
+});
+
 export const estampagemConfig = buildConfig(
   "estampagem",
   "Estampagem",
   [
-    {
-      id: "FRONT",
-      label: "Área Principal",
-      mockupSrc: "/catalog/editor/estampagem.svg",
-      mockup: {
-        baseSrc: "/catalog/editor/estampagem.svg",
-        silhouettePath: TSHIRT_SILHOUETTE_PATH,
-      },
-      printArea: {
-        xFraction: 104 / 800,
-        yFraction: 128 / 800,
-        widthFraction: 592 / 800,
-        heightFraction: 588 / 800,
-        shape: {
-          type: "svg-path",
-          svgPath: TSHIRT_SILHOUETTE_PATH,
-        },
-      },
-    },
+    estampagemSurface("FRONT", "Frente"),
+    estampagemSurface("BACK", "Costas"),
   ],
 );
+
+/* -------------------------------------------------------------------------- */
+/* IMPRESSÃO                                                                  */
+/* -------------------------------------------------------------------------- */
 
 export const impressaoConfig = buildConfig(
   "impressao",
@@ -283,68 +309,119 @@ export const impressaoConfig = buildConfig(
   ],
 );
 
+/* -------------------------------------------------------------------------- */
+/* ARTIGOS GERADOS A PARTIR DE supporterDefinitions                           */
+/* -------------------------------------------------------------------------- */
+
 export const productCustomizerConfigs: Record<
   string,
   ProductCustomizerConfig
 > = {
   ...Object.fromEntries(
     supporterDefinitions.map((d) => {
-      const surface: Surface = {
-        id: "FRONT",
-        label: d.id === "garrafa" ? "Corpo" : "Frente",
+      const createSurface = (
+        id: "FRONT" | "BACK",
+        label: string,
+      ): Surface => ({
+        id,
+        label,
+
         mockupSrc: `/catalog/editor/${d.base}.svg`,
+
         mockup: {
           baseSrc: `/catalog/editor/${d.base}.svg`,
+
           ...(d.id === "garrafa"
             ? { overlaySrc: bottleShadeOverlay }
             : {}),
+
           ...(d.id === "bone"
             ? { overlaySrc: capShadeOverlay }
             : {}),
+
           ...(d.id === "saco"
             ? { overlaySrc: sacoShadeOverlay }
             : {}),
+
           ...(d.id === "mochila"
             ? { overlaySrc: mochilaShadeOverlay }
             : {}),
+
           ...(d.id === "calcoes"
             ? { overlaySrc: shortsShadeOverlay }
             : {}),
+
           ...(d.silhouettePath
             ? { silhouettePath: d.silhouettePath }
             : {}),
         },
+
         printArea: d.area,
-      };
+      });
+
+      const hasBack =
+        d.id === "tshirt" ||
+        d.id === "saco";
+
+      const surfaces: Surface[] = hasBack
+        ? [
+            createSurface("FRONT", "Frente"),
+            createSurface("BACK", "Costas"),
+          ]
+        : [
+            createSurface(
+              "FRONT",
+              d.id === "garrafa"
+                ? "Corpo"
+                : "Frente",
+            ),
+          ];
 
       const config = buildConfig(
         `${d.id}-personalizado`,
         d.name,
-        [surface],
+        surfaces,
       );
 
-      config.projection = d.projection ?? "flat";
+      config.projection =
+        d.projection ?? "flat";
 
       if (d.note) {
         config.mockupNote = d.note;
       }
 
-      return [config.id, config];
+      return [
+        config.id,
+        config,
+      ];
     }),
   ),
 
-  [caneleirasConfig.id]: caneleirasConfig,
-  [equipamentoConfig.id]: equipamentoConfig,
-  [bandeiraConfig.id]: bandeiraConfig,
-  [adeptosConfig.id]: adeptosConfig,
-  [estampagemConfig.id]: estampagemConfig,
-  [impressaoConfig.id]: impressaoConfig,
+  [caneleirasConfig.id]:
+    caneleirasConfig,
+
+  [equipamentoConfig.id]:
+    equipamentoConfig,
+
+  [bandeiraConfig.id]:
+    bandeiraConfig,
+
+  [adeptosConfig.id]:
+    adeptosConfig,
+
+  [estampagemConfig.id]:
+    estampagemConfig,
+
+  [impressaoConfig.id]:
+    impressaoConfig,
 };
 
 export function getProductCustomizerConfig(
   productId: string,
 ): ProductCustomizerConfig | undefined {
-  return productCustomizerConfigs[productId];
+  return productCustomizerConfigs[
+    productId
+  ];
 }
 
 export { caneleirasConfig };
