@@ -94,9 +94,9 @@ export const equipamentoConfig = buildConfig(
       },
       printArea: {
         xFraction: 0.31,
-        yFraction: 0.28,
+        yFraction: 0.29,
         widthFraction: 0.38,
-        heightFraction: 0.36,
+        heightFraction: 0.38,
         shape: {
           type: "rounded",
           cornerRadius: 8,
@@ -114,9 +114,9 @@ export const equipamentoConfig = buildConfig(
       },
       printArea: {
         xFraction: 0.31,
-        yFraction: 0.22,
+        yFraction: 0.24,
         widthFraction: 0.38,
-        heightFraction: 0.44,
+        heightFraction: 0.40,
         shape: {
           type: "rounded",
           cornerRadius: 8,
@@ -196,10 +196,10 @@ export const estampagemConfig = buildConfig(
         baseSrc: "/catalog/editor/estampagem.svg",
       },
       printArea: {
-        xFraction: 0.28,
-        yFraction: 0.26,
-        widthFraction: 0.44,
-        heightFraction: 0.46,
+        xFraction: 0.31,
+        yFraction: 0.29,
+        widthFraction: 0.38,
+        heightFraction: 0.43,
         shape: {
           type: "rounded",
           cornerRadius: 10,

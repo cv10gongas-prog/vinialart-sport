@@ -372,7 +372,7 @@ export function ProductDesignWorkspace({
                 onClick={() => {
                   c.smartFit();
                 }}
-                disabled={!hasArtOnActiveSurface}
+                disabled={!c.selectedLayer}
                 title="Ajustar à área útil (conter)"
                 aria-label="Ajustar"
                 className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
@@ -386,7 +386,7 @@ export function ProductDesignWorkspace({
                 onClick={() => {
                   c.coverFit();
                 }}
-                disabled={!hasArtOnActiveSurface}
+                disabled={!c.selectedLayer}
                 title="Preencher área útil (cobrir)"
                 aria-label="Preencher"
                 className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-all hover:bg-white/10 hover:text-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
