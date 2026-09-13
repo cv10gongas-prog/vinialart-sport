@@ -129,7 +129,12 @@ export function CanvasEditor({
     };
   }, []);
 
-  const PADDING = 30;
+  /*
+   * IMPORTANTE:
+   * As barras NÃO retiram espaço ao canvas.
+   * O canvas continua a usar praticamente a área toda.
+   */
+  const PADDING = 18;
 
   const availableWidth =
     Math.max(
@@ -163,6 +168,10 @@ export function CanvasEditor({
 
   const selectedLayer =
     customizer.selectedLayer;
+
+  const controlsVisible =
+    Boolean(selectedLayer) &&
+    customizer.viewMode === "edit";
 
   const selectedScale =
     selectedLayer
@@ -277,14 +286,15 @@ export function CanvasEditor({
   return (
     <div
       onWheel={handleWheel}
-      className="relative flex h-full min-h-[300px] w-full min-w-0 flex-col overflow-hidden pb-[72px]"
+      className="relative h-full min-h-[300px] w-full min-w-0 overflow-hidden"
       style={{
         touchAction: "none",
       }}
     >
+      {/* CANVAS — ocupa novamente praticamente a altura TODA */}
       <div
         ref={stageViewportRef}
-        className="relative min-h-0 flex-1"
+        className="absolute inset-0"
       >
         {!mounted ||
         !KonvaLib ||
@@ -295,7 +305,20 @@ export function CanvasEditor({
             </span>
           </div>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="absolute inset-0 flex items-center justify-center transition-transform duration-200"
+            style={{
+              /*
+               * Com as barras visíveis, só deslocamos a peça
+               * ligeiramente para cima.
+               *
+               * NÃO reduzimos o scale.
+               */
+              transform: controlsVisible
+                ? "translateY(-32px)"
+                : "translateY(0px)",
+            }}
+          >
             <div
               style={{
                 width:
@@ -332,11 +355,12 @@ export function CanvasEditor({
         )}
       </div>
 
-      {selectedLayer &&
-        customizer.viewMode ===
-          "edit" && (
-          <div className="relative z-30 mx-auto mt-3 w-[min(88%,560px)] shrink-0 rounded-xl border border-white/10 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md">
+      {/* BARRAS — flutuam por cima da zona inferior, sem encolher o canvas */}
+      {controlsVisible &&
+        selectedLayer && (
+          <div className="absolute bottom-[78px] left-1/2 z-30 w-[min(86%,540px)] -translate-x-1/2 rounded-xl border border-white/10 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)] backdrop-blur-md">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* TAMANHO */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
@@ -399,6 +423,7 @@ export function CanvasEditor({
                 />
               </div>
 
+              {/* ROTAÇÃO */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-400">
