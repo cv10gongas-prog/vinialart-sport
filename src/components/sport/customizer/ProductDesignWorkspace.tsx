@@ -1747,7 +1747,7 @@ export function ProductDesignWorkspace({
 
                 <div className="space-y-1.5 pt-1">
                   <label className="flex items-center justify-between font-mono text-[0.68rem] uppercase tracking-wider text-zinc-400">
-                    <span>Nota opcional</span>
+                    <span>Nota</span>
                     <span className="text-zinc-600 lowercase font-normal">(opcional)</span>
                   </label>
                   <textarea
