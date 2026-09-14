@@ -2,8 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   ArrowUpRight,
-  FileImage,
-  Layers3,
 } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
@@ -284,26 +282,16 @@ function CatalogCard({
 }
 
 function Loja() {
-  const customizable = products.filter(
-    (product) =>
-      product.isCustomizable &&
-      product.customizationMode ===
-        "product",
-  );
+  const primarySlugs = [
+    "caneleiras-personalizadas",
+    "equipamento-personalizado",
+    "bandeira-personalizada",
+    "estampagem",
+  ];
 
-  const supporterService =
-    products.find(
-      (product) =>
-        product.slug ===
-        "artigos-adeptos",
-    );
-
-  const printService =
-    products.find(
-      (product) =>
-        product.slug ===
-        "impressao",
-    );
+  const primaryProducts = primarySlugs
+    .map((slug) => products.find((p) => p.slug === slug))
+    .filter((p): p is Product => Boolean(p));
 
   return (
     <PageShell className="bg-[#090c11] text-white">
@@ -338,123 +326,68 @@ function Loja() {
 
           <div className="mt-8 flex flex-wrap gap-2">
             <a
-              href="#personalizaveis"
+              href="#destaques"
               className="rounded-full border border-cyan-400/30 bg-cyan-400/[0.08] px-4 py-2 font-mono text-[0.62rem] uppercase tracking-[0.15em] text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
             >
-              Personalizáveis
+              Produtos Principais
             </a>
 
             <a
-              href="#servicos"
+              href="#mais-formas"
               className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[0.62rem] uppercase tracking-[0.15em] text-zinc-300 transition hover:border-white/25 hover:bg-white/[0.07]"
             >
-              Serviços
-            </a>
-
-            <a
-              href="#adeptos"
-              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[0.62rem] uppercase tracking-[0.15em] text-zinc-300 transition hover:border-white/25 hover:bg-white/[0.07]"
-            >
-              Artigos & acessórios
+              Mais Formas de Personalizar
             </a>
           </div>
         </div>
       </section>
 
       <div className="mx-auto max-w-7xl space-y-24 px-5 py-16 sm:px-8 lg:py-24">
-        {/* PERSONALIZÁVEIS */}
+        {/* SECÇÃO 1: 4 PRODUTOS PRINCIPAIS */}
         <section
-          id="personalizaveis"
+          id="destaques"
           className="scroll-mt-28"
         >
           <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end">
             <div>
               <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-cyan-400">
-                01 // Configurador online
+                01 // Produtos em destaque
               </span>
 
               <h2 className="mt-2 font-display text-3xl uppercase leading-none tracking-tight text-white sm:text-5xl">
                 Produtos
                 <br />
                 <span className="text-zinc-500">
-                  personalizáveis.
+                  principais.
                 </span>
               </h2>
             </div>
 
             <p className="max-w-sm text-sm leading-6 text-zinc-500">
-              Personaliza diretamente no site e vê o resultado antes de
-              adicionares o pedido.
+              Personaliza diretamente no site ou pede orçamento para caneleiras,
+              equipamento, bandeira e estampagem.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {customizable.map(
-              (product) => (
-                <MainProductCard
-                  key={product.slug}
-                  product={product}
-                />
-              ),
-            )}
+            {primaryProducts.map((product) => (
+              <MainProductCard
+                key={product.slug}
+                product={product}
+              />
+            ))}
           </div>
         </section>
 
-        {/* SERVIÇOS */}
+        {/* SECÇÃO 2: MAIS FORMAS DE PERSONALIZAR (RESTANTES ARTIGOS) */}
         <section
-          id="servicos"
-          className="scroll-mt-28"
-        >
-          <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end">
-            <div>
-              <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-fuchsia-400">
-                02 // Pedidos & serviços
-              </span>
-
-              <h2 className="mt-2 font-display text-3xl uppercase leading-none tracking-tight text-white sm:text-5xl">
-                Para além
-                <br />
-                <span className="text-zinc-500">
-                  do equipamento.
-                </span>
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-2 text-zinc-500">
-              <Layers3 size={16} />
-
-              <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em]">
-                Sob consulta
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {supporterService && (
-              <ServiceCard
-                product={supporterService}
-                visual="photo"
-              />
-            )}
-
-            {printService && (
-              <ServiceCard
-                product={printService}
-                visual="graphic"
-              />
-            )}
-          </div>
-        </section>
-
-        {/* MERCHANDISING */}
-        <section
-          id="adeptos"
+          id="mais-formas"
           className="scroll-mt-28"
         >
           <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end">
             <div>
               <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-yellow-300">
-                03 // Artigos & merchandising
+                02 // Catálogo alargado
               </span>
 
               <h2 className="mt-2 font-display text-3xl uppercase leading-none tracking-tight text-white sm:text-5xl">
@@ -467,20 +400,18 @@ function Loja() {
             </div>
 
             <p className="max-w-md text-sm leading-6 text-zinc-500">
-              Garrafas, bonés, sacos, mochilas, T-shirts, braçadeiras e
-              calções disponíveis para pedidos de personalização.
+              Garrafas, bonés, sacos, mochilas, T-shirts, braçadeiras, calções
+              e outros artigos disponíveis para personalização e pedidos de equipa.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {catalogExamples.map(
-              (example) => (
-                <CatalogCard
-                  key={example.id}
-                  example={example}
-                />
-              ),
-            )}
+            {catalogExamples.map((example) => (
+              <CatalogCard
+                key={example.id}
+                example={example}
+              />
+            ))}
           </div>
         </section>
 

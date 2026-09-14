@@ -98,15 +98,7 @@ export const caneleirasConfig: ProductCustomizerConfig = {
   canvasWidth: 480,
   canvasHeight: 480,
 
-  colorSwatches: [
-    "#ffffff",
-    "#00c8ff",
-    "#ec008c",
-    "#ffd400",
-    "#111111",
-    "#166534",
-    "#1d4ed8",
-  ],
+  colorSwatches: ["#ffffff"],
 
   fontOptions: [
     "Archivo Black",

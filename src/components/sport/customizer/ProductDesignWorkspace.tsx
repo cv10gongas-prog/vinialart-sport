@@ -140,20 +140,22 @@ export function ProductDesignWorkspace({
       "Tamanho Único",
   );
 
+  const isCaneleiras =
+    product.slug.includes("caneleiras") ||
+    config.id === "caneleiras-personalizadas";
+
   const [
     selectedColor,
     setSelectedColor,
   ] = useState<string>(
-    config.colorSwatches?.[0] ||
-      "#ffffff",
+    isCaneleiras ? "#ffffff" : (config.colorSwatches?.[0] || "#ffffff"),
   );
 
   const [
     customHex,
     setCustomHex,
   ] = useState<string>(
-    config.colorSwatches?.[0] ||
-      "#00C8FF",
+    isCaneleiras ? "#ffffff" : (config.colorSwatches?.[0] || "#00C8FF"),
   );
 
   const [
@@ -773,7 +775,9 @@ export function ProductDesignWorkspace({
                             c
                           }
                           baseColor={
-                            selectedColor
+                            isCaneleiras
+                              ? "#ffffff"
+                              : selectedColor
                           }
                         />
                       ) : konva ? (
@@ -788,7 +792,9 @@ export function ProductDesignWorkspace({
                             c
                           }
                           baseColor={
-                            selectedColor
+                            isCaneleiras
+                              ? "#ffffff"
+                              : selectedColor
                           }
                           KonvaLib={
                             konva
@@ -1354,10 +1360,9 @@ export function ProductDesignWorkspace({
               )}
             </div>
 
-            {config.colorSwatches &&
-              config.colorSwatches
-                .length >
-                1 && (
+            {!isCaneleiras &&
+              config.colorSwatches &&
+              config.colorSwatches.length > 1 && (
                 <div className="pt-3 border-t border-white/5 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
