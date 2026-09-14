@@ -1,19 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowDown,
   ArrowRight,
-  Check,
-  PackageSearch,
+  ChevronDown,
+  Package,
   Sparkles,
-  Users,
-  WandSparkles,
 } from "lucide-react";
-import type { ReactNode } from "react";
 
 import { PageShell } from "@/components/sport/PageShell";
 import { TeamClubBanner } from "@/components/sport/TeamClubBanner";
-import { products, type Product } from "@/lib/sport-data";
 import { catalogExamples } from "@/lib/catalog-examples";
+import { products, type Product } from "@/lib/sport-data";
 
 export const Route = createFileRoute("/loja")({
   component: Loja,
@@ -48,7 +44,7 @@ export const Route = createFileRoute("/loja")({
   }),
 });
 
-const PRIMARY_SLUGS = [
+const MAIN_PRODUCT_SLUGS = [
   "caneleiras-personalizadas",
   "equipamento-personalizado",
   "bandeira-personalizada",
@@ -62,204 +58,12 @@ const REAL_PHOTO_SLUGS = new Set([
   "artigos-adeptos",
 ]);
 
-function productPrice(product: Product) {
-  return product.slug === "caneleiras-personalizadas"
-    ? "Desde 19,90€"
-    : "Sob orçamento";
-}
+function getProductPrice(product: Product) {
+  if (product.slug === "caneleiras-personalizadas") {
+    return "Desde 19,90€";
+  }
 
-function StorePill({
-  icon,
-  children,
-}: {
-  icon: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex min-h-10 items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.035] px-4 text-[0.78rem] text-zinc-300 backdrop-blur-sm">
-      <span className="text-cyan-300">
-        {icon}
-      </span>
-
-      {children}
-    </div>
-  );
-}
-
-function SectionHeader({
-  number,
-  label,
-  title,
-  mutedTitle,
-  description,
-  tone = "cyan",
-}: {
-  number: string;
-  label: string;
-  title: string;
-  mutedTitle: string;
-  description: string;
-  tone?: "cyan" | "yellow";
-}) {
-  return (
-    <div className="grid gap-7 border-b border-white/10 pb-7 lg:grid-cols-[1fr_420px] lg:items-end">
-      <div>
-        <div
-          className={[
-            "flex items-center gap-3 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.21em]",
-            tone === "yellow"
-              ? "text-yellow-300"
-              : "text-cyan-400",
-          ].join(" ")}
-        >
-          <span>
-            {number}
-          </span>
-
-          <span className="h-px w-10 bg-current opacity-50" />
-
-          <span>
-            {label}
-          </span>
-        </div>
-
-        <h2 className="mt-4 font-display text-[2.7rem] uppercase leading-[0.87] tracking-tight text-white sm:text-5xl lg:text-6xl">
-          {title}
-          <br />
-
-          <span className="text-zinc-600">
-            {mutedTitle}
-          </span>
-        </h2>
-      </div>
-
-      <p className="max-w-md text-[0.94rem] leading-7 text-zinc-400 lg:justify-self-end">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function ProductCard({
-  title,
-  category,
-  image,
-  description,
-  priceLabel,
-  isPhoto = false,
-  featured = false,
-  linkProps,
-}: {
-  title: string;
-  category: string;
-  image: string;
-  description?: string;
-  priceLabel?: string;
-  isPhoto?: boolean;
-  featured?: boolean;
-  linkProps: any;
-}) {
-  return (
-    <Link
-      {...linkProps}
-      className={[
-        "group relative flex h-full flex-col overflow-hidden",
-        "rounded-[1.6rem] border border-white/[0.09]",
-        "bg-[#0f1620] outline-none",
-        "transition-all duration-300",
-        "hover:-translate-y-1.5",
-        "hover:border-cyan-400/35",
-        "hover:shadow-[0_22px_70px_rgba(0,0,0,0.42)]",
-        "focus-visible:ring-2 focus-visible:ring-cyan-400",
-      ].join(" ")}
-    >
-      <article className="flex h-full flex-col">
-        <div
-          className={[
-            "relative flex aspect-square w-full items-center justify-center overflow-hidden",
-            "bg-[#080d14]",
-            featured ? "p-3 sm:p-4" : "p-4",
-          ].join(" ")}
-        >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.12),transparent_58%)] opacity-80" />
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#080d14] via-[#080d14]/55 to-transparent" />
-
-          <div className="pointer-events-none absolute left-0 top-0 h-20 w-20 bg-gradient-to-br from-cyan-400/[0.08] to-transparent" />
-
-          <img
-            src={image}
-            alt={title}
-            loading="lazy"
-            className={[
-              "relative z-10 transition duration-500 ease-out",
-              "group-hover:scale-[1.035]",
-              isPhoto
-                ? "h-full w-full object-cover"
-                : "max-h-full max-w-full object-contain",
-            ].join(" ")}
-          />
-
-          {priceLabel && (
-            <div className="absolute right-3 top-3 z-20 rounded-full border border-white/10 bg-black/80 px-3 py-1.5 font-mono text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-zinc-100 shadow-lg backdrop-blur-md">
-              {priceLabel}
-            </div>
-          )}
-
-          {featured && (
-            <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-400/[0.09] px-3 py-1.5 font-mono text-[0.58rem] font-semibold uppercase tracking-[0.13em] text-cyan-300 backdrop-blur-md">
-              <Sparkles size={11} />
-              Produto principal
-            </div>
-          )}
-        </div>
-
-        <div
-          className={[
-            "relative flex flex-1 flex-col border-t border-white/[0.065]",
-            featured ? "p-5 sm:p-6" : "p-4 sm:p-5",
-          ].join(" ")}
-        >
-          <div className="flex-1">
-            <span className="font-mono text-[0.64rem] font-semibold uppercase tracking-[0.17em] text-cyan-400">
-              {category}
-            </span>
-
-            <h3
-              className={[
-                "mt-2.5 font-display uppercase leading-[1] tracking-wide text-white",
-                "transition-colors duration-300",
-                "group-hover:text-cyan-200",
-                featured
-                  ? "text-[1.35rem] sm:text-[1.55rem]"
-                  : "text-lg sm:text-xl",
-              ].join(" ")}
-            >
-              {title}
-            </h3>
-
-            {description && (
-              <p className="mt-3 line-clamp-3 text-[0.83rem] leading-6 text-zinc-400">
-                {description}
-              </p>
-            )}
-          </div>
-
-          <div className="mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4">
-            <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-cyan-300">
-              Personalizar
-            </span>
-
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-zinc-400 transition-all duration-300 group-hover:border-cyan-400 group-hover:bg-cyan-400 group-hover:text-black">
-              <ArrowRight size={15} />
-            </span>
-          </div>
-        </div>
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent transition-all duration-300 group-hover:via-cyan-400/80" />
-      </article>
-    </Link>
-  );
+  return "Sob orçamento";
 }
 
 function MainProductCard({
@@ -268,27 +72,66 @@ function MainProductCard({
   product: Product;
 }) {
   const image = product.catalogImage ?? product.image;
+  const isPhoto = REAL_PHOTO_SLUGS.has(product.slug);
 
   return (
-    <ProductCard
-      title={product.name}
-      category={product.category}
-      image={image}
-      description={product.description}
-      priceLabel={productPrice(product)}
-      isPhoto={REAL_PHOTO_SLUGS.has(product.slug)}
-      featured
-      linkProps={{
-        to: "/produto/$slug",
-        params: {
-          slug: product.slug,
-        },
-        search: {
-          cartItem: undefined,
-          modo: undefined,
-        },
+    <Link
+      to="/produto/$slug"
+      params={{
+        slug: product.slug,
       }}
-    />
+      search={{
+        cartItem: undefined,
+        modo: undefined,
+      }}
+      className="group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#10141b] outline-none transition duration-300 hover:-translate-y-1 hover:border-cyan-400/35 hover:bg-[#121923] hover:shadow-[0_18px_55px_rgba(0,0,0,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400"
+    >
+      <div className="relative aspect-square overflow-hidden bg-[#090d12]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(34,211,238,0.09),transparent_58%)]" />
+
+        <img
+          src={image}
+          alt={product.name}
+          loading="lazy"
+          className={[
+            "relative z-10 h-full w-full transition-transform duration-500 group-hover:scale-[1.025]",
+            isPhoto
+              ? "object-cover"
+              : "object-contain p-5 sm:p-6",
+          ].join(" ")}
+        />
+
+        <div className="absolute left-3 top-3 z-20 rounded-full border border-white/10 bg-black/75 px-3 py-1.5 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.11em] text-white backdrop-blur">
+          {getProductPrice(product)}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex-1">
+          <span className="font-mono text-[0.63rem] font-semibold uppercase tracking-[0.16em] text-cyan-400">
+            {product.category}
+          </span>
+
+          <h3 className="mt-2 font-display text-xl uppercase leading-none tracking-wide text-white transition-colors group-hover:text-cyan-200">
+            {product.name}
+          </h3>
+
+          <p className="mt-3 line-clamp-2 text-sm leading-6 text-zinc-400">
+            {product.description}
+          </p>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4">
+          <span className="font-mono text-[0.66rem] font-semibold uppercase tracking-[0.13em] text-zinc-200">
+            Personalizar
+          </span>
+
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-400 text-black transition-transform group-hover:translate-x-1">
+            <ArrowRight size={15} strokeWidth={2.5} />
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -297,36 +140,63 @@ function CatalogProductCard({
 }: {
   example: (typeof catalogExamples)[number];
 }) {
-  const isPhoto =
+  const isRealPhoto =
     example.kind === "Fotografia de trabalho";
 
   return (
-    <ProductCard
-      title={example.name}
-      category={
-        isPhoto
-          ? "Exemplo real"
-          : "Base para personalização"
-      }
-      image={example.image}
-      priceLabel="Sob consulta"
-      isPhoto={isPhoto}
-      linkProps={{
-        to: "/produto/$slug",
-        params: {
-          slug: `${example.id}-personalizado`,
-        },
-        search: {
-          modo: undefined,
-          cartItem: undefined,
-        },
+    <Link
+      to="/produto/$slug"
+      params={{
+        slug: `${example.id}-personalizado`,
       }}
-    />
+      search={{
+        modo: undefined,
+        cartItem: undefined,
+      }}
+      className="group flex h-full flex-col overflow-hidden rounded-[1.15rem] border border-white/[0.08] bg-[#0f1319] outline-none transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-[#12171e] focus-visible:ring-2 focus-visible:ring-cyan-400"
+    >
+      <div className="relative aspect-square overflow-hidden bg-[#090d12]">
+        <img
+          src={example.image}
+          alt={example.name}
+          loading="lazy"
+          className={[
+            "h-full w-full transition-transform duration-500 group-hover:scale-[1.025]",
+            isRealPhoto
+              ? "object-cover"
+              : "object-contain p-5 sm:p-6",
+          ].join(" ")}
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <span className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+          {isRealPhoto
+            ? "Exemplo real"
+            : "Personalizável"}
+        </span>
+
+        <h3 className="mt-2 font-display text-lg uppercase leading-none text-white transition-colors group-hover:text-cyan-200">
+          {example.name}
+        </h3>
+
+        <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
+          <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-cyan-300">
+            Ver produto
+          </span>
+
+          <ArrowRight
+            size={14}
+            className="text-zinc-500 transition-all group-hover:translate-x-1 group-hover:text-cyan-300"
+          />
+        </div>
+      </div>
+    </Link>
   );
 }
 
 function Loja() {
-  const primaryProducts = PRIMARY_SLUGS
+  const mainProducts = MAIN_PRODUCT_SLUGS
     .map((slug) =>
       products.find(
         (product) => product.slug === slug,
@@ -338,130 +208,94 @@ function Loja() {
     );
 
   return (
-    <PageShell className="bg-[#080b10] text-white">
+    <PageShell className="bg-[#080b0f] text-white">
       {/* HERO */}
-      <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#0b1017]">
+      <section className="relative overflow-hidden border-b border-white/[0.08] bg-[#0b0f14]">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(34,211,238,0.025),transparent_38%,rgba(217,70,239,0.02)_70%,rgba(250,204,21,0.02))]" />
+          <div className="absolute -right-24 -top-48 h-[500px] w-[500px] rounded-full bg-cyan-400/[0.07] blur-[140px]" />
 
-          <div className="absolute right-[14%] top-[-250px] h-[720px] w-[155px] rotate-[31deg] bg-cyan-400/[0.075]" />
-          <div className="absolute right-[8%] top-[-250px] h-[720px] w-[105px] rotate-[31deg] bg-fuchsia-500/[0.07]" />
-          <div className="absolute right-[4%] top-[-250px] h-[720px] w-[55px] rotate-[31deg] bg-yellow-300/[0.07]" />
+          <div className="absolute -left-40 bottom-[-220px] h-[400px] w-[400px] rounded-full bg-fuchsia-500/[0.04] blur-[140px]" />
 
-          <div className="absolute -left-60 bottom-[-350px] h-[620px] w-[620px] rounded-full bg-cyan-400/[0.08] blur-[180px]" />
-
-          <div className="absolute right-[-80px] top-[180px] h-[350px] w-[350px] rounded-full bg-fuchsia-500/[0.045] blur-[150px]" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
         </div>
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:py-28">
-          <div>
-            <div className="flex items-center gap-3 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-cyan-400">
-              <span>
-                VinilArt Sport
-              </span>
+        <div className="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+          <div className="max-w-4xl">
+            <div className="flex items-center gap-3 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-cyan-400">
+              <span>VinilArt Sport</span>
 
-              <span className="h-px w-9 bg-cyan-400/50" />
+              <span className="h-px w-10 bg-cyan-400/40" />
 
               <span className="text-zinc-500">
                 Loja
               </span>
             </div>
 
-            <h1 className="mt-5 max-w-4xl font-display text-[3.1rem] uppercase leading-[0.84] tracking-tight text-white sm:text-6xl lg:text-[5.6rem]">
-              O teu jogo.
+            <h1 className="mt-5 font-display text-[3.15rem] uppercase leading-[0.86] tracking-tight sm:text-6xl lg:text-[5.5rem]">
+              Feito para
               <br />
-
-              <span className="bg-gradient-to-r from-cyan-300 via-fuchsia-400 to-yellow-300 bg-clip-text text-transparent">
-                A tua identidade.
+              <span className="text-cyan-300">
+                o teu jogo.
               </span>
             </h1>
 
-            <p className="mt-8 max-w-2xl text-[0.98rem] leading-7 text-zinc-400 sm:text-base">
-              Caneleiras, equipamentos, bandeiras,
-              estampagem e acessórios feitos para
-              atletas, equipas e clubes que querem
-              jogar com identidade própria.
+            <p className="mt-6 max-w-2xl text-[0.98rem] leading-7 text-zinc-400 sm:text-base">
+              Personaliza equipamento, acessórios e
+              artigos desportivos com a identidade da
+              tua equipa, clube ou projeto.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-2.5">
-              <StorePill
-                icon={<WandSparkles size={14} />}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#principais"
+                className="inline-flex min-h-12 items-center gap-3 rounded-full bg-cyan-400 px-5 font-mono text-[0.67rem] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-cyan-300"
               >
-                Personalização online
-              </StorePill>
+                Ver produtos
+                <ChevronDown size={14} />
+              </a>
 
-              <StorePill
-                icon={<Users size={14} />}
+              <Link
+                to="/contactos"
+                className="inline-flex min-h-12 items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-5 font-mono text-[0.67rem] font-semibold uppercase tracking-[0.13em] text-zinc-200 transition hover:border-white/20 hover:bg-white/[0.07]"
               >
-                Clubes e equipas
-              </StorePill>
-
-              <StorePill
-                icon={<Check size={13} />}
-              >
-                Apoio da VinilArt
-              </StorePill>
-            </div>
-          </div>
-
-          <div className="lg:justify-self-end">
-            <div className="max-w-md rounded-[1.6rem] border border-white/[0.08] bg-white/[0.025] p-5 backdrop-blur-sm sm:p-6">
-              <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                Começa por aqui
-              </span>
-
-              <p className="mt-3 text-sm leading-6 text-zinc-300">
-                Escolhe um dos nossos principais
-                produtos ou explora todas as bases
-                disponíveis para personalização.
-              </p>
-
-              <div className="mt-5 grid gap-2">
-                <a
-                  href="#produtos-principais"
-                  className="group flex min-h-12 items-center justify-between rounded-xl border border-cyan-400/25 bg-cyan-400/[0.075] px-4 font-mono text-[0.67rem] font-semibold uppercase tracking-[0.13em] text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
-                >
-                  Produtos principais
-
-                  <ArrowDown
-                    size={14}
-                    className="transition-transform group-hover:translate-y-0.5"
-                  />
-                </a>
-
-                <a
-                  href="#catalogo"
-                  className="group flex min-h-12 items-center justify-between rounded-xl border border-white/10 bg-white/[0.025] px-4 font-mono text-[0.67rem] font-semibold uppercase tracking-[0.13em] text-zinc-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
-                >
-                  Ver catálogo
-
-                  <ArrowDown
-                    size={14}
-                    className="transition-transform group-hover:translate-y-0.5"
-                  />
-                </a>
-              </div>
+                Preciso de ajuda
+                <ArrowRight size={14} />
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:py-28">
+      <main className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
         {/* PRINCIPAIS */}
         <section
-          id="produtos-principais"
+          id="principais"
           className="scroll-mt-28"
         >
-          <SectionHeader
-            number="01"
-            label="Produtos principais"
-            title="Os essenciais."
-            mutedTitle="Feitos à tua maneira."
-            description="As principais soluções VinilArt Sport, prontas para personalizares diretamente no site ou desenvolveres com a nossa equipa."
-          />
+          <div className="mb-8 flex flex-col gap-5 border-b border-white/[0.08] pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-cyan-400">
+                <Sparkles size={14} />
 
-          <div className="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {primaryProducts.map((product) => (
+                <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.18em]">
+                  Produtos principais
+                </span>
+              </div>
+
+              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-5xl">
+                Começa por aqui.
+              </h2>
+            </div>
+
+            <p className="max-w-md text-sm leading-6 text-zinc-400">
+              Os produtos principais da VinilArt Sport,
+              disponíveis para personalização e pedidos
+              de equipa.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {mainProducts.map((product) => (
               <MainProductCard
                 key={product.slug}
                 product={product}
@@ -470,32 +304,37 @@ function Loja() {
           </div>
         </section>
 
-        {/* DIVISOR */}
-        <div className="my-24 flex items-center gap-4 lg:my-32">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-white/10" />
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#0d131b] text-zinc-600">
-            <PackageSearch size={16} />
-          </div>
-
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/10" />
-        </div>
-
-        {/* CATÁLOGO */}
+        {/* OUTROS ARTIGOS */}
         <section
           id="catalogo"
-          className="scroll-mt-28"
+          className="mt-20 scroll-mt-28 lg:mt-28"
         >
-          <SectionHeader
-            number="02"
-            label="Catálogo"
-            title="Mais formas"
-            mutedTitle="de personalizar."
-            tone="yellow"
-            description="Do acessório de treino ao merchandising. Explora outras bases disponíveis e encontra novas formas de representar a tua equipa."
-          />
+          <div className="mb-8 flex flex-col gap-5 border-b border-white/[0.08] pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-yellow-300">
+                <Package size={14} />
 
-          <div className="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.18em]">
+                  Outros artigos
+                </span>
+              </div>
+
+              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-5xl">
+                Mais para
+                <span className="text-zinc-500">
+                  {" "}personalizar.
+                </span>
+              </h2>
+            </div>
+
+            <p className="max-w-md text-sm leading-6 text-zinc-400">
+              Garrafas, bonés, sacos, mochilas,
+              T-shirts, braçadeiras, calções e outros
+              artigos disponíveis mediante pedido.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             {catalogExamples.map((example) => (
               <CatalogProductCard
                 key={example.id}
@@ -505,47 +344,45 @@ function Loja() {
           </div>
         </section>
 
-        {/* CUSTOM REQUEST CTA */}
-        <section className="relative mt-24 overflow-hidden rounded-[1.8rem] border border-white/[0.09] bg-[#0e151f] lg:mt-32">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/[0.07] blur-[100px]" />
-            <div className="absolute -bottom-20 left-[25%] h-60 w-60 rounded-full bg-fuchsia-500/[0.05] blur-[110px]" />
-          </div>
+        {/* PEDIDO ESPECIAL */}
+        <section className="mt-20 lg:mt-28">
+          <div className="relative overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-[#10151c] p-6 sm:p-8 lg:p-10">
+            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-400/[0.07] blur-[90px]" />
 
-          <div className="relative grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
-            <div>
-              <div className="flex items-center gap-2 font-mono text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-cyan-400">
-                <Sparkles size={12} />
-                Projeto especial
+            <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <span className="font-mono text-[0.64rem] font-semibold uppercase tracking-[0.17em] text-cyan-400">
+                  Projeto especial
+                </span>
+
+                <h2 className="mt-3 font-display text-3xl uppercase leading-none sm:text-4xl">
+                  Não encontraste
+                  <br className="hidden sm:block" />
+                  <span className="text-zinc-500">
+                    {" "}o que procuravas?
+                  </span>
+                </h2>
+
+                <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-400">
+                  Envia-nos a tua ideia. Podemos avaliar
+                  outros artigos e soluções personalizadas
+                  para a tua equipa ou projeto.
+                </p>
               </div>
 
-              <h2 className="mt-3 max-w-2xl font-display text-3xl uppercase leading-[0.95] text-white sm:text-4xl">
-                Não encontraste
-                <span className="text-zinc-600">
-                  {" "}o que procuravas?
-                </span>
-              </h2>
-
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400">
-                Se tens uma ideia, um produto diferente
-                ou precisas de algo para a tua equipa,
-                fala connosco. A VinilArt analisa o
-                projeto e prepara uma solução à medida.
-              </p>
+              <Link
+                to="/contactos"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-full bg-white px-5 font-mono text-[0.67rem] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-cyan-300"
+              >
+                Falar com a VinilArt
+                <ArrowRight size={15} />
+              </Link>
             </div>
-
-            <Link
-              to="/contactos"
-              className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl border border-cyan-400/25 bg-cyan-400/[0.08] px-5 font-mono text-[0.67rem] font-semibold uppercase tracking-[0.13em] text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
-            >
-              Falar com a VinilArt
-              <ArrowRight size={15} />
-            </Link>
           </div>
         </section>
 
         {/* CLUBES */}
-        <section className="mt-14 lg:mt-20">
+        <section className="mt-12 lg:mt-16">
           <TeamClubBanner />
         </section>
       </main>
