@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Check,
   ChevronDown,
   Package,
   Sparkles,
+  Users,
+  WandSparkles,
 } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
@@ -59,91 +60,14 @@ const REAL_PHOTO_SLUGS = new Set([
   "artigos-adeptos",
 ]);
 
-function productPrice(product: Product) {
-  return product.slug === "caneleiras-personalizadas"
-    ? "Desde 19,90€"
-    : "Sob orçamento";
-}
-
 function getProductImage(product: Product) {
   return product.catalogImage ?? product.image;
 }
 
-function HeroProductTile({
-  product,
-  index,
-}: {
-  product: Product;
-  index: number;
-}) {
-  const image = getProductImage(product);
-  const isPhoto = REAL_PHOTO_SLUGS.has(product.slug);
-
-  return (
-    <Link
-      to="/produto/$slug"
-      params={{
-        slug: product.slug,
-      }}
-      search={{
-        cartItem: undefined,
-        modo: undefined,
-      }}
-      className={[
-        "group relative overflow-hidden bg-[#0c1118] outline-none",
-        "border border-white/[0.08]",
-        "transition-all duration-500",
-        "hover:border-cyan-400/35",
-        "focus-visible:ring-2 focus-visible:ring-cyan-400",
-        index === 0
-          ? "col-span-2 row-span-2 rounded-[1.65rem]"
-          : "rounded-[1.25rem]",
-      ].join(" ")}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.10),transparent_58%)]" />
-
-      <img
-        src={image}
-        alt={product.name}
-        className={[
-          "relative z-10 h-full w-full transition-transform duration-700",
-          "group-hover:scale-[1.035]",
-          isPhoto
-            ? "object-cover"
-            : index === 0
-              ? "object-contain p-8"
-              : "object-contain p-5",
-        ].join(" ")}
-      />
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[55%] bg-gradient-to-t from-black via-black/45 to-transparent" />
-
-      <div className="absolute inset-x-0 bottom-0 z-30 p-4 sm:p-5">
-        <span className="font-mono text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-cyan-300">
-          {index === 0
-            ? "Mais procurado"
-            : product.category}
-        </span>
-
-        <div className="mt-1 flex items-end justify-between gap-3">
-          <h3
-            className={[
-              "font-display uppercase leading-none text-white",
-              index === 0
-                ? "text-2xl sm:text-3xl"
-                : "text-base sm:text-lg",
-            ].join(" ")}
-          >
-            {product.name}
-          </h3>
-
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform group-hover:translate-x-1">
-            <ArrowRight size={14} />
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
+function getProductPrice(product: Product) {
+  return product.slug === "caneleiras-personalizadas"
+    ? "Desde 19,90€"
+    : "Sob orçamento";
 }
 
 function MainProductCard({
@@ -159,25 +83,15 @@ function MainProductCard({
   return (
     <Link
       to="/produto/$slug"
-      params={{
-        slug: product.slug,
-      }}
+      params={{ slug: product.slug }}
       search={{
         cartItem: undefined,
         modo: undefined,
       }}
-      className="group flex h-full flex-col overflow-hidden border-b border-white/[0.09] bg-transparent pb-6 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+      className="group relative flex h-full flex-col overflow-hidden rounded-[1.45rem] border border-white/[0.08] bg-[#0d1218] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_65px_rgba(0,0,0,0.38)] focus-visible:ring-2 focus-visible:ring-cyan-400"
     >
-      <div className="relative aspect-square overflow-hidden rounded-[1.35rem] bg-[#0c1117]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_22%,rgba(34,211,238,0.09),transparent_62%)]" />
-
-        <div className="absolute left-4 top-4 z-20 font-mono text-[0.62rem] font-semibold tracking-[0.12em] text-zinc-500">
-          0{index + 1}
-        </div>
-
-        <div className="absolute right-3 top-3 z-20 rounded-full border border-white/[0.09] bg-black/75 px-3 py-1.5 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur">
-          {productPrice(product)}
-        </div>
+      <div className="relative aspect-square overflow-hidden bg-[#080c11]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(34,211,238,0.09),transparent_62%)]" />
 
         <img
           src={image}
@@ -190,30 +104,41 @@ function MainProductCard({
               : "object-contain p-5 sm:p-7",
           ].join(" ")}
         />
+
+        <div className="absolute left-3 top-3 z-20 flex h-8 min-w-8 items-center justify-center rounded-full border border-white/10 bg-black/65 px-2 font-mono text-[0.61rem] font-bold tracking-[0.1em] text-zinc-300 backdrop-blur">
+          0{index + 1}
+        </div>
+
+        <div className="absolute right-3 top-3 z-20 rounded-full border border-white/10 bg-black/75 px-3 py-1.5 font-mono text-[0.59rem] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur">
+          {getProductPrice(product)}
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[#080c11]/85 to-transparent" />
       </div>
 
-      <div className="flex flex-1 flex-col pt-5">
+      <div className="flex flex-1 flex-col p-5">
         <div className="flex-1">
           <span className="font-mono text-[0.61rem] font-semibold uppercase tracking-[0.17em] text-cyan-400">
             {product.category}
           </span>
 
-          <h3 className="mt-2 font-display text-[1.45rem] uppercase leading-none text-white transition-colors group-hover:text-cyan-200 sm:text-[1.65rem]">
+          <h3 className="mt-2.5 font-display text-[1.4rem] uppercase leading-[0.98] tracking-wide text-white transition-colors group-hover:text-cyan-200 sm:text-[1.6rem]">
             {product.name}
           </h3>
 
-          <p className="mt-3 line-clamp-2 max-w-sm text-[0.84rem] leading-6 text-zinc-500">
+          <p className="mt-3 line-clamp-2 text-[0.84rem] leading-6 text-zinc-400">
             {product.description}
           </p>
         </div>
 
-        <div className="mt-5 flex items-center gap-2 font-mono text-[0.64rem] font-bold uppercase tracking-[0.13em] text-white">
-          Personalizar
+        <div className="mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4">
+          <span className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.13em] text-white">
+            Personalizar
+          </span>
 
-          <ArrowRight
-            size={13}
-            className="text-cyan-400 transition-transform group-hover:translate-x-1"
-          />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-400 text-black transition-all duration-300 group-hover:translate-x-1 group-hover:bg-cyan-300">
+            <ArrowRight size={15} strokeWidth={2.5} />
+          </span>
         </div>
       </div>
     </Link>
@@ -225,8 +150,7 @@ function CatalogCard({
 }: {
   example: (typeof catalogExamples)[number];
 }) {
-  const isPhoto =
-    example.kind === "Fotografia de trabalho";
+  const isPhoto = example.kind === "Fotografia de trabalho";
 
   return (
     <Link
@@ -238,9 +162,9 @@ function CatalogCard({
         modo: undefined,
         cartItem: undefined,
       }}
-      className="group flex min-w-0 flex-col outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+      className="group min-w-0 outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
     >
-      <div className="relative aspect-square overflow-hidden rounded-[1.15rem] border border-white/[0.07] bg-[#0d1218] transition-all duration-300 group-hover:border-cyan-400/25 group-hover:bg-[#101720]">
+      <div className="relative aspect-square overflow-hidden rounded-[1.1rem] border border-white/[0.07] bg-[#0c1117] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-cyan-400/25 group-hover:bg-[#101720] group-hover:shadow-[0_16px_45px_rgba(0,0,0,0.28)]">
         <img
           src={example.image}
           alt={example.name}
@@ -253,19 +177,17 @@ function CatalogCard({
           ].join(" ")}
         />
 
-        <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.1] bg-black/70 text-white opacity-0 backdrop-blur transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+        <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-black opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
           <ArrowRight size={13} />
         </div>
       </div>
 
       <div className="px-1 pt-3">
-        <span className="font-mono text-[0.55rem] font-semibold uppercase tracking-[0.15em] text-zinc-600">
-          {isPhoto
-            ? "Exemplo real"
-            : "Personalizável"}
+        <span className="font-mono text-[0.56rem] font-semibold uppercase tracking-[0.15em] text-zinc-600">
+          {isPhoto ? "Exemplo real" : "Personalizável"}
         </span>
 
-        <h3 className="mt-1 font-display text-base uppercase leading-none text-white transition-colors group-hover:text-cyan-200 sm:text-lg">
+        <h3 className="mt-1.5 font-display text-base uppercase leading-none text-white transition-colors group-hover:text-cyan-200 sm:text-lg">
           {example.name}
         </h3>
 
@@ -279,78 +201,50 @@ function CatalogCard({
 
 function Loja() {
   const primaryProducts = PRIMARY_SLUGS
-    .map((slug) =>
-      products.find(
-        (product) => product.slug === slug,
-      ),
-    )
-    .filter(
-      (product): product is Product =>
-        Boolean(product),
-    );
+    .map((slug) => products.find((product) => product.slug === slug))
+    .filter((product): product is Product => Boolean(product));
 
   return (
     <PageShell className="bg-[#080b0f] text-white">
-      {/* HERO / STOREFRONT */}
-      <section className="border-b border-white/[0.08] bg-[#090d12]">
-        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:py-16">
-          <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
-            {/* LEFT */}
-            <div className="max-w-xl">
-              <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-cyan-400">
+      {/* HERO */}
+      <section className="relative overflow-hidden border-b border-white/[0.07] bg-[#090d12]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(34,211,238,0.025),transparent_45%,rgba(217,70,239,0.02))]" />
+
+          <div className="absolute right-[17%] top-[-260px] h-[700px] w-[130px] rotate-[28deg] bg-cyan-400/[0.055]" />
+          <div className="absolute right-[10%] top-[-260px] h-[700px] w-[90px] rotate-[28deg] bg-fuchsia-500/[0.045]" />
+          <div className="absolute right-[5%] top-[-260px] h-[700px] w-[50px] rotate-[28deg] bg-yellow-300/[0.045]" />
+
+          <div className="absolute -left-52 bottom-[-360px] h-[600px] w-[600px] rounded-full bg-cyan-400/[0.06] blur-[170px]" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-18 lg:py-20">
+          <div className="grid gap-10 lg:grid-cols-[1fr_0.78fr] lg:items-end">
+            <div>
+              <span className="font-mono text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-cyan-400">
                 VinilArt Sport // Loja
               </span>
 
-              <h1 className="mt-5 font-display text-[3.2rem] uppercase leading-[0.85] tracking-tight text-white sm:text-6xl lg:text-[5.2rem]">
-                Tudo para
+              <h1 className="mt-5 max-w-4xl font-display text-[3rem] uppercase leading-[0.86] tracking-tight text-white sm:text-6xl lg:text-[5.2rem]">
+                Personalização
                 <br />
 
-                <span className="text-zinc-500">
-                  jogar à tua maneira.
+                <span className="text-zinc-600">
+                  feita para jogar.
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-lg text-[0.96rem] leading-7 text-zinc-400">
-                Personaliza equipamento e acessórios
-                para ti, para a tua equipa ou para o
-                teu clube.
+              <p className="mt-6 max-w-xl text-[0.96rem] leading-7 text-zinc-400">
+                Produtos desportivos e acessórios personalizados
+                para atletas, equipas e clubes.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 border-y border-white/[0.07] py-5">
-                <div className="flex items-center gap-2 text-sm text-zinc-300">
-                  <Check
-                    size={14}
-                    className="text-cyan-400"
-                  />
-
-                  Personalização online
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-zinc-300">
-                  <Check
-                    size={14}
-                    className="text-cyan-400"
-                  />
-
-                  Apoio VinilArt
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-zinc-300">
-                  <Check
-                    size={14}
-                    className="text-cyan-400"
-                  />
-
-                  Clubes e equipas
-                </div>
-              </div>
-
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="#produtos"
+                  href="#principais"
                   className="inline-flex min-h-12 items-center gap-3 rounded-full bg-cyan-400 px-5 font-mono text-[0.66rem] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-cyan-300"
                 >
-                  Explorar produtos
+                  Ver produtos
                   <ChevronDown size={14} />
                 </a>
 
@@ -363,61 +257,65 @@ function Loja() {
               </div>
             </div>
 
-            {/* RIGHT PRODUCT MOSAIC */}
-            <div className="grid aspect-[1.05/1] grid-cols-4 grid-rows-4 gap-2.5 sm:gap-3">
-              {primaryProducts.map(
-                (product, index) => {
-                  if (index === 0) {
-                    return (
-                      <div
-                        key={product.slug}
-                        className="col-span-2 row-span-4"
-                      >
-                        <HeroProductTile
-                          product={product}
-                          index={index}
-                        />
-                      </div>
-                    );
-                  }
+            {/* INFO PANEL */}
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              <div className="flex items-center gap-4 border-t border-white/[0.08] py-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[0.08] text-cyan-300">
+                  <WandSparkles size={15} />
+                </span>
 
-                  if (index === 1) {
-                    return (
-                      <div
-                        key={product.slug}
-                        className="col-span-2 row-span-2"
-                      >
-                        <HeroProductTile
-                          product={product}
-                          index={index}
-                        />
-                      </div>
-                    );
-                  }
+                <div>
+                  <span className="block text-sm font-medium text-white">
+                    Personaliza online
+                  </span>
 
-                  return (
-                    <div
-                      key={product.slug}
-                      className="col-span-1 row-span-2"
-                    >
-                      <HeroProductTile
-                        product={product}
-                        index={index}
-                      />
-                    </div>
-                  );
-                },
-              )}
+                  <span className="mt-0.5 block text-xs leading-5 text-zinc-500">
+                    Vê o resultado antes de enviar o pedido.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 border-t border-white/[0.08] py-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-400/[0.07] text-fuchsia-300">
+                  <Users size={15} />
+                </span>
+
+                <div>
+                  <span className="block text-sm font-medium text-white">
+                    Equipas e clubes
+                  </span>
+
+                  <span className="mt-0.5 block text-xs leading-5 text-zinc-500">
+                    Soluções individuais ou em quantidade.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 border-y border-white/[0.08] py-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-300/[0.07] text-yellow-300">
+                  <Sparkles size={15} />
+                </span>
+
+                <div>
+                  <span className="block text-sm font-medium text-white">
+                    Tens outra ideia?
+                  </span>
+
+                  <span className="mt-0.5 block text-xs leading-5 text-zinc-500">
+                    Também trabalhamos projetos fora do catálogo.
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SMALL CATEGORY BAR */}
-      <div className="border-b border-white/[0.07] bg-[#0b0f14]">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-5 py-3 sm:px-8">
+      {/* STORE NAV */}
+      <div className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#090d12]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 py-3 sm:px-8">
           <a
-            href="#produtos"
+            href="#principais"
             className="shrink-0 rounded-full bg-white px-4 py-2 font-mono text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black"
           >
             Principais
@@ -434,130 +332,112 @@ function Loja() {
             to="/contactos"
             className="shrink-0 rounded-full border border-white/[0.08] px-4 py-2 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:border-white/20 hover:text-white"
           >
-            Projeto personalizado
+            Pedido especial
           </Link>
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
-        {/* PRIMARY */}
+      <main className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+        {/* PRIMARY PRODUCTS */}
         <section
-          id="produtos"
-          className="scroll-mt-28"
+          id="principais"
+          className="scroll-mt-24"
         >
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <Sparkles
-                  size={13}
-                  className="text-cyan-400"
-                />
+              <span className="font-mono text-[0.63rem] font-semibold uppercase tracking-[0.19em] text-cyan-400">
+                01 // Produtos principais
+              </span>
 
-                <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-cyan-400">
-                  Os principais
-                </span>
-              </div>
-
-              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-4xl">
-                Escolhe o teu produto.
+              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-4xl lg:text-5xl">
+                Começa por aqui.
               </h2>
             </div>
 
             <p className="max-w-md text-sm leading-6 text-zinc-500">
-              As quatro soluções principais VinilArt
-              Sport, prontas para começares a
-              personalizar.
+              As principais soluções VinilArt Sport para
+              personalização individual ou de equipa.
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 xl:grid-cols-4">
-            {primaryProducts.map(
-              (product, index) => (
-                <MainProductCard
-                  key={product.slug}
-                  product={product}
-                  index={index}
-                />
-              ),
-            )}
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {primaryProducts.map((product, index) => (
+              <MainProductCard
+                key={product.slug}
+                product={product}
+                index={index}
+              />
+            ))}
           </div>
         </section>
 
-        {/* SECONDARY CATALOG */}
+        {/* SECONDARY */}
         <section
           id="catalogo"
-          className="mt-24 scroll-mt-28 lg:mt-32"
+          className="mt-24 scroll-mt-24 lg:mt-32"
         >
           <div className="flex flex-col gap-5 border-t border-white/[0.08] pt-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Package
-                  size={13}
-                  className="text-yellow-300"
-                />
+                <Package size={13} className="text-yellow-300" />
 
-                <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-yellow-300">
-                  Mais artigos
+                <span className="font-mono text-[0.63rem] font-semibold uppercase tracking-[0.19em] text-yellow-300">
+                  02 // Mais artigos
                 </span>
               </div>
 
-              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-4xl">
-                Há muito mais
+              <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-4xl lg:text-5xl">
+                Mais formas
                 <span className="text-zinc-600">
-                  {" "}para personalizar.
+                  {" "}de personalizar.
                 </span>
               </h2>
             </div>
 
             <p className="max-w-md text-sm leading-6 text-zinc-500">
-              Acessórios, merchandising e outros
-              artigos disponíveis para projetos
-              individuais, equipas e clubes.
+              Garrafas, bonés, sacos, mochilas, T-shirts,
+              braçadeiras, calções e muito mais.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4">
-            {catalogExamples.map(
-              (example) => (
-                <CatalogCard
-                  key={example.id}
-                  example={example}
-                />
-              ),
-            )}
+            {catalogExamples.map((example) => (
+              <CatalogCard
+                key={example.id}
+                example={example}
+              />
+            ))}
           </div>
         </section>
 
-        {/* CUSTOM PROJECT */}
+        {/* SPECIAL REQUEST */}
         <section className="mt-24 lg:mt-32">
-          <div className="relative overflow-hidden border-y border-white/[0.08] py-10 sm:py-12">
-            <div className="pointer-events-none absolute right-0 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-cyan-400/[0.055] blur-[120px]" />
+          <div className="relative overflow-hidden rounded-[1.5rem] bg-white px-6 py-8 text-black sm:px-8 sm:py-10 lg:px-10">
+            <div className="pointer-events-none absolute right-[-60px] top-[-100px] h-64 w-64 rounded-full bg-cyan-300/40 blur-[80px]" />
 
             <div className="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
-                <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-cyan-400">
-                  Não está no catálogo?
+                <span className="font-mono text-[0.62rem] font-bold uppercase tracking-[0.18em] text-zinc-500">
+                  Fora do catálogo
                 </span>
 
-                <h2 className="mt-3 max-w-3xl font-display text-3xl uppercase leading-[0.95] text-white sm:text-4xl">
-                  Se tens a ideia,
-                  <span className="text-zinc-600">
-                    {" "}nós vemos como a fazer.
-                  </span>
+                <h2 className="mt-3 max-w-3xl font-display text-3xl uppercase leading-[0.95] sm:text-4xl">
+                  Tens outra coisa
+                  <br className="hidden sm:block" />
+                  em mente?
                 </h2>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-500">
-                  Fala connosco sobre outros artigos,
-                  personalizações especiais ou projetos
-                  para a tua equipa.
+                <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-600">
+                  Diz-nos o que precisas e vemos contigo a melhor
+                  solução para o projeto.
                 </p>
               </div>
 
               <Link
                 to="/contactos"
-                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-white px-5 font-mono text-[0.66rem] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-cyan-300"
+                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-black px-5 font-mono text-[0.66rem] font-bold uppercase tracking-[0.13em] text-white transition hover:bg-cyan-400 hover:text-black"
               >
-                Pedir informação
+                Falar com a VinilArt
 
                 <ArrowRight size={14} />
               </Link>
@@ -565,7 +445,6 @@ function Loja() {
           </div>
         </section>
 
-        {/* TEAM / CLUB */}
         <section className="mt-14 lg:mt-20">
           <TeamClubBanner />
         </section>
