@@ -206,6 +206,21 @@ function Loja() {
 
   return (
     <PageShell className="bg-[#080b0f] text-white">
+      <style>
+        {`
+          .store-nav-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+
+          .store-nav-scroll::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+        `}
+      </style>
+
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/[0.07] bg-[#090d12]">
         <div className="pointer-events-none absolute inset-0">
@@ -313,7 +328,7 @@ function Loja() {
 
       {/* STORE NAV */}
       <div className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#090d12]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 py-3 sm:px-8">
+        <div className="store-nav-scroll mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 py-3 sm:px-8">
           <a
             href="#principais"
             className="shrink-0 rounded-full bg-white px-4 py-2 font-mono text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black"
