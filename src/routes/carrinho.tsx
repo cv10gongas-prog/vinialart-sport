@@ -203,8 +203,18 @@ function Carrinho() {
               <p className="text-muted-foreground">
                 A VinilArt analisa os artigos, ficheiros e quantidades para preparar o orçamento.
               </p>
-              <button className="order-primary" onClick={() => setQuote(true)}>
-                Pedir orçamento
+              <Link
+                to="/checkout"
+                className="order-primary inline-flex items-center justify-center text-center font-bold no-underline py-3 px-6 rounded-lg shadow transition hover:opacity-90"
+              >
+                Avançar para o Checkout
+              </Link>
+              <button
+                type="button"
+                className="w-full text-xs text-muted-foreground hover:text-foreground underline pt-2 pb-1"
+                onClick={() => setQuote(!quote)}
+              >
+                {quote ? "Ocultar exportação manual" : "Prefiro apenas descarregar resumo / pedir orçamento"}
               </button>
               <SportLink to="/loja" variant="outline" className="w-full">
                 Continuar na loja
