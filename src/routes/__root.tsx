@@ -78,12 +78,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "VinilArt Sport" },
       {
         name: "description",
-        content: "Personalização desportiva VinilArt Sport.",
+        content: "Personalização desportiva VinilArt Sport. Cria o teu equipamento, bonés, mochilas e acessórios desportivos personalizados.",
       },
+      { name: "theme-color", content: "#0B0C10" },
       { name: "author", content: "VinilArt" },
       { property: "og:site_name", content: "VinilArt Sport" },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: "VinilArt Sport — Personalização Desportiva" },
+      {
+        property: "og:description",
+        content: "Personalização desportiva VinilArt Sport. Cria o teu equipamento, bonés, mochilas e acessórios desportivos personalizados.",
+      },
+      { property: "og:image", content: "/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "VinilArt Sport" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "VinilArt Sport — Personalização Desportiva" },
+      {
+        name: "twitter:description",
+        content: "Personalização desportiva VinilArt Sport. Cria o teu equipamento, bonés, mochilas e acessórios desportivos personalizados.",
+      },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
       {
@@ -100,7 +116,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
   }),
 
