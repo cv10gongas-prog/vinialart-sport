@@ -39,11 +39,12 @@ import {
 import { CanvasEditor } from "./CanvasEditor";
 import { SingleSurfacePreviewCanvas } from "./DualShinGuardPreview";
 import { ColorWheel } from "./ColorWheel";
+import { VinilartHelpPanel } from "./VinilartHelpPanel";
 
 import { useProductCustomizer } from "@/hooks/useProductCustomizer";
 import { useCart } from "@/lib/cart/store";
 
-import type { CartItem } from "@/lib/cart/types";
+import type { CartItem, AttachmentItem } from "@/lib/cart/types";
 import type { ProductCustomizerConfig } from "@/lib/customizer/types";
 import type { Product } from "@/lib/sport-data";
 
@@ -186,10 +187,20 @@ export function ProductDesignWorkspace({
     });
 
   const [
+    helpRequestedText,
+    setHelpRequestedText,
+  ] = useState<string>(
+    item?.serviceDetails?.requestedText ||
+      "",
+  );
+
+  const [
     helpIdea,
     setHelpIdea,
   ] = useState<string>(
-    item?.serviceDetails?.notes ||
+    item?.serviceDetails?.designNotes ||
+      item?.serviceDetails?.notes ||
+      item?.serviceDetails?.description ||
       "",
   );
 
@@ -197,14 +208,22 @@ export function ProductDesignWorkspace({
     helpContact,
     setHelpContact,
   ] = useState<string>(
-    item?.serviceDetails
-      ?.userContact || "",
+    item?.serviceDetails?.contact ||
+      item?.serviceDetails?.userContact ||
+      "",
   );
 
   const [
-    helpFiles,
-    setHelpFiles,
-  ] = useState<File[]>([]);
+    helpAttachments,
+    setHelpAttachments,
+  ] = useState<AttachmentItem[]>(
+    item?.serviceDetails?.attachments || [],
+  );
+
+  const [
+    helpContactError,
+    setHelpContactError,
+  ] = useState<string>("");
 
   const [
     quantity,
@@ -465,35 +484,51 @@ export function ProductDesignWorkspace({
           );
         }
       } else {
+        if (!helpContact.trim()) {
+          setHelpContactError(
+            "Indica um WhatsApp ou e-mail para podermos contactar-te.",
+          );
+          setError(
+            "Indica um WhatsApp ou e-mail para podermos contactar-te.",
+          );
+          setBusy(false);
+          return;
+        }
+
+        setHelpContactError("");
+
+        const previewDataUrl =
+          c.activeLayers.length > 0
+            ? await generateThumbnail()
+            : helpAttachments.find((a) => a.previewUrl)?.previewUrl ||
+              undefined;
+
         const options = {
           quantity,
-          variant:
-            selectedSize,
+          variant: selectedSize,
+          previewDataUrl,
           mode: "ajuda" as const,
           serviceDetails: {
-            itemOrServiceType:
-              product.name,
-
-            userContact:
-              helpContact ||
-              undefined,
-
+            itemOrServiceType: product.name,
+            personalizationMode: "vinilart-help" as const,
+            contact: helpContact.trim(),
+            userContact: helpContact.trim(),
+            requestedText: helpRequestedText.trim() || undefined,
+            designNotes: helpIdea.trim() || undefined,
             notes:
-              helpIdea ||
+              helpIdea.trim() ||
+              helpRequestedText.trim() ||
               undefined,
-
+            description: helpIdea.trim() || undefined,
+            attachments: helpAttachments,
             fileName:
-              helpFiles
-                .map(
-                  (f) =>
-                    f.name,
-                )
-                .join(", ") ||
+              helpAttachments
+                .map((f) => f.fileName)
+                .join(", ") || undefined,
+            fileKey:
+              helpAttachments[0]?.fileKey ||
               undefined,
-
-            approxDimensions:
-              selectedSize,
-
+            approxDimensions: selectedSize,
             quantity,
           },
         };
@@ -1709,43 +1744,29 @@ export function ProductDesignWorkspace({
               </div>
             )}
 
-            {method ===
-              "ajuda" && (
-              <div className="mt-4 space-y-3">
-                <input
-                  type="text"
-                  value={
-                    helpIdea
+            {method === "ajuda" && (
+              <VinilartHelpPanel
+                requestedText={helpRequestedText}
+                onRequestedTextChange={setHelpRequestedText}
+                designNotes={helpIdea}
+                onDesignNotesChange={setHelpIdea}
+                contact={helpContact}
+                onContactChange={(val) => {
+                  setHelpContact(val);
+                  if (val.trim()) {
+                    setHelpContactError("");
+                    if (
+                      error ===
+                      "Indica um WhatsApp ou e-mail para podermos contactar-te."
+                    ) {
+                      setError("");
+                    }
                   }
-                  onChange={(
-                    e,
-                  ) =>
-                    setHelpIdea(
-                      e.target
-                        .value,
-                    )
-                  }
-                  placeholder="Nome / número / ideia"
-                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-xs"
-                />
-
-                <input
-                  type="text"
-                  value={
-                    helpContact
-                  }
-                  onChange={(
-                    e,
-                  ) =>
-                    setHelpContact(
-                      e.target
-                        .value,
-                    )
-                  }
-                  placeholder="WhatsApp ou e-mail"
-                  className="w-full rounded-xl border border-white/10 bg-zinc-900 px-3 py-2 text-xs"
-                />
-              </div>
+                }}
+                contactError={helpContactError}
+                attachments={helpAttachments}
+                onAttachmentsChange={setHelpAttachments}
+              />
             )}
           </div>
 

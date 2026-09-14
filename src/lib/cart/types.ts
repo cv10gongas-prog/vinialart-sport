@@ -6,6 +6,15 @@
  * Order completion goes through the quote/contact flow.
  */
 
+export interface AttachmentItem {
+  id: string;
+  fileKey: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  previewUrl?: string | undefined;
+}
+
 export type ServiceQuoteDetails = {
   itemOrServiceType: string;
   userName?: string | undefined;
@@ -17,6 +26,13 @@ export type ServiceQuoteDetails = {
   notes?: string | undefined;
   fileName?: string | undefined;
   fileDataUrl?: string | undefined;
+
+  /** Specialized fields for "QUERO AJUDA DA VINILART" (VinilArt Design Assistance) */
+  personalizationMode?: "vinilart-help" | "ready-design" | undefined;
+  contact?: string | undefined;
+  requestedText?: string | undefined;
+  designNotes?: string | undefined;
+  attachments?: AttachmentItem[] | undefined;
 };
 
 export type CartItem = {

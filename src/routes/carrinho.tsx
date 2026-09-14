@@ -116,14 +116,45 @@ function Carrinho() {
                             item.serviceDetails.itemOrServiceType !== item.productName && (
                               <p>{item.serviceDetails.itemOrServiceType}</p>
                             )}
-                          {item.serviceDetails.description && (
-                            <p className="cart-brief">{item.serviceDetails.description}</p>
+                          {item.serviceDetails.requestedText && (
+                            <p className="text-xs text-zinc-300">
+                              <span className="text-zinc-500 font-mono uppercase text-[0.68rem] block">Texto a incluir:</span>
+                              {item.serviceDetails.requestedText}
+                            </p>
                           )}
-                          {item.serviceDetails.fileName && (
+                          {(item.serviceDetails.designNotes || item.serviceDetails.description || item.serviceDetails.notes) && (
+                            <p className="cart-brief text-xs text-zinc-300">
+                              <span className="text-zinc-500 font-mono uppercase text-[0.68rem] block">Ideia / Notas:</span>
+                              {item.serviceDetails.designNotes || item.serviceDetails.description || item.serviceDetails.notes}
+                            </p>
+                          )}
+                          {(item.serviceDetails.contact || item.serviceDetails.userContact) && (
+                            <p className="text-xs text-zinc-400">
+                              <span className="text-zinc-500 font-mono uppercase text-[0.68rem] block">Contacto:</span>
+                              {item.serviceDetails.contact || item.serviceDetails.userContact}
+                            </p>
+                          )}
+                          {item.serviceDetails.attachments && item.serviceDetails.attachments.length > 0 ? (
+                            <div className="mt-2 space-y-1">
+                              <span className="text-[0.68rem] font-mono uppercase tracking-wider text-cyan-400">
+                                Anexos ({item.serviceDetails.attachments.length}):
+                              </span>
+                              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                {item.serviceDetails.attachments.map((att) => (
+                                  <span
+                                    key={att.id || att.fileKey}
+                                    className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[0.7rem] text-zinc-300"
+                                  >
+                                    {att.mimeType === "application/pdf" ? "📄" : "🖼️"} {att.fileName}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ) : item.serviceDetails.fileName ? (
                             <p className="cart-filename">
                               Referência: {item.serviceDetails.fileName}
                             </p>
-                          )}
+                          ) : null}
                         </>
                       )}
                       <p>Sob consulta</p>
