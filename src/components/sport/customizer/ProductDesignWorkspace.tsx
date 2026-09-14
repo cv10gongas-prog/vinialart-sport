@@ -232,10 +232,11 @@ export function ProductDesignWorkspace({
     item?.quantity ?? 1,
   );
 
-  const [
-    confirmed,
-    setConfirmed,
-  ] = useState<boolean>(true);
+  const [designNote, setDesignNote] = useState<string>(
+    item?.serviceDetails?.notes ||
+      item?.serviceDetails?.description ||
+      "",
+  );
 
   const [busy, setBusy] =
     useState<boolean>(false);
@@ -431,14 +432,6 @@ export function ProductDesignWorkspace({
   }
 
   async function handleAddToCart() {
-    if (!confirmed) {
-      setError(
-        "Por favor, confirma a pré-visualização para prosseguir.",
-      );
-
-      return;
-    }
-
     setBusy(true);
     setError("");
 
@@ -469,6 +462,16 @@ export function ProductDesignWorkspace({
           customizerDesign,
           previewDataUrl,
           mode: "design" as const,
+          serviceDetails: designNote.trim()
+            ? {
+                itemOrServiceType: product.name,
+                notes: designNote.trim(),
+                description: designNote.trim(),
+                designNotes: designNote.trim(),
+                quantity,
+                approxDimensions: selectedSize,
+              }
+            : undefined,
         };
 
         if (item) {
@@ -1741,6 +1744,20 @@ export function ProductDesignWorkspace({
                     }}
                   />
                 </label>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="flex items-center justify-between font-mono text-[0.68rem] uppercase tracking-wider text-zinc-400">
+                    <span>Nota opcional</span>
+                    <span className="text-zinc-600 lowercase font-normal">(opcional)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={designNote}
+                    onChange={(e) => setDesignNote(e.target.value)}
+                    placeholder="Instruções, observações ou posicionamento pretendido..."
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/80 px-3.5 py-2 text-xs text-white placeholder:text-zinc-600 leading-relaxed transition-colors focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 resize-none"
+                  />
+                </div>
               </div>
             )}
 
@@ -1814,25 +1831,6 @@ export function ProductDesignWorkspace({
               </div>
             </div>
 
-            <label className="flex gap-2 text-xs text-zinc-400">
-              <input
-                type="checkbox"
-                checked={
-                  confirmed
-                }
-                onChange={(
-                  e,
-                ) =>
-                  setConfirmed(
-                    e.target
-                      .checked,
-                  )
-                }
-              />
-
-              Confirmo a pré-visualização.
-            </label>
-
             {error && (
               <p className="text-xs text-red-400">
                 {
@@ -1843,10 +1841,7 @@ export function ProductDesignWorkspace({
 
             <button
               type="button"
-              disabled={
-                busy ||
-                !confirmed
-              }
+              disabled={busy}
               onClick={() =>
                 void handleAddToCart()
               }

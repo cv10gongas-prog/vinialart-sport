@@ -124,7 +124,9 @@ function Carrinho() {
                           )}
                           {(item.serviceDetails.designNotes || item.serviceDetails.description || item.serviceDetails.notes) && (
                             <p className="cart-brief text-xs text-zinc-300">
-                              <span className="text-zinc-500 font-mono uppercase text-[0.68rem] block">Ideia / Notas:</span>
+                              <span className="text-zinc-500 font-mono uppercase text-[0.68rem] block">
+                                {mode === "design" ? "Nota:" : "Ideia / Notas:"}
+                              </span>
                               {item.serviceDetails.designNotes || item.serviceDetails.description || item.serviceDetails.notes}
                             </p>
                           )}
