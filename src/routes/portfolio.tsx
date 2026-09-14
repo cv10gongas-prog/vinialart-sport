@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
 
 import { PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
@@ -41,8 +40,7 @@ const portfolioItems = [
     alt: "Caneleiras personalizadas produzidas pela VinilArt Sport",
     category: "Caneleiras",
     title: "Caneleiras personalizadas",
-    layout:
-      "md:col-span-7 md:row-span-2 min-h-[420px] md:min-h-[640px]",
+    layout: "md:col-span-7 min-h-[460px] md:min-h-[540px]",
     position: "object-center",
   },
   {
@@ -50,8 +48,7 @@ const portfolioItems = [
     alt: "Equipamento desportivo personalizado",
     category: "Equipamentos",
     title: "Equipamentos personalizados",
-    layout:
-      "md:col-span-5 min-h-[300px]",
+    layout: "md:col-span-5 min-h-[460px] md:min-h-[540px]",
     position: "object-center",
   },
   {
@@ -59,17 +56,7 @@ const portfolioItems = [
     alt: "Equipamento desportivo personalizado em produção",
     category: "Equipamentos",
     title: "Personalização de equipamentos",
-    layout:
-      "md:col-span-5 min-h-[300px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/caneleiras-cores.jpg",
-    alt: "Caneleiras personalizadas com diferentes grafismos",
-    category: "Caneleiras",
-    title: "Design aplicado ao produto",
-    layout:
-      "md:col-span-4 min-h-[360px]",
+    layout: "md:col-span-5 min-h-[340px]",
     position: "object-center",
   },
   {
@@ -77,8 +64,15 @@ const portfolioItems = [
     alt: "Trabalho de estampagem em equipamento desportivo",
     category: "Estampagem",
     title: "Estampagem desportiva",
-    layout:
-      "md:col-span-8 min-h-[360px]",
+    layout: "md:col-span-7 min-h-[340px]",
+    position: "object-center",
+  },
+  {
+    src: "/catalog/caneleiras-cores.jpg",
+    alt: "Caneleiras personalizadas com diferentes grafismos",
+    category: "Caneleiras",
+    title: "Design aplicado ao produto",
+    layout: "md:col-span-4 min-h-[380px]",
     position: "object-center",
   },
   {
@@ -86,8 +80,7 @@ const portfolioItems = [
     alt: "Boné personalizado pela VinilArt Sport",
     category: "Acessórios",
     title: "Bonés personalizados",
-    layout:
-      "md:col-span-5 min-h-[420px]",
+    layout: "md:col-span-8 min-h-[380px]",
     position: "object-center",
   },
   {
@@ -95,8 +88,23 @@ const portfolioItems = [
     alt: "Braçadeira desportiva personalizada em utilização",
     category: "Acessórios",
     title: "Braçadeiras personalizadas",
-    layout:
-      "md:col-span-7 min-h-[420px]",
+    layout: "md:col-span-7 min-h-[400px]",
+    position: "object-center",
+  },
+  {
+    src: "/catalog/bracadeira.jpg",
+    alt: "Braçadeira personalizada produzida pela VinilArt Sport",
+    category: "Acessórios",
+    title: "Personalização de braçadeiras",
+    layout: "md:col-span-5 min-h-[400px]",
+    position: "object-center",
+  },
+  {
+    src: "/catalog/bracadeira-aberta.jpg",
+    alt: "Braçadeira personalizada aberta com grafismo completo",
+    category: "Acessórios",
+    title: "Grafismo integral",
+    layout: "md:col-span-12 min-h-[340px] md:min-h-[410px]",
     position: "object-center",
   },
   {
@@ -104,8 +112,7 @@ const portfolioItems = [
     alt: "Caneleiras personalizadas",
     category: "Caneleiras",
     title: "Personalização à medida",
-    layout:
-      "md:col-span-6 min-h-[360px]",
+    layout: "md:col-span-6 min-h-[360px]",
     position: "object-center",
   },
   {
@@ -113,8 +120,7 @@ const portfolioItems = [
     alt: "Caneleiras personalizadas",
     category: "Caneleiras",
     title: "Acabamento personalizado",
-    layout:
-      "md:col-span-6 min-h-[360px]",
+    layout: "md:col-span-6 min-h-[360px]",
     position: "object-center",
   },
 ];
@@ -142,8 +148,10 @@ function Portfolio() {
             <h1 className="mt-5 font-display text-[2.8rem] uppercase leading-[0.9] tracking-tight text-white sm:text-6xl lg:text-7xl">
               A identidade
               <br />
+
               <span className="relative inline-block">
                 ganha forma.
+
                 <span className="absolute -bottom-3 left-0 h-[3px] w-full bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-yellow-400" />
               </span>
             </h1>
@@ -156,7 +164,7 @@ function Portfolio() {
         </div>
       </section>
 
-      {/* GRID */}
+      {/* PORTFÓLIO */}
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-24">
         <div className="mb-10 flex flex-col justify-between gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-end">
           <div>
@@ -167,7 +175,10 @@ function Portfolio() {
             <h2 className="mt-2 font-display text-3xl uppercase leading-none tracking-tight text-white sm:text-5xl">
               Do ficheiro
               <br />
-              <span className="text-zinc-500">ao produto.</span>
+
+              <span className="text-zinc-500">
+                ao produto.
+              </span>
             </h2>
           </div>
 
@@ -194,7 +205,7 @@ function Portfolio() {
 
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 p-5 sm:p-6">
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                 <figcaption>
                   <span className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-cyan-300">
                     {item.category}
@@ -204,10 +215,6 @@ function Portfolio() {
                     {item.title}
                   </h3>
                 </figcaption>
-
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white opacity-70 backdrop-blur transition-all duration-300 group-hover:border-cyan-400/50 group-hover:bg-cyan-400 group-hover:text-black group-hover:opacity-100">
-                  <ArrowUpRight size={17} />
-                </span>
               </div>
             </figure>
           ))}
@@ -233,7 +240,10 @@ function Portfolio() {
             <h2 className="mt-3 max-w-3xl font-display text-3xl uppercase leading-[0.95] tracking-tight text-white sm:text-5xl lg:text-6xl">
               O próximo projeto
               <br />
-              <span className="text-cyan-400">pode ser o teu.</span>
+
+              <span className="text-cyan-400">
+                pode ser o teu.
+              </span>
             </h2>
 
             <p className="mt-6 max-w-xl text-sm leading-7 text-zinc-400">
@@ -242,11 +252,18 @@ function Portfolio() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <SportLink to="/contactos" size="lg">
+              <SportLink
+                to="/contactos"
+                size="lg"
+              >
                 Falar com a VinilArt
               </SportLink>
 
-              <SportLink to="/loja" size="lg" variant="outline">
+              <SportLink
+                to="/loja"
+                size="lg"
+                variant="outline"
+              >
                 Ver loja
               </SportLink>
             </div>
