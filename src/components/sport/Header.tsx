@@ -133,22 +133,22 @@ export function Header() {
       {open && (
         <div
           id="mobile-nav"
-          className="fixed inset-0 top-0 z-40 flex flex-col bg-background md:hidden"
+          className="fixed inset-0 top-0 z-50 flex flex-col bg-[#0b0d12] md:hidden overflow-y-auto"
         >
-          <div className="flex items-center justify-between px-5 py-5">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
             <Wordmark onClick={() => setOpen(false)} />
             <button
               aria-label="Fechar menu"
               onClick={() => setOpen(false)}
-              className="grid h-11 w-11 place-items-center rounded-full border border-border"
+              className="grid h-12 w-12 min-h-[48px] min-w-[48px] place-items-center rounded-full border border-white/20 text-white transition-colors hover:border-cyan-400 hover:text-cyan-400"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           <nav
             aria-label="Menu móvel"
-            className="flex flex-1 flex-col justify-center gap-2 px-6 pb-16"
+            className="flex flex-1 flex-col justify-center gap-4 px-6 py-10"
           >
             {nav.map((item, index) => (
               <Link
@@ -156,20 +156,36 @@ export function Header() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 style={{ animationDelay: `${index * 60}ms` }}
-                className="rise-in font-display text-[2.4rem] leading-[1.05] text-foreground/90 transition-colors hover:text-foreground"
+                className="rise-in flex min-h-[48px] items-center font-display text-3xl sm:text-4xl leading-tight text-white/90 uppercase tracking-wide transition-colors hover:text-cyan-400 active:text-cyan-300"
               >
                 {item.label}
               </Link>
             ))}
 
-            <a
-              href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
-              className="mt-10 inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground"
-              rel="noopener noreferrer"
-            >
-              <span>Voltar à VinilArt</span>
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            <div className="mt-8 pt-6 border-t border-white/10 flex flex-col gap-4">
+              <Link
+                to="/carrinho"
+                onClick={() => setOpen(false)}
+                className="flex min-h-[48px] items-center justify-between rounded-xl bg-white/[0.05] px-4 py-3 text-sm font-semibold uppercase tracking-wider text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <ShoppingBag className="h-4 w-4 text-cyan-400" />
+                  Carrinho
+                </span>
+                <span className="rounded-full bg-magenta px-2.5 py-0.5 text-xs font-bold text-white">
+                  {totalItems}
+                </span>
+              </Link>
+
+              <a
+                href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+                className="inline-flex min-h-[48px] items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors py-2"
+                rel="noopener noreferrer"
+              >
+                <span>Voltar à VinilArt Principal</span>
+                <ArrowUpRight className="h-4 w-4 text-cyan-400" />
+              </a>
+            </div>
           </nav>
         </div>
       )}

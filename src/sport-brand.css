@@ -665,8 +665,10 @@
   background: #0b0d10;
 }
 .sport-site #mobile-nav nav {
-  gap: 20px;
+  gap: 16px;
 }
 .sport-site #mobile-nav nav a {
   font-weight: 900;
+  font-size: clamp(26px, 7vw, 36px);
 }
+

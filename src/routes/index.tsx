@@ -195,62 +195,6 @@ function Home() {
         </section>
       )}
 
-      <section className="home-paths home-section" aria-labelledby="paths-title">
-        <div className="home-container">
-          <div className="home-section-heading">
-            <div>
-              <p className="home-eyebrow">A tua ideia é o ponto de partida</p>
-              <h2 id="paths-title">
-                Como queres
-                <br />
-                avançar?
-              </h2>
-            </div>
-            <p className="home-heading-note">
-              Com o design pronto ou só uma ideia.
-              <br />
-              Há espaço para os dois.
-            </p>
-          </div>
-          <div className="home-path-grid">
-            <article className="home-path home-path-ready">
-              <div className="home-path-top">
-                <span>01 / O teu ficheiro</span>
-                <Upload size={29} strokeWidth={1.5} aria-hidden="true" />
-              </div>
-              <h3>
-                Já tens
-                <br />o design?
-              </h3>
-              <p>Carrega o teu ficheiro e vê como pode ficar no produto.</p>
-              <Link to="/personalizar" className="home-button home-button-cyan">
-                Personalizar <ArrowUpRight size={19} aria-hidden="true" />
-              </Link>
-              <div className="home-path-rule" aria-hidden="true" />
-            </article>
-            <article className="home-path home-path-help">
-              <div className="home-path-top">
-                <span>02 / A tua ideia</span>
-                <MessageSquare size={29} strokeWidth={1.5} aria-hidden="true" />
-              </div>
-              <h3>
-                Ainda não tens
-                <br />o design?
-              </h3>
-              <p>Envia a tua ideia ou referência e a VinilArt trata contigo da personalização.</p>
-              <Link
-                to="/personalizar"
-                search={{ modo: "ajuda" }}
-                className="home-button home-button-magenta"
-              >
-                Pedir ajuda <ArrowUpRight size={19} aria-hidden="true" />
-              </Link>
-              <div className="home-path-rule" aria-hidden="true" />
-            </article>
-          </div>
-        </div>
-      </section>
-
       <section className="home-services home-section" aria-labelledby="services-title">
         <div className="home-container">
           <div className="home-section-heading">

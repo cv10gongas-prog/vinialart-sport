@@ -43,9 +43,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const fieldClass =
-  "h-12 w-full rounded-xl border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors";
+  "min-h-[48px] h-12 w-full rounded-xl border border-input bg-background/60 px-4 text-base sm:text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors";
 
-const errorClass = "mt-1 text-[0.65rem] text-destructive";
+const errorClass = "mt-1.5 text-xs sm:text-[0.65rem] text-destructive";
 
 function Contactos() {
   const [submitted, setSubmitted] = useState(false);
@@ -129,7 +129,7 @@ function Contactos() {
             <div>
               <label
                 htmlFor="nome"
-                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+                className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
               >
                 Nome{" "}
                 <span aria-hidden="true" className="text-destructive">
@@ -155,7 +155,7 @@ function Contactos() {
             <div>
               <label
                 htmlFor="email"
-                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+                className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
               >
                 Email{" "}
                 <span aria-hidden="true" className="text-destructive">
@@ -171,7 +171,7 @@ function Contactos() {
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
                 className={cn("mt-2", fieldClass, errors.email && "border-destructive")}
-                placeholder="email@exemplo.pt"
+                placeholder="o-teu-email@exemplo.pt"
               />
               {errors.email && (
                 <p id="email-error" role="alert" className={errorClass}>
@@ -185,7 +185,7 @@ function Contactos() {
             <div>
               <label
                 htmlFor="telefone"
-                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+                className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
               >
                 Telefone <span className="text-muted-foreground/50">(opcional)</span>
               </label>
@@ -201,7 +201,7 @@ function Contactos() {
             <div>
               <label
                 htmlFor="clube"
-                className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+                className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
               >
                 Clube / Empresa <span className="text-muted-foreground/50">(opcional)</span>
               </label>
@@ -217,7 +217,7 @@ function Contactos() {
           <div>
             <label
               htmlFor="tipoPedido"
-              className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
             >
               Tipo de pedido{" "}
               <span aria-hidden="true" className="text-destructive">
@@ -250,7 +250,7 @@ function Contactos() {
           <div>
             <label
               htmlFor="mensagem"
-              className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground"
+              className="text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium"
             >
               Mensagem{" "}
               <span aria-hidden="true" className="text-destructive">
@@ -265,7 +265,7 @@ function Contactos() {
               aria-invalid={!!errors.mensagem}
               aria-describedby={errors.mensagem ? "mensagem-error" : undefined}
               className={cn(
-                "mt-2 w-full rounded-xl border border-input bg-background/60 p-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors",
+                "mt-2 w-full rounded-xl border border-input bg-background/60 p-4 text-base sm:text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors",
                 errors.mensagem && "border-destructive",
               )}
               placeholder="Descreve o que precisas: quantidades, tamanhos, prazos, referências visuais…"

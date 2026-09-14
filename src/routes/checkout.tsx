@@ -395,11 +395,11 @@ function CheckoutPage() {
         </div>
 
         {/* Main 2-column layout (Desktop) / 1-column (Mobile) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start w-full">
           {/* LEFT COLUMN: Customer Form + Payment Method + Proof Upload (7 cols) */}
-          <form onSubmit={handleSubmitOrder} className="lg:col-span-7 space-y-6">
+          <form onSubmit={handleSubmitOrder} className="lg:col-span-7 space-y-6 w-full">
             {/* 1. DADOS DO CLIENTE */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 sm:p-6 backdrop-blur-md space-y-4">
+            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6 backdrop-blur-md space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/20 text-[0.65rem] font-bold text-cyan-400">
@@ -416,8 +416,8 @@ function CheckoutPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Nome completo */}
-                <div className="sm:col-span-2 space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Nome completo <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -429,22 +429,22 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, fullName: true })}
                     placeholder="Ex.: Tomás Silva"
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.fullName && fieldErrors.fullName
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.fullName && fieldErrors.fullName && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.fullName}
                     </p>
                   )}
                 </div>
 
                 {/* Email */}
-                <div className="space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Email <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -456,22 +456,22 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, email: true })}
                     placeholder="exemplo@email.com"
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.email && fieldErrors.email
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.email && fieldErrors.email && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.email}
                     </p>
                   )}
                 </div>
 
                 {/* Telemóvel */}
-                <div className="space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Telemóvel <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -483,22 +483,22 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, phone: true })}
                     placeholder="912 345 678"
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.phone && fieldErrors.phone
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.phone && fieldErrors.phone && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.phone}
                     </p>
                   )}
                 </div>
 
                 {/* Morada */}
-                <div className="sm:col-span-2 space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Morada <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -510,22 +510,22 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, address: true })}
                     placeholder="Rua, número, andar / fração"
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.address && fieldErrors.address
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.address && fieldErrors.address && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.address}
                     </p>
                   )}
                 </div>
 
                 {/* Código Postal */}
-                <div className="space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Código Postal <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -537,22 +537,22 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, postalCode: true })}
                     placeholder="4700-000"
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.postalCode && fieldErrors.postalCode
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.postalCode && fieldErrors.postalCode && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.postalCode}
                     </p>
                   )}
                 </div>
 
                 {/* Localidade */}
-                <div className="space-y-1">
-                  <label className="font-mono text-[0.68rem] uppercase tracking-wider text-zinc-300">
+                <div className="space-y-1.5">
+                  <label className="font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-300">
                     Localidade <span className="text-cyan-400">*</span>
                   </label>
                   <input
@@ -564,38 +564,38 @@ function CheckoutPage() {
                     }}
                     onBlur={() => setTouched({ ...touched, city: true })}
                     placeholder="Braga, Porto, Lisboa..."
-                    className={`w-full rounded-xl border bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
+                    className={`w-full rounded-xl border bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-1 ${
                       touched.city && fieldErrors.city
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400"
                     }`}
                   />
                   {touched.city && fieldErrors.city && (
-                    <p className="text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
+                    <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1 pt-0.5">
                       <AlertCircle size={12} /> {fieldErrors.city}
                     </p>
                   )}
                 </div>
 
                 {/* NIF (Opcional) */}
-                <div className="sm:col-span-2 space-y-1 pt-1">
-                  <div className="flex items-center justify-between font-mono text-[0.68rem] uppercase tracking-wider text-zinc-400">
+                <div className="sm:col-span-2 space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between font-mono text-xs sm:text-[0.68rem] uppercase tracking-wider text-zinc-400">
                     <span>NIF</span>
-                    <span className="text-zinc-600 lowercase font-normal">(opcional)</span>
+                    <span className="text-zinc-500 lowercase font-normal">(opcional)</span>
                   </div>
                   <input
                     type="text"
                     value={customer.taxId || ""}
                     onChange={(e) => setCustomer({ ...customer, taxId: e.target.value })}
                     placeholder="Para emissão de fatura com NIF"
-                    className="w-full rounded-xl border border-white/10 bg-zinc-900/80 px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 transition-colors focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/80 px-4 py-3 sm:py-2.5 text-base sm:text-xs text-white placeholder:text-zinc-600 transition-colors focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
                   />
                 </div>
               </div>
             </div>
 
             {/* 2. MÉTODO DE PAGAMENTO */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 sm:p-6 backdrop-blur-md space-y-5">
+            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6 backdrop-blur-md space-y-5">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/20 text-[0.65rem] font-bold text-cyan-400">
@@ -810,8 +810,8 @@ function CheckoutPage() {
             </div>
 
             {/* 4. PRIVACIDADE & TERMOS */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-5 backdrop-blur-md space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer text-xs text-zinc-300 leading-relaxed">
+            <div className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-5 backdrop-blur-md space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer text-sm sm:text-xs text-zinc-300 leading-relaxed">
                 <input
                   type="checkbox"
                   checked={privacyAccepted}
@@ -819,7 +819,7 @@ function CheckoutPage() {
                     setPrivacyAccepted(e.target.checked);
                     if (e.target.checked) setPrivacyError("");
                   }}
-                  className="mt-1 h-4 w-4 rounded border-white/20 bg-zinc-900 text-cyan-400 focus:ring-cyan-400 cursor-pointer"
+                  className="mt-0.5 h-5 w-5 sm:h-4 sm:w-4 rounded border-white/20 bg-zinc-900 text-cyan-400 focus:ring-cyan-400 cursor-pointer shrink-0"
                 />
                 <span>
                   Li e aceito a{" "}
@@ -831,8 +831,8 @@ function CheckoutPage() {
               </label>
 
               {privacyError && (
-                <p className="text-[0.68rem] text-red-400 flex items-center gap-1">
-                  <AlertCircle size={12} /> {privacyError}
+                <p className="text-xs sm:text-[0.68rem] text-red-400 flex items-center gap-1">
+                  <AlertCircle size={14} /> {privacyError}
                 </p>
               )}
             </div>
@@ -841,7 +841,7 @@ function CheckoutPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-cyan-400 py-4 text-xs font-bold uppercase tracking-wider text-black transition-all hover:bg-cyan-300 shadow-[0_0_25px_rgba(0,229,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full min-h-[50px] flex items-center justify-center gap-2 rounded-xl bg-cyan-400 py-4 px-6 text-sm sm:text-xs font-bold uppercase tracking-wider text-black transition-all hover:bg-cyan-300 shadow-[0_0_25px_rgba(0,229,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShieldCheck size={18} />
               {submitting ? "A submeter pedido..." : "Finalizar Pedido · Enviar Comprovativo"}

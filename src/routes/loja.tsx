@@ -103,72 +103,121 @@ function ProductRouteLink({
   );
 }
 
+function UniformProductCard({
+  title,
+  category,
+  priceLabel,
+  description,
+  image,
+  isPhoto,
+  actionLabel,
+  linkProps,
+  isExternalLink = false,
+}: {
+  title: string;
+  category: string;
+  priceLabel?: string;
+  description?: string;
+  image: string;
+  isPhoto?: boolean;
+  actionLabel: string;
+  linkProps: any;
+  isExternalLink?: boolean;
+}) {
+  const CardWrapper = ({ children }: { children: React.ReactNode }) => {
+    if (isExternalLink) {
+      return (
+        <a {...linkProps} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111722] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-[0_12px_32px_rgba(0,0,0,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400">
+          {children}
+        </a>
+      );
+    }
+    return (
+      <Link {...linkProps} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111722] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-[0_12px_32px_rgba(0,0,0,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400">
+        {children}
+      </Link>
+    );
+  };
+
+  return (
+    <CardWrapper>
+      <article className="flex h-full flex-col">
+        {/* Square 1:1 Media Container */}
+        <div className="relative aspect-square w-full overflow-hidden bg-[#0a0e16] p-4 sm:p-5 flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(0,200,255,0.08),transparent_65%)]" />
+
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            className={`relative z-10 max-h-full max-w-full w-auto h-auto transition-transform duration-500 group-hover:scale-105 ${
+              isPhoto ? "object-cover h-full w-full" : "object-contain"
+            }`}
+          />
+
+          {priceLabel && (
+            <span className="absolute right-3 top-3 z-20 rounded-full border border-white/10 bg-black/75 px-2.5 py-1 font-mono text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-200 backdrop-blur-md">
+              {priceLabel}
+            </span>
+          )}
+        </div>
+
+        {/* Content Box */}
+        <div className="flex flex-1 flex-col justify-between border-t border-white/[0.06] p-4 sm:p-5">
+          <div>
+            <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-cyan-400">
+              {category}
+            </span>
+
+            <h3 className="mt-1.5 font-display text-lg uppercase leading-tight tracking-wide text-white transition-colors group-hover:text-cyan-300 sm:text-xl">
+              {title}
+            </h3>
+
+            {description && (
+              <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-400">
+                {description}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-white/[0.07] pt-3">
+            <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-cyan-300">
+              {actionLabel}
+            </span>
+
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition-all duration-300 group-hover:border-cyan-400 group-hover:bg-cyan-400 group-hover:text-black">
+              <ArrowRight size={13} />
+            </span>
+          </div>
+        </div>
+      </article>
+    </CardWrapper>
+  );
+}
+
 function MainProductCard({
   product,
 }: {
   product: Product;
 }) {
-  const image =
-    product.catalogImage ??
-    product.image;
-
-  const isRealPhoto =
-    realPhotoSlugs.has(
-      product.slug,
-    );
+  const image = product.catalogImage ?? product.image;
+  const isRealPhoto = realPhotoSlugs.has(product.slug);
 
   return (
-    <ProductRouteLink
-      product={product}
-      className="group block overflow-hidden rounded-3xl border border-white/10 bg-[#101520] outline-none transition-all duration-500 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_70px_rgba(0,0,0,0.35)] focus-visible:ring-2 focus-visible:ring-cyan-400"
-    >
-      <article className="relative">
-        <div className="relative h-[340px] overflow-hidden bg-[#0c111a] sm:h-[400px]">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,200,255,0.12),transparent_42%),radial-gradient(circle_at_90%_90%,rgba(236,0,140,0.10),transparent_42%)]" />
-
-          <img
-            src={image}
-            alt={`${product.name} — ${product.imageKind ?? "VinilArt Sport"}`}
-            loading="lazy"
-            className={`relative z-10 h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.035] ${
-              isRealPhoto
-                ? "object-cover"
-                : "object-contain p-8 sm:p-10"
-            }`}
-          />
-
-          <span className="absolute right-4 top-4 z-20 rounded-full border border-white/10 bg-black/70 px-3 py-1.5 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-200 backdrop-blur-md">
-            {productPrice(product)}
-          </span>
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-28 bg-gradient-to-t from-[#101520] to-transparent" />
-        </div>
-
-        <div className="relative z-20 -mt-5 px-6 pb-7 sm:px-7">
-          <span className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-cyan-400">
-            {product.category}
-          </span>
-
-          <h3 className="mt-2 font-display text-2xl uppercase leading-none tracking-wide text-white sm:text-3xl">
-            {product.name}
-          </h3>
-
-          <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-400">
-            {product.description}
-          </p>
-
-          <div className="mt-6 flex items-center justify-between border-t border-white/[0.08] pt-4">
-            <span className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.15em] text-cyan-300">
-              Personalizar
-            </span>
-
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-300 transition-all duration-300 group-hover:border-cyan-400 group-hover:bg-cyan-400 group-hover:text-black">
-              <ArrowRight size={15} />
-            </span>
-          </div>
-        </div>
-      </article>
-    </ProductRouteLink>
+    <UniformProductCard
+      title={product.name}
+      category={product.category}
+      priceLabel={productPrice(product)}
+      description={product.description}
+      image={image}
+      isPhoto={isRealPhoto}
+      actionLabel="Personalizar"
+      linkProps={{
+        to: "/produto/$slug",
+        params: { slug: product.slug },
+        search: { cartItem: undefined, modo: undefined },
+      }}
+    />
   );
 }
 
@@ -179,106 +228,34 @@ function ServiceCard({
   product: Product;
   visual: "photo" | "graphic";
 }) {
-  const content = (
-    <article className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#10141d] transition-all duration-500 hover:border-white/20">
-      <div className="relative min-h-[290px] overflow-hidden">
-        {visual === "photo" &&
-        product.catalogImage ? (
-          <>
-            <img
-              src={product.catalogImage}
-              alt={product.name}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-[#10141d] via-black/15 to-black/10" />
-          </>
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-[#0b0f16]" />
-
-            <div className="absolute -right-12 -top-28 h-[440px] w-[125px] rotate-[28deg] bg-cyan-400/20" />
-            <div className="absolute right-12 -top-28 h-[440px] w-[90px] rotate-[28deg] bg-fuchsia-500/20" />
-            <div className="absolute right-28 -top-28 h-[440px] w-[42px] rotate-[28deg] bg-yellow-400/20" />
-
-            <div className="absolute bottom-8 left-7">
-              <FileImage
-                size={48}
-                strokeWidth={1.2}
-                className="text-zinc-500"
-              />
-            </div>
-          </>
-        )}
-
-        <span className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/60 px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-[0.17em] text-zinc-300 backdrop-blur">
-          Sob consulta
-        </span>
-      </div>
-
-      <div className="relative px-6 pb-7 pt-6">
-        <span className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-zinc-500">
-          {product.category}
-        </span>
-
-        <h3 className="mt-2 font-display text-2xl uppercase tracking-wide text-white">
-          {product.name}
-        </h3>
-
-        <p className="mt-3 max-w-md text-sm leading-6 text-zinc-400">
-          {product.description}
-        </p>
-
-        <div className="mt-6 flex items-center justify-between border-t border-white/[0.08] pt-4">
-          <span className="font-mono text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-cyan-300">
-            {product.customizationMode ===
-            "catalog"
-              ? "Ver artigos"
-              : "Pedir orçamento"}
-          </span>
-
-          <ArrowUpRight
-            size={16}
-            className="text-zinc-500 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-300"
-          />
-        </div>
-      </div>
-    </article>
-  );
-
-  if (
-    product.customizationMode ===
-    "catalog"
-  ) {
-    return (
-      <Link
-        to="/adeptos"
-        search={{
-          artigo: undefined,
-          cartItem: undefined,
-        }}
-        className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-3xl"
-      >
-        {content}
-      </Link>
-    );
-  }
+  const isCatalogMode = product.customizationMode === "catalog";
+  const image =
+    visual === "photo" && product.catalogImage
+      ? product.catalogImage
+      : product.image ?? "/catalog/editor/estampagem.svg";
 
   return (
-    <Link
-      to="/produto/$slug"
-      params={{
-        slug: product.slug,
-      }}
-      search={{
-        cartItem: undefined,
-        modo: undefined,
-      }}
-      className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-3xl"
-    >
-      {content}
-    </Link>
+    <UniformProductCard
+      title={product.name}
+      category={product.category}
+      priceLabel="Sob consulta"
+      description={product.description}
+      image={image}
+      isPhoto={visual === "photo" && !!product.catalogImage}
+      actionLabel={isCatalogMode ? "Ver artigos" : "Pedir orçamento"}
+      linkProps={
+        isCatalogMode
+          ? {
+              to: "/adeptos",
+              search: { artigo: undefined, cartItem: undefined },
+            }
+          : {
+              to: "/produto/$slug",
+              params: { slug: product.slug },
+              search: { cartItem: undefined, modo: undefined },
+            }
+      }
+    />
   );
 }
 
@@ -287,62 +264,22 @@ function CatalogCard({
 }: {
   example: (typeof catalogExamples)[number];
 }) {
-  const isPhoto =
-    example.kind ===
-    "Fotografia de trabalho";
+  const isPhoto = example.kind === "Fotografia de trabalho";
 
   return (
-    <Link
-      to="/produto/$slug"
-      params={{
-        slug: `${example.id}-personalizado`,
+    <UniformProductCard
+      title={example.name}
+      category={isPhoto ? "Exemplo real" : "Base para personalização"}
+      priceLabel="Sob consulta"
+      image={example.image}
+      isPhoto={isPhoto}
+      actionLabel="Personalizar"
+      linkProps={{
+        to: "/produto/$slug",
+        params: { slug: `${example.id}-personalizado` },
+        search: { modo: undefined, cartItem: undefined },
       }}
-      search={{
-        modo: undefined,
-        cartItem: undefined,
-      }}
-      className="group block overflow-hidden rounded-2xl border border-white/10 bg-[#111722] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 focus-visible:ring-2 focus-visible:ring-cyan-400"
-    >
-      <article>
-        <div className="relative h-[245px] overflow-hidden bg-[#090d13]">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,200,255,0.10),transparent_55%)]" />
-
-          <img
-            src={example.image}
-            alt={`${example.name} — ${example.kind}`}
-            loading="lazy"
-            className={`relative z-10 h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-              isPhoto
-                ? "object-cover"
-                : "object-contain p-5"
-            }`}
-          />
-        </div>
-
-        <div className="border-t border-white/[0.06] px-5 py-5">
-          <span className="font-mono text-[0.58rem] uppercase tracking-[0.16em] text-zinc-500">
-            {isPhoto
-              ? "Exemplo real"
-              : "Base para personalização"}
-          </span>
-
-          <h3 className="mt-1 font-display text-xl uppercase tracking-wide text-white">
-            {example.name}
-          </h3>
-
-          <div className="mt-4 flex items-center justify-between border-t border-white/[0.07] pt-3">
-            <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-cyan-300">
-              Personalizar
-            </span>
-
-            <ArrowUpRight
-              size={14}
-              className="text-zinc-500 transition-colors group-hover:text-cyan-300"
-            />
-          </div>
-        </div>
-      </article>
-    </Link>
+    />
   );
 }
 
@@ -451,7 +388,7 @@ function Loja() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {customizable.map(
               (product) => (
                 <MainProductCard
@@ -492,7 +429,7 @@ function Loja() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {supporterService && (
               <ServiceCard
                 product={supporterService}
@@ -535,7 +472,7 @@ function Loja() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {catalogExamples.map(
               (example) => (
                 <CatalogCard
