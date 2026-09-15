@@ -88,7 +88,7 @@ function MainProductCard({
         cartItem: undefined,
         modo: undefined,
       }}
-      className="group relative flex min-w-0 h-full flex-col overflow-hidden rounded-[1rem] border border-white/[0.08] bg-[#0d1218] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_65px_rgba(0,0,0,0.38)] focus-visible:ring-2 focus-visible:ring-cyan-400 sm:rounded-[1.35rem]"
+      className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-white/[0.08] bg-[#0d1218] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_65px_rgba(0,0,0,0.38)] focus-visible:ring-2 focus-visible:ring-cyan-400 sm:rounded-[1.35rem]"
     >
       <div className="relative aspect-square overflow-hidden bg-[#080c11]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(34,211,238,0.09),transparent_62%)]" />
@@ -117,7 +117,7 @@ function MainProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-5">
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <span className="block truncate font-mono text-[0.48rem] font-semibold uppercase tracking-[0.11em] text-cyan-400 sm:text-[0.61rem] sm:tracking-[0.17em]">
             {product.category}
           </span>
@@ -237,25 +237,31 @@ function Loja() {
           <div className="absolute -left-52 bottom-[-360px] h-[600px] w-[600px] rounded-full bg-cyan-400/[0.06] blur-[170px]" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-18 lg:py-20">
-          <div className="grid gap-10 lg:grid-cols-[1fr_0.78fr] lg:items-end">
-            <div>
+        <div className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-18 lg:py-20">
+          <div className="grid gap-9 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-10">
+            <div className="min-w-0">
               <span className="font-mono text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-cyan-400">
                 VinilArt Sport // Loja
               </span>
 
-              <h1 className="mt-5 max-w-4xl font-display text-[3rem] uppercase leading-[0.86] tracking-tight text-white sm:text-6xl lg:text-[5.2rem]">
-                Personalização
-                <br />
+              <h1 className="mt-5 w-full max-w-full font-display text-[2.25rem] uppercase leading-[0.9] tracking-[-0.025em] text-white sm:max-w-4xl sm:text-6xl sm:leading-[0.86] sm:tracking-tight lg:text-[5.2rem]">
+                <span className="block whitespace-nowrap">
+                  Personalização
+                </span>
 
-                <span className="text-zinc-600">
-                  feita para jogar.
+                <span className="mt-1 block text-zinc-600 sm:mt-0">
+                  <span className="block sm:inline">
+                    feita para
+                  </span>{" "}
+                  <span className="block sm:inline">
+                    jogar.
+                  </span>
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-[0.96rem] leading-7 text-zinc-400">
-                Produtos desportivos e acessórios personalizados
-                para atletas, equipas e clubes.
+              <p className="mt-6 max-w-xl text-[0.94rem] leading-7 text-zinc-400 sm:text-[0.96rem]">
+                Produtos desportivos e acessórios personalizados para atletas,
+                equipas e clubes.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -374,8 +380,8 @@ function Loja() {
             </div>
 
             <p className="max-w-md text-sm leading-6 text-zinc-500">
-              As principais soluções VinilArt Sport para
-              personalização individual ou de equipa.
+              As principais soluções VinilArt Sport para personalização
+              individual ou de equipa.
             </p>
           </div>
 
@@ -398,7 +404,10 @@ function Loja() {
           <div className="flex flex-col gap-5 border-t border-white/[0.08] pt-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Package size={13} className="text-yellow-300" />
+                <Package
+                  size={13}
+                  className="text-yellow-300"
+                />
 
                 <span className="font-mono text-[0.63rem] font-semibold uppercase tracking-[0.19em] text-yellow-300">
                   02 // Mais artigos
@@ -408,14 +417,15 @@ function Loja() {
               <h2 className="mt-3 font-display text-3xl uppercase leading-none text-white sm:text-4xl lg:text-5xl">
                 Mais formas
                 <span className="text-zinc-600">
-                  {" "}de personalizar.
+                  {" "}
+                  de personalizar.
                 </span>
               </h2>
             </div>
 
             <p className="max-w-md text-sm leading-6 text-zinc-500">
-              Garrafas, bonés, sacos, mochilas, T-shirts,
-              braçadeiras, calções e muito mais.
+              Garrafas, bonés, sacos, mochilas, T-shirts, braçadeiras,
+              calções e muito mais.
             </p>
           </div>
 
@@ -447,8 +457,8 @@ function Loja() {
                 </h2>
 
                 <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-600">
-                  Diz-nos o que precisas e vemos contigo a melhor
-                  solução para o projeto.
+                  Diz-nos o que precisas e vemos contigo a melhor solução
+                  para o projeto.
                 </p>
               </div>
 
