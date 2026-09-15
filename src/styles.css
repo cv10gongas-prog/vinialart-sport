@@ -355,16 +355,13 @@
 
 /*
  * ==========================================================
- * VINILART SPORT — MOBILE HERO
+ * VINILART SPORT — MOBILE HERO / CENTER PLAYER
  * ==========================================================
  *
- * IMPORTANTE:
- * no mobile NÃO usamos "cover" a ocupar os 580px todos.
+ * No mobile assumimos de vez que não vamos tentar
+ * mostrar a composição panorâmica inteira.
  *
- * A imagem mantém a proporção panorâmica original,
- * fica no topo e desaparece progressivamente para preto.
- *
- * É a mesma /brand/sport-hero-approved.jpg do desktop.
+ * O foco passa a ser o jogador CENTRAL da fotografia.
  */
 @media (max-width: 760px) {
   .sport-site .campaign-hero {
@@ -375,73 +372,68 @@
   }
 
   /*
-   * ESTE É O PONTO PRINCIPAL.
+   * A fotografia ocupa apenas a zona superior.
    *
-   * Antes:
-   * width: 100%;
-   * height: 100%;
-   * object-fit: cover;
-   *
-   * Isso fazia zoom enorme na imagem panorâmica.
-   *
-   * Agora:
-   * a imagem fica a 155% da largura do telemóvel
-   * e mantém a altura AUTOMÁTICA.
+   * Como o container é muito mais vertical que a fotografia,
+   * object-fit: cover corta as laterais e deixa o jogador
+   * central grande, mas sem o zoom absurdo de preencher
+   * os 580px do hero inteiro.
    */
   .sport-site .campaign-hero-image {
     position: absolute !important;
 
     inset: auto !important;
     top: 0 !important;
-    left: 50% !important;
+    left: 0 !important;
     right: auto !important;
     bottom: auto !important;
 
-    width: 155% !important;
+    width: 100% !important;
     max-width: none !important;
-    height: auto !important;
+    height: 410px !important;
 
-    object-fit: contain !important;
-    object-position: center top !important;
+    object-fit: cover !important;
+    object-position: 50% center !important;
 
-    transform: translateX(-50%) !important;
+    transform: none !important;
 
-    opacity: 0.86 !important;
+    opacity: 0.88 !important;
     filter: none !important;
 
     /*
-     * A fotografia desaparece suavemente em baixo,
-     * em vez de terminar com um corte seco.
+     * A parte inferior do jogador dissolve-se suavemente
+     * no fundo preto do hero.
      */
     -webkit-mask-image: linear-gradient(
       to bottom,
       #000 0%,
-      #000 55%,
-      rgba(0, 0, 0, 0.95) 65%,
-      rgba(0, 0, 0, 0.72) 76%,
-      rgba(0, 0, 0, 0.35) 89%,
+      #000 53%,
+      rgba(0, 0, 0, 0.98) 62%,
+      rgba(0, 0, 0, 0.83) 72%,
+      rgba(0, 0, 0, 0.55) 82%,
+      rgba(0, 0, 0, 0.2) 93%,
       transparent 100%
     ) !important;
 
     mask-image: linear-gradient(
       to bottom,
       #000 0%,
-      #000 55%,
-      rgba(0, 0, 0, 0.95) 65%,
-      rgba(0, 0, 0, 0.72) 76%,
-      rgba(0, 0, 0, 0.35) 89%,
+      #000 53%,
+      rgba(0, 0, 0, 0.98) 62%,
+      rgba(0, 0, 0, 0.83) 72%,
+      rgba(0, 0, 0, 0.55) 82%,
+      rgba(0, 0, 0, 0.2) 93%,
       transparent 100%
     ) !important;
   }
 
   /*
-   * Fade lateral tipo desktop.
+   * Fade horizontal ao estilo desktop:
+   * preto forte atrás do texto e imagem mais limpa
+   * no centro/direita.
    *
-   * O texto fica protegido pelo preto à esquerda,
-   * mas a imagem continua visível no centro/direita.
-   *
-   * O segundo gradiente fecha o hero para preto
-   * por baixo da fotografia.
+   * O segundo gradiente reforça a passagem para preto
+   * na metade inferior.
    */
   .sport-site .campaign-hero::before {
     content: "" !important;
@@ -452,26 +444,30 @@
     background:
       linear-gradient(
         90deg,
-        #07090cf8 0%,
-        #07090ce9 20%,
-        #07090cc8 38%,
-        #07090c89 55%,
-        #07090c45 72%,
-        #07090c12 90%,
+        #07090cfb 0%,
+        #07090cf2 16%,
+        #07090cda 32%,
+        #07090ca0 48%,
+        #07090c62 63%,
+        #07090c28 80%,
         transparent 100%
       ),
       linear-gradient(
         180deg,
         transparent 0%,
-        #07090c08 18%,
-        #07090c30 31%,
-        #07090c8c 42%,
-        #07090ce8 54%,
-        #07090c 68%,
+        transparent 25%,
+        #07090c18 38%,
+        #07090c72 49%,
+        #07090cd1 59%,
+        #07090cf5 68%,
+        #07090c 78%,
         #07090c 100%
       ) !important;
   }
 
+  /*
+   * Mantemos exatamente o layout atual do conteúdo.
+   */
   .sport-site .campaign-hero-inner {
     position: relative !important;
     z-index: 2 !important;
@@ -501,22 +497,24 @@
 }
 
 /*
- * Em ecrãs mesmo estreitos aumentamos ligeiramente
- * a fotografia para ela continuar a ter presença.
+ * Nos telemóveis muito estreitos puxamos o enquadramento
+ * só um bocadinho para a direita para a cara/corpo do
+ * jogador central não ficarem demasiado colados ao texto.
  */
 @media (max-width: 390px) {
   .sport-site .campaign-hero-image {
-    width: 165% !important;
-    left: 52% !important;
+    object-position: 52% center !important;
+    height: 400px !important;
   }
 }
 
 /*
- * Num telemóvel maior conseguimos mostrar ainda
- * mais da composição original.
+ * Em mobile maior conseguimos dar-lhe um bocadinho
+ * mais de altura sem exagerar o zoom.
  */
 @media (min-width: 430px) and (max-width: 760px) {
   .sport-site .campaign-hero-image {
-    width: 145% !important;
+    height: 430px !important;
+    object-position: 50% center !important;
   }
 }
