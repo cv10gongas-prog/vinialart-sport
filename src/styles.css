@@ -97,12 +97,18 @@
     var(--magenta) 45%,
     var(--cyan) 100%
   );
+
   --gradient-magenta: linear-gradient(
     120deg,
     var(--magenta),
     color-mix(in oklab, var(--magenta) 55%, var(--cyan))
   );
-  --gradient-fade-bottom: linear-gradient(to top, var(--background), transparent);
+
+  --gradient-fade-bottom: linear-gradient(
+    to top,
+    var(--background),
+    transparent
+  );
 }
 
 .dark {
@@ -156,19 +162,26 @@
 /* Very light grain, editorial not noisy */
 @utility grain {
   position: relative;
+
   &::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
     opacity: 0.18;
-    background-image: radial-gradient(oklch(1 0 0 / 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(
+      oklch(1 0 0 / 0.05) 1px,
+      transparent 1px
+    );
     background-size: 4px 4px;
   }
 }
 
 @utility bg-tech-grid {
-  background-image: radial-gradient(oklch(1 0 0 / 0.035) 1px, transparent 1px);
+  background-image: radial-gradient(
+    oklch(1 0 0 / 0.035) 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
 }
 
@@ -195,8 +208,16 @@
 /* Deep studio floor used behind large product shots */
 @utility bg-studio {
   background:
-    radial-gradient(70% 60% at 50% 15%, oklch(0.24 0.008 285) 0%, transparent 70%),
-    linear-gradient(to bottom, oklch(0.155 0.005 285), oklch(0.115 0.004 285));
+    radial-gradient(
+      70% 60% at 50% 15%,
+      oklch(0.24 0.008 285) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      oklch(0.155 0.005 285),
+      oklch(0.115 0.004 285)
+    );
 }
 
 @utility text-sport-gradient {
@@ -240,15 +261,22 @@
 
 /* Unified card: soft surface, almost no border, lifts gently */
 @utility card-sport {
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--surface) 92%,
+    transparent
+  );
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
+
   transition:
     border-color 0.4s var(--ease-editorial),
     transform 0.4s var(--ease-editorial),
     box-shadow 0.4s var(--ease-editorial),
     background-color 0.4s var(--ease-editorial);
+
   &:hover {
     border-color: oklch(1 0 0 / 18%);
     transform: translateY(-3px);
@@ -257,32 +285,53 @@
 }
 
 @utility card-sport-cyan {
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--surface) 92%,
+    transparent
+  );
+
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
+
   transition:
     border-color 0.4s var(--ease-editorial),
     transform 0.4s var(--ease-editorial),
     box-shadow 0.4s var(--ease-editorial);
+
   &:hover {
-    border-color: color-mix(in oklab, var(--cyan) 45%, transparent);
+    border-color: color-mix(
+      in oklab,
+      var(--cyan) 45%,
+      transparent
+    );
+
     transform: translateY(-3px);
     box-shadow: var(--shadow-glow-cyan);
   }
 }
 
 @utility glow-text-magenta {
-  text-shadow: 0 0 40px color-mix(in oklab, var(--magenta) 35%, transparent);
+  text-shadow: 0 0 40px color-mix(
+    in oklab,
+    var(--magenta) 35%,
+    transparent
+  );
 }
 
 @utility glow-text-cyan {
-  text-shadow: 0 0 40px color-mix(in oklab, var(--cyan) 35%, transparent);
+  text-shadow: 0 0 40px color-mix(
+    in oklab,
+    var(--cyan) 35%,
+    transparent
+  );
 }
 
 /* Slow image reveal for editorial galleries */
 @utility media-zoom {
   transition: transform 0.9s var(--ease-editorial);
+
   &:hover {
     transform: scale(1.04);
   }
@@ -297,8 +346,143 @@
     opacity: 0;
     transform: translateY(18px);
   }
+
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/*
+ * ==========================================================
+ * VINILART SPORT — MOBILE CAMPAIGN HERO FINAL OVERRIDE
+ * ==========================================================
+ *
+ * Desktop NÃO é alterado.
+ *
+ * No mobile queremos imitar a lógica visual do desktop:
+ * - texto numa zona escura à esquerda
+ * - jogador/fotografia mais visível à direita
+ * - fade progressivo entre as duas zonas
+ * - mesma sport-hero-approved.jpg
+ */
+@media (max-width: 760px) {
+  .sport-site .campaign-hero {
+    min-height: 580px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #07090c !important;
+  }
+
+  /*
+   * Mantemos a imagem a preencher o hero.
+   * O foco vai mais para a direita para mostrar a parte
+   * mais forte da composição, como acontece no desktop.
+   */
+  .sport-site .campaign-hero-image {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position: 69% center !important;
+
+    opacity: 0.84 !important;
+
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+
+    filter: none !important;
+  }
+
+  /*
+   * FADE PRINCIPAL
+   *
+   * Esquerda:
+   * praticamente preta, para o texto ficar limpo.
+   *
+   * Direita:
+   * progressivamente transparente para revelar o jogador.
+   */
+  .sport-site .campaign-hero::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+
+    background:
+      linear-gradient(
+        90deg,
+        #07090c 0%,
+        #07090cfa 15%,
+        #07090cf2 32%,
+        #07090cd6 47%,
+        #07090c9b 61%,
+        #07090c52 75%,
+        #07090c18 91%,
+        transparent 100%
+      ),
+      linear-gradient(
+        0deg,
+        #07090c 0%,
+        #07090cfb 7%,
+        #07090cd8 17%,
+        #07090c80 29%,
+        transparent 48%
+      ) !important;
+  }
+
+  /*
+   * Mantém o conteúdo por cima da imagem/fade.
+   */
+  .sport-site .campaign-hero-inner {
+    position: relative !important;
+    z-index: 2 !important;
+    padding-block: 74px 110px !important;
+  }
+
+  .sport-site .campaign-tag,
+  .sport-site .campaign-hero h1,
+  .sport-site .campaign-hero .home-intro,
+  .sport-site .campaign-hero .home-actions {
+    position: relative !important;
+    z-index: 3 !important;
+  }
+
+  /*
+   * No mobile deixamos o texto com largura controlada.
+   * A fotografia respira mais no lado direito.
+   */
+  .sport-site .campaign-hero h1 {
+    max-width: 330px !important;
+  }
+
+  .sport-site .campaign-hero .home-intro {
+    max-width: 315px !important;
+  }
+
+  .sport-site .campaign-hero-baseline {
+    z-index: 3 !important;
+  }
+}
+
+/*
+ * Num telemóvel muito estreito não queremos perder
+ * completamente o sujeito principal.
+ */
+@media (max-width: 390px) {
+  .sport-site .campaign-hero-image {
+    object-position: 66% center !important;
+  }
+}
+
+/*
+ * Em telemóveis um pouco mais largos podemos revelar
+ * ainda mais a parte direita da composição.
+ */
+@media (min-width: 430px) and (max-width: 760px) {
+  .sport-site .campaign-hero-image {
+    object-position: 72% center !important;
   }
 }
