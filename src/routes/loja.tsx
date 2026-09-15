@@ -88,7 +88,7 @@ function MainProductCard({
         cartItem: undefined,
         modo: undefined,
       }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[1.45rem] border border-white/[0.08] bg-[#0d1218] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_65px_rgba(0,0,0,0.38)] focus-visible:ring-2 focus-visible:ring-cyan-400"
+      className="group relative flex min-w-0 h-full flex-col overflow-hidden rounded-[1rem] border border-white/[0.08] bg-[#0d1218] outline-none transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:shadow-[0_22px_65px_rgba(0,0,0,0.38)] focus-visible:ring-2 focus-visible:ring-cyan-400 sm:rounded-[1.35rem]"
     >
       <div className="relative aspect-square overflow-hidden bg-[#080c11]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,rgba(34,211,238,0.09),transparent_62%)]" />
@@ -101,43 +101,47 @@ function MainProductCard({
             "relative z-10 h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.035]",
             isPhoto
               ? "object-cover"
-              : "object-contain p-5 sm:p-7",
+              : "object-contain p-3 sm:p-5 xl:p-6",
           ].join(" ")}
         />
 
-        <div className="absolute left-3 top-3 z-20 flex h-8 min-w-8 items-center justify-center rounded-full border border-white/10 bg-black/65 px-2 font-mono text-[0.61rem] font-bold tracking-[0.1em] text-zinc-300 backdrop-blur">
+        <div className="absolute left-2 top-2 z-20 flex h-7 min-w-7 items-center justify-center rounded-full border border-white/10 bg-black/70 px-1.5 font-mono text-[0.5rem] font-bold tracking-[0.08em] text-zinc-300 backdrop-blur sm:left-3 sm:top-3 sm:h-8 sm:min-w-8 sm:px-2 sm:text-[0.61rem]">
           0{index + 1}
         </div>
 
-        <div className="absolute right-3 top-3 z-20 rounded-full border border-white/10 bg-black/75 px-3 py-1.5 font-mono text-[0.59rem] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur">
+        <div className="absolute right-2 top-2 z-20 max-w-[82px] rounded-full border border-white/10 bg-black/80 px-2 py-1.5 text-center font-mono text-[0.43rem] font-semibold uppercase leading-tight tracking-[0.06em] text-white backdrop-blur sm:right-3 sm:top-3 sm:max-w-none sm:px-3 sm:text-[0.59rem] sm:tracking-[0.1em]">
           {getProductPrice(product)}
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[#080c11]/85 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-14 bg-gradient-to-t from-[#080c11]/85 to-transparent sm:h-24" />
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex-1">
-          <span className="font-mono text-[0.61rem] font-semibold uppercase tracking-[0.17em] text-cyan-400">
+      <div className="flex flex-1 flex-col p-3 sm:p-5">
+        <div className="flex-1 min-w-0">
+          <span className="block truncate font-mono text-[0.48rem] font-semibold uppercase tracking-[0.11em] text-cyan-400 sm:text-[0.61rem] sm:tracking-[0.17em]">
             {product.category}
           </span>
 
-          <h3 className="mt-2.5 font-display text-[1.4rem] uppercase leading-[0.98] tracking-wide text-white transition-colors group-hover:text-cyan-200 sm:text-[1.6rem]">
+          <h3 className="mt-1.5 line-clamp-2 min-h-[2.15rem] font-display text-[0.98rem] uppercase leading-[1.05] tracking-wide text-white transition-colors group-hover:text-cyan-200 sm:mt-2.5 sm:min-h-0 sm:text-[1.35rem] xl:text-[1.5rem]">
             {product.name}
           </h3>
 
-          <p className="mt-3 line-clamp-2 text-[0.84rem] leading-6 text-zinc-400">
+          <p className="mt-3 hidden line-clamp-2 text-[0.8rem] leading-5 text-zinc-400 sm:block">
             {product.description}
           </p>
         </div>
 
-        <div className="mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4">
-          <span className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.13em] text-white">
+        <div className="mt-3 flex items-center justify-between border-t border-white/[0.07] pt-3 sm:mt-5 sm:pt-4">
+          <span className="font-mono text-[0.5rem] font-bold uppercase tracking-[0.09em] text-white sm:text-[0.65rem] sm:tracking-[0.13em]">
             Personalizar
           </span>
 
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-400 text-black transition-all duration-300 group-hover:translate-x-1 group-hover:bg-cyan-300">
-            <ArrowRight size={15} strokeWidth={2.5} />
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-black transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-cyan-300 sm:h-9 sm:w-9 sm:group-hover:translate-x-1">
+            <ArrowRight
+              size={12}
+              strokeWidth={2.5}
+              className="sm:h-[15px] sm:w-[15px]"
+            />
           </span>
         </div>
       </div>
@@ -375,7 +379,7 @@ function Loja() {
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
             {primaryProducts.map((product, index) => (
               <MainProductCard
                 key={product.slug}
