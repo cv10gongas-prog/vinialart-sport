@@ -355,16 +355,16 @@
 
 /*
  * ==========================================================
- * VINILART SPORT — MOBILE CAMPAIGN HERO FINAL OVERRIDE
+ * VINILART SPORT — MOBILE HERO
  * ==========================================================
  *
- * Desktop NÃO é alterado.
+ * IMPORTANTE:
+ * no mobile NÃO usamos "cover" a ocupar os 580px todos.
  *
- * No mobile queremos imitar a lógica visual do desktop:
- * - texto numa zona escura à esquerda
- * - jogador/fotografia mais visível à direita
- * - fade progressivo entre as duas zonas
- * - mesma sport-hero-approved.jpg
+ * A imagem mantém a proporção panorâmica original,
+ * fica no topo e desaparece progressivamente para preto.
+ *
+ * É a mesma /brand/sport-hero-approved.jpg do desktop.
  */
 @media (max-width: 760px) {
   .sport-site .campaign-hero {
@@ -375,35 +375,73 @@
   }
 
   /*
-   * Mantemos a imagem a preencher o hero.
-   * O foco vai mais para a direita para mostrar a parte
-   * mais forte da composição, como acontece no desktop.
+   * ESTE É O PONTO PRINCIPAL.
+   *
+   * Antes:
+   * width: 100%;
+   * height: 100%;
+   * object-fit: cover;
+   *
+   * Isso fazia zoom enorme na imagem panorâmica.
+   *
+   * Agora:
+   * a imagem fica a 155% da largura do telemóvel
+   * e mantém a altura AUTOMÁTICA.
    */
   .sport-site .campaign-hero-image {
     position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
 
-    object-fit: cover !important;
-    object-position: 69% center !important;
+    inset: auto !important;
+    top: 0 !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
 
-    opacity: 0.84 !important;
+    width: 155% !important;
+    max-width: none !important;
+    height: auto !important;
 
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
+    object-fit: contain !important;
+    object-position: center top !important;
 
+    transform: translateX(-50%) !important;
+
+    opacity: 0.86 !important;
     filter: none !important;
+
+    /*
+     * A fotografia desaparece suavemente em baixo,
+     * em vez de terminar com um corte seco.
+     */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 55%,
+      rgba(0, 0, 0, 0.95) 65%,
+      rgba(0, 0, 0, 0.72) 76%,
+      rgba(0, 0, 0, 0.35) 89%,
+      transparent 100%
+    ) !important;
+
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 55%,
+      rgba(0, 0, 0, 0.95) 65%,
+      rgba(0, 0, 0, 0.72) 76%,
+      rgba(0, 0, 0, 0.35) 89%,
+      transparent 100%
+    ) !important;
   }
 
   /*
-   * FADE PRINCIPAL
+   * Fade lateral tipo desktop.
    *
-   * Esquerda:
-   * praticamente preta, para o texto ficar limpo.
+   * O texto fica protegido pelo preto à esquerda,
+   * mas a imagem continua visível no centro/direita.
    *
-   * Direita:
-   * progressivamente transparente para revelar o jogador.
+   * O segundo gradiente fecha o hero para preto
+   * por baixo da fotografia.
    */
   .sport-site .campaign-hero::before {
     content: "" !important;
@@ -414,32 +452,31 @@
     background:
       linear-gradient(
         90deg,
-        #07090c 0%,
-        #07090cfa 15%,
-        #07090cf2 32%,
-        #07090cd6 47%,
-        #07090c9b 61%,
-        #07090c52 75%,
-        #07090c18 91%,
+        #07090cf8 0%,
+        #07090ce9 20%,
+        #07090cc8 38%,
+        #07090c89 55%,
+        #07090c45 72%,
+        #07090c12 90%,
         transparent 100%
       ),
       linear-gradient(
-        0deg,
-        #07090c 0%,
-        #07090cfb 7%,
-        #07090cd8 17%,
-        #07090c80 29%,
-        transparent 48%
+        180deg,
+        transparent 0%,
+        #07090c08 18%,
+        #07090c30 31%,
+        #07090c8c 42%,
+        #07090ce8 54%,
+        #07090c 68%,
+        #07090c 100%
       ) !important;
   }
 
-  /*
-   * Mantém o conteúdo por cima da imagem/fade.
-   */
   .sport-site .campaign-hero-inner {
     position: relative !important;
     z-index: 2 !important;
-    padding-block: 74px 110px !important;
+    padding-top: 84px !important;
+    padding-bottom: 110px !important;
   }
 
   .sport-site .campaign-tag,
@@ -450,10 +487,6 @@
     z-index: 3 !important;
   }
 
-  /*
-   * No mobile deixamos o texto com largura controlada.
-   * A fotografia respira mais no lado direito.
-   */
   .sport-site .campaign-hero h1 {
     max-width: 330px !important;
   }
@@ -468,21 +501,22 @@
 }
 
 /*
- * Num telemóvel muito estreito não queremos perder
- * completamente o sujeito principal.
+ * Em ecrãs mesmo estreitos aumentamos ligeiramente
+ * a fotografia para ela continuar a ter presença.
  */
 @media (max-width: 390px) {
   .sport-site .campaign-hero-image {
-    object-position: 66% center !important;
+    width: 165% !important;
+    left: 52% !important;
   }
 }
 
 /*
- * Em telemóveis um pouco mais largos podemos revelar
- * ainda mais a parte direita da composição.
+ * Num telemóvel maior conseguimos mostrar ainda
+ * mais da composição original.
  */
 @media (min-width: 430px) and (max-width: 760px) {
   .sport-site .campaign-hero-image {
-    object-position: 72% center !important;
+    width: 145% !important;
   }
 }
