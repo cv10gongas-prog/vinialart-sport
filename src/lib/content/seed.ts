@@ -36,23 +36,52 @@ function categoryIdForName(name: string): string {
   return found ? found.id : "cat-adeptos";
 }
 
-/** Converte um produto legacy (array hardcoded) para o modelo administrável. */
+/** Preços atualmente apresentados no site — preservados tal e qual. */
+const legacyPrices: Record<string, string> = {
+  "caneleiras-personalizadas": "Desde 19,90€",
+};
+
+/** Produtos apresentados com fotografia real (imagem a preencher o cartão). */
+const legacyPhotoSlugs = new Set([
+  "caneleiras-personalizadas",
+  "equipamento-personalizado",
+  "estampagem",
+  "artigos-adeptos",
+]);
+
+/** Nomes curtos e imagens usados hoje na grelha de catálogo. */
+const catalogPresentation = new Map(
+  catalogExamples.map((example) => [
+    `${example.id}-personalizado`,
+    example,
+  ]),
+);
+
+/** Converte um produto legacy (array hardcoded) para o modelo centralizado. */
 export function normalizeLegacyProduct(
   product: Product,
   order: number,
   featured: boolean,
 ): SiteProduct {
+  const presentation = catalogPresentation.get(product.slug);
+  const price = legacyPrices[product.slug] ?? "";
+  const isPhoto = presentation
+    ? presentation.kind === "Fotografia de trabalho"
+    : legacyPhotoSlugs.has(product.slug);
+
   return {
     id: `prod-${product.slug}`,
     slug: product.slug,
     name: product.name,
+    shortName: presentation?.name ?? product.name,
     categoryId: categoryIdForName(product.category),
     shortDescription: product.description,
     longDescription: product.description,
-    image: product.catalogImage ?? product.image,
+    image: presentation?.image ?? product.catalogImage ?? product.image,
+    imageFit: isPhoto ? "cover" : "contain",
     gallery: product.catalogGallery ?? product.gallery ?? [],
-    priceMode: "quote",
-    price: "",
+    priceMode: price ? "price" : "quote",
+    price,
     badge: product.badges[0] ?? "",
     featured,
     order,
