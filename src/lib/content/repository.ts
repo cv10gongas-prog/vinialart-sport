@@ -63,6 +63,7 @@ export interface ProductRepository {
     inHome?: boolean;
     featured?: boolean;
     categoryId?: string;
+    shelf?: "principal" | "catalogo";
   }): SiteProduct[];
   /** ID estável: nunca depende do nome nem do slug. */
   getById(id: string): SiteProduct | undefined;
@@ -106,6 +107,7 @@ export function createRepositories(content: SiteContent): ContentRepositories {
       if (options?.inHome) list = list.filter((p) => p.showInHome);
       if (options?.featured) list = list.filter((p) => p.featured);
       if (options?.categoryId) list = list.filter((p) => p.categoryId === options.categoryId);
+      if (options?.shelf) list = list.filter((p) => p.shelf === options.shelf);
       return list;
     },
     getById: (id) => content.products.find((p) => p.id === id),
