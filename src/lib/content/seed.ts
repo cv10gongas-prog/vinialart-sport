@@ -11,14 +11,14 @@ import { supporterProducts } from "@/lib/supporter-products";
 import { VINILART_MAIN_URL } from "@/lib/config";
 
 import {
-  CMS_SCHEMA_VERSION,
-  type CmsCategory,
-  type CmsContactChannel,
-  type CmsContent,
-  type CmsHomeSection,
-  type CmsNavLink,
-  type CmsPortfolioItem,
-  type CmsProduct,
+  CONTENT_SCHEMA_VERSION,
+  type SiteCategory,
+  type SiteContactChannel,
+  type SiteContent,
+  type SiteHomeSection,
+  type SiteNavLink,
+  type SitePortfolioItem,
+  type SiteProduct,
 } from "./types";
 
 const legacyCategories: { id: string; name: string; slug: string }[] = [
@@ -40,7 +40,7 @@ export function normalizeLegacyProduct(
   product: Product,
   order: number,
   featured: boolean,
-): CmsProduct {
+): SiteProduct {
   return {
     id: `prod-${product.slug}`,
     slug: product.slug,
@@ -70,14 +70,14 @@ const FEATURED_SLUGS = new Set([
   "estampagem",
 ]);
 
-function defaultProducts(): CmsProduct[] {
+function defaultProducts(): SiteProduct[] {
   const all = [...coreProducts, ...supporterProducts];
   return all.map((product, index) =>
     normalizeLegacyProduct(product, index + 1, FEATURED_SLUGS.has(product.slug)),
   );
 }
 
-function defaultCategories(): CmsCategory[] {
+function defaultCategories(): SiteCategory[] {
   return legacyCategories.map((category, index) => ({
     id: category.id,
     name: category.name,
@@ -103,7 +103,7 @@ const legacyPortfolio: { title: string; categoryName: string; image: string }[] 
   { title: "Acabamento personalizado", categoryName: "Caneleiras", image: "/catalog/caneleiras-azuis.jpg" },
 ];
 
-function defaultPortfolio(): CmsPortfolioItem[] {
+function defaultPortfolio(): SitePortfolioItem[] {
   return legacyPortfolio.map((item, index) => ({
     id: `port-${index + 1}`,
     title: item.title,
@@ -117,7 +117,7 @@ function defaultPortfolio(): CmsPortfolioItem[] {
   }));
 }
 
-function defaultContacts(): CmsContactChannel[] {
+function defaultContacts(): SiteContactChannel[] {
   // Sem dados inventados: os canais ficam vazios até serem preenchidos no admin.
   return [
     { id: "ch-telefone", type: "telefone", label: "Telefone", value: "", order: 1, visible: false },
@@ -128,7 +128,7 @@ function defaultContacts(): CmsContactChannel[] {
   ];
 }
 
-function defaultHeaderLinks(): CmsNavLink[] {
+function defaultHeaderLinks(): SiteNavLink[] {
   return [
     { id: "nav-inicio", label: "Início", to: "/", order: 1, visible: true },
     { id: "nav-loja", label: "Loja", to: "/loja", order: 2, visible: true },
@@ -137,7 +137,7 @@ function defaultHeaderLinks(): CmsNavLink[] {
   ];
 }
 
-function defaultFooterLinks(): CmsNavLink[] {
+function defaultFooterLinks(): SiteNavLink[] {
   return [
     { id: "foot-loja", label: "Loja", to: "/loja", order: 1, visible: true },
     { id: "foot-personalizar", label: "Personalizar", to: "/personalizar", order: 2, visible: true },
@@ -146,7 +146,7 @@ function defaultFooterLinks(): CmsNavLink[] {
   ];
 }
 
-function defaultHomeSections(): CmsHomeSection[] {
+function defaultHomeSections(): SiteHomeSection[] {
   return [
     { id: "home-hero", key: "hero", label: "Destaque inicial", title: "", subtitle: "", order: 1, visible: true },
     { id: "home-areas", key: "areas", label: "O que personalizamos", title: "", subtitle: "", order: 2, visible: true },
@@ -157,9 +157,9 @@ function defaultHomeSections(): CmsHomeSection[] {
   ];
 }
 
-export function defaultContent(): CmsContent {
+export function seedContent(): SiteContent {
   return {
-    schemaVersion: CMS_SCHEMA_VERSION,
+    schemaVersion: CONTENT_SCHEMA_VERSION,
     categories: defaultCategories(),
     products: defaultProducts(),
     portfolio: defaultPortfolio(),
