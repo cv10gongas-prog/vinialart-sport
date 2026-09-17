@@ -27,10 +27,14 @@ export type SiteProduct = {
   id: string;
   slug: string;
   name: string;
+  /** Nome curto usado nas grelhas de catálogo. */
+  shortName: string;
   categoryId: string;
   shortDescription: string;
   longDescription: string;
   image: string;
+  /** Como a imagem preenche o cartão: fotografia real (cover) ou mockup (contain). */
+  imageFit: "cover" | "contain";
   gallery: string[];
   priceMode: PriceMode;
   price: string;
