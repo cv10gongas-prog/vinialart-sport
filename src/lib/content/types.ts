@@ -42,6 +42,8 @@ export type SiteProduct = {
   featured: boolean;
   order: number;
   status: PublishStatus;
+  /** Prateleira da loja: destaque principal ou grelha de catálogo. */
+  shelf: "principal" | "catalogo";
   showInShop: boolean;
   showInHome: boolean;
   customizable: boolean;
