@@ -21,6 +21,10 @@ import { Route as PersonalizarRouteImport } from './routes/personalizar'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as AdminContactosRouteImport } from './routes/admin.contactos'
+import { Route as AdminInicioRouteImport } from './routes/admin.inicio'
+import { Route as AdminPortfolioRouteImport } from './routes/admin.portfolio'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
 
@@ -84,6 +88,26 @@ const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
   path: '/categorias',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContactosRoute = AdminContactosRouteImport.update({
+  id: '/contactos',
+  path: '/contactos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInicioRoute = AdminInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPortfolioRoute = AdminPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProdutosRoute = AdminProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -107,6 +131,10 @@ export interface FileRoutesByFullPath {
   '/personalizar': typeof PersonalizarRoute
   '/portfolio': typeof PortfolioRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contactos': typeof AdminContactosRoute
+  '/admin/inicio': typeof AdminInicioRoute
+  '/admin/portfolio': typeof AdminPortfolioRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -122,6 +150,10 @@ export interface FileRoutesByTo {
   '/personalizar': typeof PersonalizarRoute
   '/portfolio': typeof PortfolioRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contactos': typeof AdminContactosRoute
+  '/admin/inicio': typeof AdminInicioRoute
+  '/admin/portfolio': typeof AdminPortfolioRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -139,6 +171,10 @@ export interface FileRoutesById {
   '/personalizar': typeof PersonalizarRoute
   '/portfolio': typeof PortfolioRoute
   '/admin/categorias': typeof AdminCategoriasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contactos': typeof AdminContactosRoute
+  '/admin/inicio': typeof AdminInicioRoute
+  '/admin/portfolio': typeof AdminPortfolioRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -157,6 +193,10 @@ export interface FileRouteTypes {
     | '/personalizar'
     | '/portfolio'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/contactos'
+    | '/admin/inicio'
+    | '/admin/portfolio'
     | '/admin/produtos'
     | '/produto/$slug'
     | '/admin/'
@@ -172,6 +212,10 @@ export interface FileRouteTypes {
     | '/personalizar'
     | '/portfolio'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/contactos'
+    | '/admin/inicio'
+    | '/admin/portfolio'
     | '/admin/produtos'
     | '/produto/$slug'
     | '/admin'
@@ -188,6 +232,10 @@ export interface FileRouteTypes {
     | '/personalizar'
     | '/portfolio'
     | '/admin/categorias'
+    | '/admin/configuracoes'
+    | '/admin/contactos'
+    | '/admin/inicio'
+    | '/admin/portfolio'
     | '/admin/produtos'
     | '/produto/$slug'
     | '/admin/'
@@ -293,6 +341,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/contactos': {
+      id: '/admin/contactos'
+      path: '/contactos'
+      fullPath: '/admin/contactos'
+      preLoaderRoute: typeof AdminContactosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/inicio': {
+      id: '/admin/inicio'
+      path: '/inicio'
+      fullPath: '/admin/inicio'
+      preLoaderRoute: typeof AdminInicioRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/portfolio': {
+      id: '/admin/portfolio'
+      path: '/portfolio'
+      fullPath: '/admin/portfolio'
+      preLoaderRoute: typeof AdminPortfolioRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/produtos': {
       id: '/admin/produtos'
       path: '/produtos'
@@ -312,12 +388,20 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriasRoute: typeof AdminCategoriasRoute
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminContactosRoute: typeof AdminContactosRoute
+  AdminInicioRoute: typeof AdminInicioRoute
+  AdminPortfolioRoute: typeof AdminPortfolioRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriasRoute: AdminCategoriasRoute,
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminContactosRoute: AdminContactosRoute,
+  AdminInicioRoute: AdminInicioRoute,
+  AdminPortfolioRoute: AdminPortfolioRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
