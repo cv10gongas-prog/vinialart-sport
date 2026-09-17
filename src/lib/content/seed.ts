@@ -8,6 +8,7 @@
 
 import { products as coreProducts, type Product } from "@/lib/sport-data";
 import { supporterProducts } from "@/lib/supporter-products";
+import { catalogExamples } from "@/lib/catalog-examples";
 import { VINILART_MAIN_URL } from "@/lib/config";
 
 import {
