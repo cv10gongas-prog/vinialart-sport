@@ -176,6 +176,7 @@ export const equipamentoConfig = buildConfig(
     {
       id: "FRONT",
       label: "Frente",
+      previewLabel: "FRENTE",
       mockupSrc: jerseyFrontWhite,
       mockup: {
         baseSrc: jerseyFrontWhite,
@@ -196,6 +197,7 @@ export const equipamentoConfig = buildConfig(
     {
       id: "BACK",
       label: "Costas",
+      previewLabel: "COSTAS",
       mockupSrc: jerseyBackWhite,
       mockup: {
         baseSrc: jerseyBackWhite,
