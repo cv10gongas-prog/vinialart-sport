@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <!-- Sombra de contacto suave no solo -->
+    <radialGradient id="bottleFloorDrop" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#000000" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Aço Inox Escovado (Tampa, Gargalo e Base) -->
+    <linearGradient id="brushedSteel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="15%" stop-color="#94a3b8"/>
+      <stop offset="30%" stop-color="#f8fafc"/>
+      <stop offset="48%" stop-color="#cbd5e1"/>
+      <stop offset="70%" stop-color="#64748b"/>
+      <stop offset="88%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+
+    <!-- Corpo Lacado Branco Neutro (para mistura de cores multiply perfeita) -->
+    <linearGradient id="lacquerBase" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="14%" stop-color="#f1f5f9"/>
+      <stop offset="30%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="85%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+
+    <!-- Volume Curvo e Brilho 3D de Estúdio -->
+    <linearGradient id="cylinderGloss" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.25"/>
+      <stop offset="12%" stop-color="#000000" stop-opacity="0.05"/>
+      <stop offset="28%" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="75%" stop-color="#000000" stop-opacity="0.06"/>
+      <stop offset="90%" stop-color="#000000" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <filter id="bottleShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="20" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Sombra no chão do estúdio -->
+  <ellipse cx="400" cy="722" rx="140" ry="18" fill="url(#bottleFloorDrop)"/>
+
+  <g filter="url(#bottleShadow)">
+    <!-- 1. Tampa e Alça em Aço Inoxidável -->
+    <!-- Alça em arco metálico -->
+    <path d="M 368 115 C 368 60, 432 60, 432 115" fill="none" stroke="url(#brushedSteel)" stroke-width="16" stroke-linecap="round"/>
+    <!-- Tampa roscada principal -->
+    <rect x="352" y="105" width="96" height="42" rx="6" fill="url(#brushedSteel)" stroke="#475569" stroke-width="1.5"/>
+    <!-- Anel de silicone para aderência -->
+    <rect x="348" y="120" width="104" height="12" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="1"/>
+
+    <!-- 2. Gargalo Metálico -->
+    <rect x="364" y="147" width="72" height="30" fill="url(#brushedSteel)" stroke="#64748b" stroke-width="1"/>
+    <ellipse cx="400" cy="147" rx="36" ry="6" fill="#cbd5e1" opacity="0.6"/>
+
+    <!-- 3. Ombro Cónico + Corpo Lacado Principal da Garrafa -->
+    <path d="M 364 177 
+             C 364 212, 300 218, 300 245 
+             L 300 668 
+             C 300 684, 316 690, 340 690 
+             L 460 690 
+             C 484 690, 500 684, 500 668 
+             L 500 245 
+             C 500 218, 436 212, 436 177 
+             Z" 
+          fill="url(#lacquerBase)" 
+          stroke="#94a3b8" 
+          stroke-width="1.5"/>
+
+    <!-- Camada de Volume e Luz Cilíndrica 3D -->
+    <path d="M 364 177 
+             C 364 212, 300 218, 300 245 
+             L 300 668 
+             C 300 684, 316 690, 340 690 
+             L 460 690 
+             C 484 690, 500 684, 500 668 
+             L 500 245 
+             C 500 218, 436 212, 436 177 
+             Z" 
+          fill="url(#cylinderGloss)"/>
+
+    <!-- 4. Aro / Base em Aço Inox Escovado no Fundo -->
+    <path d="M 300 664 L 300 672 C 300 686, 316 692, 340 692 L 460 692 C 484 692, 500 686, 500 672 L 500 664 Z" 
+          fill="url(#brushedSteel)" 
+          stroke="#475569" 
+          stroke-width="1"/>
+  </g>
+</svg>

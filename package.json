@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "sync:theme": "node scripts/sync-theme-assets.mjs",
+    "build:theme": "vite build && node scripts/sync-theme-assets.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

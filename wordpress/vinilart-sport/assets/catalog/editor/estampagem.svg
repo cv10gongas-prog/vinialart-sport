@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background studio glow -->
+    <radialGradient id="estampagemBgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#141a24"/>
+      <stop offset="100%" stop-color="#090c10"/>
+    </radialGradient>
+
+    <!-- Floor shadow -->
+    <ellipse id="garmentShadow" cx="250" cy="460" rx="190" ry="22" fill="#000000" opacity="0.65"/>
+
+    <!-- T-shirt / Jersey Fabric Shading -->
+    <linearGradient id="fabricShade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.18" />
+      <stop offset="15%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.02" />
+      <stop offset="85%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.18" />
+    </linearGradient>
+
+    <!-- Collar depth shadow -->
+    <radialGradient id="neckDepthEstampagem" cx="50%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#111827" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#1f2937" stop-opacity="0.3" />
+    </radialGradient>
+
+    <!-- Press bed subtle guidelines indicating heat-press transfer area -->
+    <linearGradient id="pressZoneLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#00c8ff" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Studio Backdrop -->
+  <rect width="500" height="500" fill="url(#estampagemBgGlow)"/>
+
+  <!-- Floor Contact Shadow -->
+  <ellipse cx="250" cy="460" rx="190" ry="20" fill="#000000" opacity="0.55"/>
+
+  <!-- Interior da Gola -->
+  <path d="M190,80 Q250,115 310,80 Q250,60 190,80 Z" fill="url(#neckDepthEstampagem)" />
+
+  <!-- Peça Têxtil Branca (Camisola / Base de Estampagem Desportiva) -->
+  <path d="M190,80 Q250,110 310,80 L390,115 L435,205 L375,235 L345,185 L350,440 Q250,455 150,440 L155,185 L125,235 L65,205 L110,115 Z"
+        fill="#ffffff"
+        stroke="#cbd5e1"
+        stroke-width="1.5" />
+
+  <!-- Sombras Anatómicas do Tecido -->
+  <path d="M190,80 Q250,110 310,80 L390,115 L435,205 L375,235 L345,185 L350,440 Q250,455 150,440 L155,185 L125,235 L65,205 L110,115 Z"
+        fill="url(#fabricShade)"
+        style="mix-blend-mode: multiply;" />
+
+  <!-- Bordo da Gola com Costura Desportiva -->
+  <path d="M190,80 Q250,122 310,80" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round" />
+  <path d="M190,80 Q250,122 310,80" fill="none" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" stroke-dasharray="4 2" />
+
+  <!-- Costuras nas mangas e bainhas -->
+  <path d="M110,115 L155,185" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
+  <path d="M390,115 L345,185" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
+  <path d="M68,200 L122,230" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 2" />
+  <path d="M432,200 L378,230" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 2" />
+  <path d="M152,434 Q250,449 348,434" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 2" />
+</svg>

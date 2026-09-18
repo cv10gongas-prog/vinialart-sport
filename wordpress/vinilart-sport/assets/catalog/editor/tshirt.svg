@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tshirtShade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.22" />
+      <stop offset="18%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.02" />
+      <stop offset="82%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.22" />
+    </linearGradient>
+    <radialGradient id="neckDepth" cx="50%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#111111" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#222222" stop-opacity="0.2" />
+    </radialGradient>
+  </defs>
+
+  <!-- Interior da Gola -->
+  <path d="M190,80 Q250,115 310,80 Q250,60 190,80 Z" fill="url(#neckDepth)" />
+
+  <!-- Corpo Principal e Mangas -->
+  <path d="M190,80 Q250,110 310,80 L390,115 L435,205 L375,235 L345,185 L350,440 Q250,455 150,440 L155,185 L125,235 L65,205 L110,115 Z" 
+        fill="#ffffff" 
+        stroke="#e5e7eb" 
+        stroke-width="1.5" />
+
+  <!-- Sombras Têxteis -->
+  <path d="M190,80 Q250,110 310,80 L390,115 L435,205 L375,235 L345,185 L350,440 Q250,455 150,440 L155,185 L125,235 L65,205 L110,115 Z" 
+        fill="url(#tshirtShade)" 
+        style="mix-blend-mode: multiply;" />
+
+  <!-- Bordo da Gola -->
+  <path d="M190,80 Q250,122 310,80" fill="none" stroke="#d1d5db" stroke-width="5" stroke-linecap="round" />
+</svg>

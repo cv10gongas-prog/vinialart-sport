@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <defs>
+    <radialGradient id="dropGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fabricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#f8fafc"/>
+      <stop offset="75%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="waistbandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="shortsShadow" x="-15%" y="-10%" width="130%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Sombra no solo -->
+  <ellipse cx="240" cy="425" rx="175" ry="15" fill="url(#dropGlow)"/>
+
+  <g filter="url(#shortsShadow)">
+    <!-- Corpo anatómico com recorte exato na virilha -->
+    <path d="M 125 82 
+             C 180 79, 300 79, 355 82 
+             L 358 120 
+             C 372 200, 388 290, 406 408 
+             C 380 412, 340 414, 272 410 
+             C 260 350, 248 290, 240 245 
+             C 232 290, 220 350, 208 410 
+             C 140 414, 100 412, 74 408 
+             C 92 290, 108 200, 122 120 
+             Z" 
+          fill="url(#fabricGradient)" 
+          stroke="#94a3b8" 
+          stroke-width="2" 
+          stroke-linejoin="round"/>
+
+    <!-- Cós elástico -->
+    <path d="M 125 82 C 180 79, 300 79, 355 82 L 358 120 C 300 116, 180 116, 122 120 Z" 
+          fill="url(#waistbandGradient)" 
+          stroke="#94a3b8" 
+          stroke-width="1.8"/>
+    <path d="M 124 95 C 180 91, 300 91, 356 95" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 123 108 C 180 104, 300 104, 357 108" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 2" fill="none"/>
+
+    <!-- Costura central até à virilha -->
+    <path d="M 240 120 L 240 245" stroke="#94a3b8" stroke-width="2"/>
+
+    <!-- Pespontos das bainhas -->
+    <path d="M 78 402 C 120 408, 165 406, 204 404" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+    <path d="M 276 404 C 315 406, 360 408, 402 402" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" fill="none"/>
+
+    <!-- Cordões ajustáveis -->
+    <path d="M 234 116 C 230 142, 224 165, 220 185" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="217" y="180" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(-10 219 185)"/>
+    <path d="M 246 116 C 250 142, 256 165, 260 185" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <rect x="258" y="180" width="5" height="10" rx="1.5" fill="#94a3b8" transform="rotate(10 261 185)"/>
+  </g>
+</svg>
