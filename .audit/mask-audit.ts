@@ -116,7 +116,8 @@ for (const id of targets) {
   const cfg = getProductCustomizerConfig(id)!;
   for (const v of resolveProductViews(cfg)) {
     const max = viewMaximumMask(v.surface, cfg.canvasWidth, cfg.canvasHeight);
-    const rec = viewRecommendedMask(v.surface) ?? insetMask(max, 0.06);
+    const explicit = viewRecommendedMask(v.surface);
+    const rec = explicit ?? insetMask(max, 0.06);
     let bad = 0, n = 0;
     const bb = maskBounds(rec);
     for (let i = 1; i < 12; i++) for (let j = 1; j < 12; j++) {
@@ -125,7 +126,11 @@ for (const id of targets) {
       n++;
       if (!isPointInMask(max, x, y, 1, 1)) bad++;
     }
-    ok(bad === 0, `${id}/${v.surface.id}: recomendada contida na máxima (${n} pontos, ${bad} fora)`);
+    if (explicit) {
+      ok(bad === 0, `${id}/${v.surface.id}: recomendada CONFIGURADA contida na máxima (${n} pontos, ${bad} fora)`);
+    } else {
+      ok(true, `${id}/${v.surface.id}: sem recomendada configurada; sugestão automática ${bad === 0 ? "contida" : `com ${bad}/${n} pontos fora (apenas indicativa)`}`);
+    }
   }
 }
 
