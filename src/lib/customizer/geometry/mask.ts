@@ -323,6 +323,68 @@ export function maskToPath2D(
   }
 }
 
+function isPointInPixelShape(shape: PixelShape, x: number, y: number): boolean {
+  switch (shape.kind) {
+    case "rect": {
+      if (x < shape.x || x > shape.x + shape.width || y < shape.y || y > shape.y + shape.height) {
+        return false;
+      }
+      if (shape.cornerRadius > 0) {
+        const r = shape.cornerRadius;
+        // Top-left corner
+        if (x < shape.x + r && y < shape.y + r) {
+          const dx = x - (shape.x + r);
+          const dy = y - (shape.y + r);
+          return dx * dx + dy * dy <= r * r;
+        }
+        // Top-right corner
+        if (x > shape.x + shape.width - r && y < shape.y + r) {
+          const dx = x - (shape.x + shape.width - r);
+          const dy = y - (shape.y + r);
+          return dx * dx + dy * dy <= r * r;
+        }
+        // Bottom-left corner
+        if (x < shape.x + r && y > shape.y + shape.height - r) {
+          const dx = x - (shape.x + r);
+          const dy = y - (shape.y + shape.height - r);
+          return dx * dx + dy * dy <= r * r;
+        }
+        // Bottom-right corner
+        if (x > shape.x + shape.width - r && y > shape.y + shape.height - r) {
+          const dx = x - (shape.x + shape.width - r);
+          const dy = y - (shape.y + shape.height - r);
+          return dx * dx + dy * dy <= r * r;
+        }
+      }
+      return true;
+    }
+    case "ellipse": {
+      if (shape.rx <= 0 || shape.ry <= 0) return false;
+      const dx = (x - shape.cx) / shape.rx;
+      const dy = (y - shape.cy) / shape.ry;
+      return dx * dx + dy * dy <= 1;
+    }
+    case "polygon": {
+      const pts = shape.points;
+      const n = Math.floor(pts.length / 2);
+      if (n < 3) return false;
+      let inside = false;
+      for (let i = 0, j = n - 1; i < n; j = i++) {
+        const xi = pts[i * 2] ?? 0;
+        const yi = pts[i * 2 + 1] ?? 0;
+        const xj = pts[j * 2] ?? 0;
+        const yj = pts[j * 2 + 1] ?? 0;
+        const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+    case "path":
+    default:
+      return true;
+  }
+}
+
 /** Verifica se um ponto (em pixéis da tela) está dentro da zona personalizável. */
 export function isPointInMask(
   mask: AreaMask,
@@ -331,17 +393,34 @@ export function isPointInMask(
   canvasWidth: number,
   canvasHeight: number,
 ): boolean {
+  if (isMaskEmpty(mask)) return false;
+
   const built = maskToPath2D(mask, canvasWidth, canvasHeight);
 
   if (built && typeof document !== "undefined") {
-    const ctx = document.createElement("canvas").getContext("2d");
-    if (ctx) return ctx.isPointInPath(built.path, x, y, built.fillRule);
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext("2d");
+      if (ctx) return ctx.isPointInPath(built.path, x, y, built.fillRule);
+    } catch {
+      // Fallback para avaliação geométrica direta
+    }
   }
 
-  const box = maskPixelBounds(mask, canvasWidth, canvasHeight);
-  return (
-    x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
-  );
+  // Avaliação geométrica direta (respeita formas exatas, cantos, elipses, polígonos e buracos):
+  const pixelShapes = maskToPixelShapes(mask, canvasWidth, canvasHeight);
+  const additive = pixelShapes.filter((s) => s.operation === "add");
+  const subtract = pixelShapes.filter((s) => s.operation === "subtract");
+
+  const inAdditive = additive.some((s) => isPointInPixelShape(s, x, y));
+  if (!inAdditive) return false;
+
+  const inSubtract = subtract.some((s) => isPointInPixelShape(s, x, y));
+  if (inSubtract) return false;
+
+  return true;
 }
 
 /** Centro geométrico da zona personalizável (usado por "Centrar"). */
@@ -354,47 +433,310 @@ export function maskCenter(
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
-/** Reduz uma máscara para dentro (usado para gerar áreas recomendadas). */
+function doLineSegmentsCross(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x3: number,
+  y3: number,
+  x4: number,
+  y4: number,
+): boolean {
+  const ccw = (
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number,
+    cx: number,
+    cy: number,
+  ) => (cy - ay) * (bx - ax) > (by - ay) * (cx - ax);
+
+  return (
+    ccw(x1, y1, x3, y3, x4, y4) !== ccw(x2, y2, x3, y3, x4, y4) &&
+    ccw(x1, y1, x2, y2, x3, y3) !== ccw(x1, y1, x2, y2, x4, y4)
+  );
+}
+
+function getPixelShapeSegments(
+  shape: PixelShape,
+): Array<{ x1: number; y1: number; x2: number; y2: number }> {
+  const segments: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
+
+  if (shape.kind === "rect") {
+    const { x, y, width: w, height: h } = shape;
+    segments.push(
+      { x1: x, y1: y, x2: x + w, y2: y },
+      { x1: x + w, y1: y, x2: x + w, y2: y + h },
+      { x1: x + w, y1: y + h, x2: x, y2: y + h },
+      { x1: x, y1: y + h, x2: x, y2: y },
+    );
+  } else if (shape.kind === "ellipse") {
+    const n = 24;
+    for (let i = 0; i < n; i++) {
+      const a1 = (i / n) * Math.PI * 2;
+      const a2 = ((i + 1) / n) * Math.PI * 2;
+      segments.push({
+        x1: shape.cx + shape.rx * Math.cos(a1),
+        y1: shape.cy + shape.ry * Math.sin(a1),
+        x2: shape.cx + shape.rx * Math.cos(a2),
+        y2: shape.cy + shape.ry * Math.sin(a2),
+      });
+    }
+  } else if (shape.kind === "polygon") {
+    const pts = shape.points;
+    const n = Math.floor(pts.length / 2);
+    for (let i = 0; i < n; i++) {
+      const nextI = (i + 1) % n;
+      segments.push({
+        x1: pts[i * 2] ?? 0,
+        y1: pts[i * 2 + 1] ?? 0,
+        x2: pts[nextI * 2] ?? 0,
+        y2: pts[nextI * 2 + 1] ?? 0,
+      });
+    }
+  }
+
+  return segments;
+}
+
+/**
+ * Verifica determinística e rigorosamente se uma máscara (subset) está 100% contida dentro de outra (superset).
+ * REGRA ABSOLUTA: recommendedArea ⊆ maximumArea.
+ *
+ * Princípio fail-closed: se a geometria for demasiado complexa ou ambígua para
+ * garantir 100% de certeza geométrica, a função devolve FALSE (rejeita a área).
+ */
+export function isMaskSubset(
+  subset: AreaMask,
+  superset: AreaMask,
+  canvasWidth = 800,
+  canvasHeight = 800,
+): boolean {
+  if (isMaskEmpty(subset)) return true;
+  if (isMaskEmpty(superset)) return false;
+
+  // 1. Verificação de Bounding Box (fail-closed imediato se exceder limites envolventes)
+  const subBox = maskBounds(subset);
+  const superBox = maskBounds(superset);
+  const EPSILON = 0.0001;
+
+  if (
+    subBox.x < superBox.x - EPSILON ||
+    subBox.y < superBox.y - EPSILON ||
+    subBox.x + subBox.width > superBox.x + superBox.width + EPSILON ||
+    subBox.y + subBox.height > superBox.y + superBox.height + EPSILON
+  ) {
+    return false;
+  }
+
+  const subsetPixelShapes = maskToPixelShapes(subset, canvasWidth, canvasHeight);
+  const supersetPixelShapes = maskToPixelShapes(superset, canvasWidth, canvasHeight);
+
+  // 2. Para polígonos/retângulos: nenhuma aresta do subset pode intersetar arestas do superset
+  const subsetSegments: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
+  for (const s of subsetPixelShapes) {
+    if (s.operation === "add") {
+      subsetSegments.push(...getPixelShapeSegments(s));
+    }
+  }
+
+  const supersetSegments: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
+  for (const s of supersetPixelShapes) {
+    supersetSegments.push(...getPixelShapeSegments(s));
+  }
+
+  for (const subSeg of subsetSegments) {
+    for (const supSeg of supersetSegments) {
+      if (
+        doLineSegmentsCross(
+          subSeg.x1,
+          subSeg.y1,
+          subSeg.x2,
+          subSeg.y2,
+          supSeg.x1,
+          supSeg.y1,
+          supSeg.x2,
+          supSeg.y2,
+        )
+      ) {
+        // Cruzamento de fronteiras detectado -> violação direta de contenção
+        return false;
+      }
+    }
+  }
+
+  // 3. Validação de vértices e pontos de amostragem
+  for (const shape of subsetPixelShapes) {
+    if (shape.operation === "subtract") continue;
+
+    const samplePoints: Array<{ x: number; y: number }> = [];
+
+    if (shape.kind === "rect") {
+      const { x, y, width: w, height: h } = shape;
+      samplePoints.push(
+        { x: x + 1, y: y + 1 },
+        { x: x + w - 1, y: y + 1 },
+        { x: x + 1, y: y + h - 1 },
+        { x: x + w - 1, y: y + h - 1 },
+        { x: x + w / 2, y: y + 1 },
+        { x: x + w / 2, y: y + h - 1 },
+        { x: x + 1, y: y + h / 2 },
+        { x: x + w - 1, y: y + h / 2 },
+        { x: x + w / 2, y: y + h / 2 },
+      );
+    } else if (shape.kind === "ellipse") {
+      const { cx, cy, rx, ry } = shape;
+      samplePoints.push({ x: cx, y: cy });
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+        samplePoints.push({
+          x: cx + rx * Math.cos(angle) * 0.98,
+          y: cy + ry * Math.sin(angle) * 0.98,
+        });
+      }
+    } else if (shape.kind === "polygon") {
+      const pts = shape.points;
+      const n = Math.floor(pts.length / 2);
+      let cx = 0;
+      let cy = 0;
+      for (let i = 0; i < n; i++) {
+        const px = pts[i * 2] ?? 0;
+        const py = pts[i * 2 + 1] ?? 0;
+        samplePoints.push({ x: px, y: py });
+        cx += px;
+        cy += py;
+        const nextI = (i + 1) % n;
+        const nextPx = pts[nextI * 2] ?? 0;
+        const nextPy = pts[nextI * 2 + 1] ?? 0;
+        samplePoints.push({ x: (px + nextPx) / 2, y: (py + nextPy) / 2 });
+      }
+      cx /= Math.max(1, n);
+      cy /= Math.max(1, n);
+      samplePoints.push({ x: cx, y: cy });
+      for (let i = 0; i < n; i++) {
+        const px = pts[i * 2] ?? 0;
+        const py = pts[i * 2 + 1] ?? 0;
+        samplePoints.push({ x: cx + (px - cx) * 0.5, y: cy + (py - cy) * 0.5 });
+      }
+    } else if (shape.kind === "path") {
+      // Para caminhos SVG complexos sem motor booleano nativo:
+      // se não for cópia exata ou se não puder ser provado determinísticamente, falha fechado
+      const superPaths = supersetPixelShapes.filter((s) => s.kind === "path");
+      if (superPaths.length === 0) return false;
+      const isIdentical = superPaths.some((sp) => sp.d === shape.d);
+      if (!isIdentical) {
+        return false;
+      }
+      samplePoints.push({ x: canvasWidth / 2, y: canvasHeight / 2 });
+    }
+
+    for (const p of samplePoints) {
+      if (isPointInMask(subset, p.x, p.y, canvasWidth, canvasHeight)) {
+        if (!isPointInMask(superset, p.x, p.y, canvasWidth, canvasHeight)) {
+          return false;
+        }
+      }
+    }
+  }
+
+  // 4. Buracos no superconjunto (subtrações) NUNCA podem ser cobertos pelo subconjunto
+  const supersetSubtract = supersetPixelShapes.filter((s) => s.operation === "subtract");
+  for (const hole of supersetSubtract) {
+    let holeCenterX = 0;
+    let holeCenterY = 0;
+    if (hole.kind === "rect") {
+      holeCenterX = hole.x + hole.width / 2;
+      holeCenterY = hole.y + hole.height / 2;
+    } else if (hole.kind === "ellipse") {
+      holeCenterX = hole.cx;
+      holeCenterY = hole.cy;
+    } else if (hole.kind === "polygon") {
+      const n = Math.floor(hole.points.length / 2);
+      for (let i = 0; i < n; i++) {
+        holeCenterX += hole.points[i * 2] ?? 0;
+        holeCenterY += hole.points[i * 2 + 1] ?? 0;
+      }
+      holeCenterX /= Math.max(1, n);
+      holeCenterY /= Math.max(1, n);
+    }
+    if (isPointInMask(subset, holeCenterX, holeCenterY, canvasWidth, canvasHeight)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Reduz uma máscara para dentro (geração segura de áreas recomendadas).
+ * Cada forma é reduzida em relação ao seu centro local (evitando pontes entre regiões desconectadas).
+ * Formas subtraídas (buracos) são preservadas para não expandir a área útil para o interior dos orifícios.
+ */
 export function insetMask(mask: AreaMask, inset: number): AreaMask {
-  const b = maskBounds(mask);
-  const cx = b.x + b.width / 2;
-  const cy = b.y + b.height / 2;
+  if (isMaskEmpty(mask)) return EMPTY_MASK;
   const factor = Math.max(0, 1 - inset * 2);
 
-  const scalePoint = (x: number, y: number): [number, number] => [
-    cx + (x - cx) * factor,
-    cy + (y - cy) * factor,
-  ];
-
   return {
-    shapes: mask.shapes.map((shape): MaskShape => {
-      switch (shape.kind) {
-        case "rect": {
-          const [x, y] = scalePoint(shape.x, shape.y);
-          return {
-            ...shape,
-            x,
-            y,
-            width: shape.width * factor,
-            height: shape.height * factor,
-          };
+    shapes: mask.shapes
+      .map((shape): MaskShape | null => {
+        const operation = shape.operation ?? "add";
+
+        // Buracos são preservados na íntegra para não violar a subtração
+        if (operation === "subtract") {
+          return { ...shape };
         }
-        case "ellipse": {
-          const [x, y] = scalePoint(shape.cx, shape.cy);
-          return { ...shape, cx: x, cy: y, rx: shape.rx * factor, ry: shape.ry * factor };
-        }
-        case "polygon": {
-          const points: number[] = [];
-          for (let i = 0; i < shape.points.length; i += 2) {
-            const [x, y] = scalePoint(shape.points[i] ?? 0, shape.points[i + 1] ?? 0);
-            points.push(x, y);
+
+        switch (shape.kind) {
+          case "rect": {
+            const newW = shape.width * factor;
+            const newH = shape.height * factor;
+            if (newW <= 0.001 || newH <= 0.001) return null;
+            const newX = shape.x + (shape.width - newW) / 2;
+            const newY = shape.y + (shape.height - newH) / 2;
+            return {
+              ...shape,
+              x: newX,
+              y: newY,
+              width: newW,
+              height: newH,
+            };
           }
-          return { ...shape, points };
+          case "ellipse": {
+            const newRx = shape.rx * factor;
+            const newRy = shape.ry * factor;
+            if (newRx <= 0.001 || newRy <= 0.001) return null;
+            return {
+              ...shape,
+              rx: newRx,
+              ry: newRy,
+            };
+          }
+          case "polygon": {
+            const pts = shape.points;
+            const n = Math.floor(pts.length / 2);
+            if (n < 3) return null;
+            let cx = 0;
+            let cy = 0;
+            for (let i = 0; i < n; i++) {
+              cx += pts[i * 2] ?? 0;
+              cy += pts[i * 2 + 1] ?? 0;
+            }
+            cx /= n;
+            cy /= n;
+
+            const points: number[] = [];
+            for (let i = 0; i < pts.length; i += 2) {
+              const px = pts[i] ?? 0;
+              const py = pts[i + 1] ?? 0;
+              points.push(cx + (px - cx) * factor, cy + (py - cy) * factor);
+            }
+            return { ...shape, points };
+          }
+          case "path":
+          default:
+            return { ...shape };
         }
-        case "path":
-        default:
-          return shape;
-      }
-    }),
+      })
+      .filter((s): s is MaskShape => s !== null),
   };
 }

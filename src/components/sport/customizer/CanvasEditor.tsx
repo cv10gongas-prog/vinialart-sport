@@ -18,6 +18,7 @@ import {
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 
 import {
+  maskCenter,
   maskToPath2D,
   maskToPixelShapes,
   type PixelShape,
@@ -366,6 +367,22 @@ function KonvaStageInner({
 
   const { printArea } = activeSurface;
 
+  /**
+   * Fonte única de verdade: a máscara máxima da vista alimenta ao mesmo tempo
+   * o contorno visível, o recorte do design e a validação de limites.
+   */
+  const maximumMask = viewMaximumMask(
+    activeSurface,
+    config.canvasWidth,
+    config.canvasHeight,
+  );
+
+  const recommendedMask = viewRecommendedMask(
+    activeSurface,
+    config.canvasWidth,
+    config.canvasHeight,
+  );
+
   const paX =
     printArea.xFraction * config.canvasWidth;
 
@@ -378,8 +395,11 @@ function KonvaStageInner({
   const paH =
     printArea.heightFraction * config.canvasHeight;
 
-  const centerX = paX + paW / 2;
-  const centerY = paY + paH / 2;
+  const { x: centerX, y: centerY } = maskCenter(
+    maximumMask,
+    config.canvasWidth,
+    config.canvasHeight,
+  );
 
   const shape = printArea.shape;
 
@@ -561,18 +581,6 @@ function KonvaStageInner({
           [],
         )
       : null;
-
-  /**
-   * Fonte única de verdade: a máscara máxima da vista alimenta ao mesmo tempo
-   * o contorno visível, o recorte do design e a validação de limites.
-   */
-  const maximumMask = viewMaximumMask(
-    activeSurface,
-    config.canvasWidth,
-    config.canvasHeight,
-  );
-
-  const recommendedMask = viewRecommendedMask(activeSurface);
 
   const maskPixelShapes = maskToPixelShapes(
     maximumMask,

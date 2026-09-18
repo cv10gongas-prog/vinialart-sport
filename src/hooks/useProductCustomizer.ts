@@ -39,6 +39,8 @@ import {
 import { getImageBlob, saveImageBlob } from "@/lib/customizer/storage/db";
 import { getImageProcessingProvider } from "@/lib/customizer/ai";
 import { nanoid } from "@/lib/customizer/nanoid";
+import { maskCenter } from "@/lib/customizer/geometry/mask";
+import { viewMaximumMask } from "@/lib/customizer/views";
 
 export type DraftSaveStatus = "idle" | "saving" | "saved";
 
@@ -816,11 +818,16 @@ export function useProductCustomizer(
     (mode: "horizontal" | "vertical" | "both") => {
       if (!selectedLayer || selectedLayer.locked) return;
 
-      const pa = activeSurface.printArea;
-      const centerX =
-        (pa.xFraction + pa.widthFraction / 2) * config.canvasWidth;
-      const centerY =
-        (pa.yFraction + pa.heightFraction / 2) * config.canvasHeight;
+      const maximumMask = viewMaximumMask(
+        activeSurface,
+        config.canvasWidth,
+        config.canvasHeight,
+      );
+      const { x: centerX, y: centerY } = maskCenter(
+        maximumMask,
+        config.canvasWidth,
+        config.canvasHeight,
+      );
 
       const isImage = selectedLayer.type === "image";
       const widthPx =
