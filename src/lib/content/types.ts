@@ -106,6 +106,97 @@ export type SiteHomeSection = {
   visible: boolean;
 };
 
+/* -------------------------------------------------------------------------- */
+/* PÁGINA INICIAL — conteúdo comercial (títulos, textos, botões, destaques)     */
+/* -------------------------------------------------------------------------- */
+
+export type HomeAccent = "magenta" | "cyan" | "yellow";
+
+export type SiteHomeCta = {
+  label: string;
+  /** Rota interna. Quando aponta para /produto/$slug, `slug` indica o produto. */
+  to: string;
+  slug?: string | undefined;
+};
+
+export type SiteHomeHighlight = {
+  id: string;
+  /** Produto em destaque, lido do repositório de produtos. */
+  productSlug: string;
+  label: string;
+  text: string;
+  accent: HomeAccent;
+  order: number;
+  visible: boolean;
+};
+
+export type SiteHomeWork = {
+  id: string;
+  image: string;
+  alt: string;
+  label: string;
+  order: number;
+  visible: boolean;
+};
+
+export type SiteHomeService = {
+  id: string;
+  /** Ícone escolhido de um conjunto fixo do frontend. */
+  icon: "flag" | "layers" | "printer";
+  title: string;
+  text: string;
+  actionLabel: string;
+  accent: HomeAccent;
+  to: string;
+  slug?: string | undefined;
+  order: number;
+  visible: boolean;
+};
+
+export type SiteHomeContent = {
+  hero: {
+    tag: string;
+    titleLine1: string;
+    titleHighlight: string;
+    intro: string;
+    image: string;
+    primaryCta: SiteHomeCta;
+    secondaryCta: SiteHomeCta;
+    baselineText: string;
+    baselineLinkLabel: string;
+    baselineLinkHref: string;
+  };
+  products: {
+    eyebrow: string;
+    titleLine1: string;
+    titleLine2: string;
+    linkLabel: string;
+    itemBadge: string;
+    itemAction: string;
+    highlights: SiteHomeHighlight[];
+  };
+  works: {
+    title: string;
+    linkLabel: string;
+    items: SiteHomeWork[];
+  };
+  services: {
+    eyebrow: string;
+    titleLine1: string;
+    titleLine2: string;
+    label: string;
+    items: SiteHomeService[];
+  };
+  contact: {
+    eyebrow: string;
+    titleLine1: string;
+    titleLine2: string;
+    titleHighlight: string;
+    text: string;
+    cta: SiteHomeCta;
+  };
+};
+
 export type SiteSettings = {
   brandName: string;
   tagline: string;
@@ -127,6 +218,7 @@ export type SiteContent = {
   headerLinks: SiteNavLink[];
   footerLinks: SiteNavLink[];
   homeSections: SiteHomeSection[];
+  home: SiteHomeContent;
   settings: SiteSettings;
 };
 

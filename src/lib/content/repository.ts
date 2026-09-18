@@ -12,6 +12,7 @@ import type {
   SiteCategory,
   SiteContactChannel,
   SiteContent,
+  SiteHomeContent,
   SiteHomeSection,
   SiteNavLink,
   SitePortfolioItem,
@@ -88,6 +89,8 @@ export interface SiteSettingsRepository {
   contacts(options?: { onlyVisible?: boolean }): SiteContactChannel[];
   nav(area: "header" | "footer"): SiteNavLink[];
   homeSections(options?: { onlyVisible?: boolean }): SiteHomeSection[];
+  /** Conteúdo comercial da página inicial. */
+  home(): SiteHomeContent;
 }
 
 export type ContentRepositories = {
