@@ -29,8 +29,6 @@ if ( ! function_exists( 'vinilart_sport_add_admin_menu' ) ) {
 		// Submenus (fundação para fases futuras)
 		$submenus = array(
 			'vinilart-sport'               => __( 'Visão Geral', 'vinilart-sport' ),
-			'vinilart-sport-produtos'       => __( 'Produtos', 'vinilart-sport' ),
-			'vinilart-sport-categorias'     => __( 'Categorias', 'vinilart-sport' ),
 			'vinilart-sport-personalizador' => __( 'Personalizador', 'vinilart-sport' ),
 			'vinilart-sport-portfolio'      => __( 'Portefólio', 'vinilart-sport' ),
 			'vinilart-sport-contactos'      => __( 'Contactos', 'vinilart-sport' ),
@@ -117,6 +115,18 @@ if ( ! function_exists( 'vinilart_sport_render_admin_dashboard' ) ) {
 						<li><strong style="color: #72777c;">⏳ Fase 3:</strong> <?php esc_html_e( 'Ligação Repositories ao WordPress', 'vinilart-sport' ); ?></li>
 					</ul>
 				</div>
+			</div>
+
+			<div style="margin-top: 30px;">
+				<hr />
+				<h3><?php esc_html_e( 'Ferramentas do Sistema', 'vinilart-sport' ); ?></h3>
+				<?php if ( isset( $_GET['seeded'] ) && '1' === $_GET['seeded'] ) : ?>
+					<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Catálogo importado com sucesso!', 'vinilart-sport' ); ?></p></div>
+				<?php endif; ?>
+				<p><?php esc_html_e( 'Importar o catálogo atual em ficheiros locais para a base de dados do WordPress. (Idempotente, não duplica)', 'vinilart-sport' ); ?></p>
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=vinilart-sport&vinilart_seed_catalog=1' ), 'seed_catalog' ) ); ?>" class="button button-secondary">
+					<?php esc_html_e( 'Importar Catálogo Base', 'vinilart-sport' ); ?>
+				</a>
 			</div>
 		</div>
 		<?php
