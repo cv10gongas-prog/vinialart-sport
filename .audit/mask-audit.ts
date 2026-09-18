@@ -28,7 +28,7 @@ for (const id of targets) {
   ok(views.every((v) => typeof v.surface.id === "string" && v.surface.id.length > 0), `${id}: ids de vista estáveis`);
   for (const v of views) {
     const max = viewMaximumMask(v.surface, config.canvasWidth, config.canvasHeight);
-    ok(!isMaskEmpty(max), `${id}/${v.surface.id}: máscara máxima não vazia (${max.shapes.map((s) => s.type).join("+")})`);
+    ok(!isMaskEmpty(max), `${id}/${v.surface.id}: máscara máxima não vazia (${max.shapes.map((s) => s.kind).join("+")})`);
     const rec = viewRecommendedMask(v.surface);
     ok(rec === undefined || !isMaskEmpty(rec), `${id}/${v.surface.id}: máscara recomendada válida`);
     // resolution independence: normalized bounds must be identical at any canvas size
@@ -53,8 +53,8 @@ const corners = [
   [b.x + 0.002, b.y + b.height - 0.002],
   [b.x + b.width - 0.002, b.y + b.height - 0.002],
 ] as const;
-const inside = isPointInMask(shinMask, b.x + b.width / 2, b.y + b.height / 2);
-const cornerHits = corners.filter(([x, y]) => isPointInMask(shinMask, x, y)).length;
+const inside = isPointInMask(shinMask, b.x + b.width / 2, b.y + b.height / 2, 1, 1);
+const cornerHits = corners.filter(([x, y]) => isPointInMask(shinMask, x, y, 1, 1)).length;
 ok(inside, "caneleiras: centro dentro da máscara");
 ok(cornerHits < 4, `caneleiras: forma não retangular (cantos da bounding box dentro: ${cornerHits}/4)`);
 
@@ -87,7 +87,7 @@ import { supporterProducts } from "@/lib/supporter-products";
   for (let i = 1; i < 40; i++) for (let j = 1; j < 40; j++) {
     const x = bb.x + (bb.width * i) / 40, y = bb.y + (bb.height * j) / 40;
     total++;
-    if (isPointInMask(mask, x, y)) inside++; else outsideInsideBB++;
+    if (isPointInMask(mask, x, y, 1, 1)) inside++; else outsideInsideBB++;
   }
   ok(inside > 0 && outsideInsideBB > 0,
     `forma irregular: ${inside}/${total} pontos dentro, ${outsideInsideBB} pontos dentro da bounding box mas FORA da máscara`);
@@ -98,8 +98,8 @@ import { supporterProducts } from "@/lib/supporter-products";
 // 2) várias zonas separadas
 {
   const twoZones = { shapes: [...maskFromRect(0.05, 0.1, 0.2, 0.3).shapes, ...maskFromRect(0.6, 0.1, 0.2, 0.3).shapes] };
-  ok(isPointInMask(twoZones, 0.1, 0.2) && isPointInMask(twoZones, 0.7, 0.2), "múltiplas zonas: pontos nas duas zonas são válidos");
-  ok(!isPointInMask(twoZones, 0.45, 0.2), "múltiplas zonas: o intervalo entre zonas é inválido");
+  ok(isPointInMask(twoZones, 0.1, 0.2, 1, 1) && isPointInMask(twoZones, 0.7, 0.2, 1, 1), "múltiplas zonas: pontos nas duas zonas são válidos");
+  ok(!isPointInMask(twoZones, 0.45, 0.2, 1, 1), "múltiplas zonas: o intervalo entre zonas é inválido");
   const bb = maskBounds(twoZones);
   ok(bb.x < 0.06 && bb.x + bb.width > 0.79, "múltiplas zonas: bounding box cobre as duas, mas não é usada como limite");
 }
@@ -108,7 +108,7 @@ import { supporterProducts } from "@/lib/supporter-products";
 {
   const donut = { shapes: [...maskFromRect(0, 0, 1, 1).shapes, ...maskFromRect(0.4, 0.4, 0.2, 0.2).shapes.map((s) => ({ ...s, operation: "subtract" as const }))] };
   ok(hasSubtractShapes(donut), "zona com buraco: operação subtract representada");
-  ok(isPointInMask(donut, 0.1, 0.1) && !isPointInMask(donut, 0.5, 0.5), "zona com buraco: interior do buraco é inválido");
+  ok(isPointInMask(donut, 0.1, 0.1, 1, 1) && !isPointInMask(donut, 0.5, 0.5, 1, 1), "zona com buraco: interior do buraco é inválido");
 }
 
 // 4) recomendada dentro da máxima
@@ -121,9 +121,9 @@ for (const id of targets) {
     const bb = maskBounds(rec);
     for (let i = 1; i < 12; i++) for (let j = 1; j < 12; j++) {
       const x = bb.x + (bb.width * i) / 12, y = bb.y + (bb.height * j) / 12;
-      if (!isPointInMask(rec, x, y)) continue;
+      if (!isPointInMask(rec, x, y, 1, 1)) continue;
       n++;
-      if (!isPointInMask(max, x, y)) bad++;
+      if (!isPointInMask(max, x, y, 1, 1)) bad++;
     }
     ok(bad === 0, `${id}/${v.surface.id}: recomendada contida na máxima (${n} pontos, ${bad} fora)`);
   }
