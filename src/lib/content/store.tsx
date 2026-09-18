@@ -98,6 +98,10 @@ export function useNavLinks(area: "header" | "footer") {
   return useMemo(() => settings.nav(area), [settings, area]);
 }
 
+export function useHomeContent() {
+  return useRepositories().settings.home();
+}
+
 export function useHomeSections(options?: { onlyVisible?: boolean }) {
   const { settings } = useRepositories();
   return useMemo(() => settings.homeSections(options), [settings, options]);

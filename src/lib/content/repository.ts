@@ -155,6 +155,7 @@ export function createRepositories(content: SiteContent): ContentRepositories {
       const list = sortByOrder(content.homeSections);
       return options?.onlyVisible ? list.filter((section) => section.visible) : list;
     },
+    home: () => content.home,
   };
 
   return { products, categories, portfolio, settings };
