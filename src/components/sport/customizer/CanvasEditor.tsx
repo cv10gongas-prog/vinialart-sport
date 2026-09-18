@@ -17,6 +17,14 @@ import {
 
 import type { ProductCustomizerHandle } from "@/hooks/useProductCustomizer";
 
+import {
+  maskToPath2D,
+  maskToPixelShapes,
+  type PixelShape,
+} from "@/lib/customizer/geometry/mask";
+
+import { viewMaximumMask, viewRecommendedMask } from "@/lib/customizer/views";
+
 interface CanvasEditorProps {
   config: ProductCustomizerConfig;
   customizer: ProductCustomizerHandle;
@@ -52,6 +60,96 @@ function createScaledSvgPath(
   } catch {
     return null;
   }
+}
+
+interface MaskOutlineProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  konva: any;
+  shape: PixelShape;
+  stroke: string;
+  strokeWidth: number;
+  dash: number[];
+}
+
+/**
+ * Contorno da zona personalizável. Desenha exatamente as mesmas formas usadas
+ * no recorte do design — o que se vê é o limite real.
+ */
+function MaskOutline({
+  konva,
+  shape,
+  stroke,
+  strokeWidth,
+  dash,
+}: MaskOutlineProps) {
+  const {
+    Path: KonvaPath,
+    Line,
+    Ellipse,
+    Rect,
+  } = konva;
+
+  if (shape.kind === "path") {
+    return (
+      <KonvaPath
+        data={shape.d}
+        scaleX={shape.scaleX}
+        scaleY={shape.scaleY}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        dash={dash}
+        lineJoin="round"
+        listening={false}
+      />
+    );
+  }
+
+  if (shape.kind === "polygon") {
+    return (
+      <Line
+        points={shape.points}
+        closed
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        dash={dash}
+        lineJoin="round"
+        listening={false}
+      />
+    );
+  }
+
+  if (shape.kind === "ellipse") {
+    return (
+      <Ellipse
+        x={shape.cx}
+        y={shape.cy}
+        radiusX={shape.rx}
+        radiusY={shape.ry}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        dash={dash}
+        listening={false}
+      />
+    );
+  }
+
+  return (
+    <Rect
+      x={shape.x}
+      y={shape.y}
+      width={shape.width}
+      height={shape.height}
+      cornerRadius={
+        shape.cornerRadius > 0
+          ? shape.cornerRadius
+          : 8
+      }
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      dash={dash}
+      listening={false}
+    />
+  );
 }
 
 export function CanvasEditor({
@@ -464,108 +562,103 @@ function KonvaStageInner({
         )
       : null;
 
+  /**
+   * Fonte única de verdade: a máscara máxima da vista alimenta ao mesmo tempo
+   * o contorno visível, o recorte do design e a validação de limites.
+   */
+  const maximumMask = viewMaximumMask(
+    activeSurface,
+    config.canvasWidth,
+    config.canvasHeight,
+  );
+
+  const recommendedMask = viewRecommendedMask(activeSurface);
+
+  const maskPixelShapes = maskToPixelShapes(
+    maximumMask,
+    config.canvasWidth,
+    config.canvasHeight,
+  );
+
+  const recommendedPixelShapes = recommendedMask
+    ? maskToPixelShapes(
+        recommendedMask,
+        config.canvasWidth,
+        config.canvasHeight,
+      )
+    : null;
+
   const clipFunc = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ctx: any) => {
-      if (
-        shape?.type === "svg-path" &&
-        shape.svgPath
-      ) {
-        const scaledPath =
-          createScaledSvgPath(
-            shape.svgPath,
-            config.canvasWidth,
-            config.canvasHeight,
-          );
-
-        if (scaledPath) {
-          return [
-            scaledPath,
-            "nonzero",
-          ] as [
-            Path2D,
-            CanvasFillRule,
-          ];
-        }
-      }
-
-      if (
-        shape?.type === "contour" &&
-        shape.points &&
-        shape.points.length >= 6
-      ) {
-        const points = shape.points;
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-          paX +
-            (points[0] ?? 0) *
-              paW,
-          paY +
-            (points[1] ?? 0) *
-              paH,
-        );
-
-        for (
-          let index = 2;
-          index < points.length;
-          index += 2
-        ) {
-          ctx.lineTo(
-            paX +
-              (points[index] ?? 0) *
-                paW,
-            paY +
-              (points[index + 1] ?? 0) *
-                paH,
-          );
-        }
-
-        ctx.closePath();
-
-        return;
-      }
-
-      if (
-        shape?.type === "rounded"
-      ) {
-        const radius =
-          typeof shape.cornerRadius ===
-          "number"
-            ? shape.cornerRadius
-            : 12;
-
-        ctx.beginPath();
-
-        ctx.roundRect(
-          paX,
-          paY,
-          paW,
-          paH,
-          radius,
-        );
-
-        ctx.closePath();
-
-        return;
-      }
-
-      ctx.beginPath();
-
-      ctx.rect(
-        paX,
-        paY,
-        paW,
-        paH,
+      const built = maskToPath2D(
+        maximumMask,
+        config.canvasWidth,
+        config.canvasHeight,
       );
 
-      ctx.closePath();
+      if (built) {
+        return [built.path, built.fillRule] as [
+          Path2D,
+          CanvasFillRule,
+        ];
+      }
+
+      // Ambiente sem Path2D: traço equivalente das mesmas formas.
+      ctx.beginPath();
+
+      maskPixelShapes.forEach((pixelShape) => {
+        if (pixelShape.kind === "polygon") {
+          if (pixelShape.points.length < 6) return;
+          ctx.moveTo(pixelShape.points[0], pixelShape.points[1]);
+          for (
+            let index = 2;
+            index < pixelShape.points.length;
+            index += 2
+          ) {
+            ctx.lineTo(
+              pixelShape.points[index],
+              pixelShape.points[index + 1],
+            );
+          }
+          ctx.closePath();
+        } else if (pixelShape.kind === "ellipse") {
+          ctx.ellipse(
+            pixelShape.cx,
+            pixelShape.cy,
+            pixelShape.rx,
+            pixelShape.ry,
+            0,
+            0,
+            Math.PI * 2,
+          );
+        } else if (pixelShape.kind === "rect") {
+          if (pixelShape.cornerRadius > 0) {
+            ctx.roundRect(
+              pixelShape.x,
+              pixelShape.y,
+              pixelShape.width,
+              pixelShape.height,
+              pixelShape.cornerRadius,
+            );
+          } else {
+            ctx.rect(
+              pixelShape.x,
+              pixelShape.y,
+              pixelShape.width,
+              pixelShape.height,
+            );
+          }
+        } else {
+          ctx.rect(paX, paY, paW, paH);
+        }
+      });
 
       return undefined;
     },
     [
-      shape,
+      maximumMask,
+      maskPixelShapes,
       paX,
       paY,
       paW,
@@ -813,49 +906,39 @@ function KonvaStageInner({
             : 0.65
         }
       >
-        {svgPathData ? (
-          <KonvaPath
-            data={svgPathData}
-            scaleX={
-              config.canvasWidth /
-              SVG_REFERENCE_SIZE
-            }
-            scaleY={
-              config.canvasHeight /
-              SVG_REFERENCE_SIZE
-            }
-            stroke="rgba(0, 200, 255, 0.75)"
-            strokeWidth={2}
-            dash={[6, 5]}
-            lineJoin="round"
-            listening={false}
-          />
-        ) : contourPoints ? (
-          <Line
-            points={contourPoints}
-            closed
-            stroke="rgba(0, 200, 255, 0.75)"
-            strokeWidth={1.5}
-            dash={[5, 5]}
-            lineJoin="round"
-          />
-        ) : (
-          <Rect
-            x={paX}
-            y={paY}
-            width={paW}
-            height={paH}
-            cornerRadius={
-              typeof shape
-                ?.cornerRadius ===
-              "number"
-                ? shape.cornerRadius
-                : 8
-            }
-            stroke="rgba(0, 200, 255, 0.75)"
-            strokeWidth={1.5}
-            dash={[5, 5]}
-          />
+        {maskPixelShapes.map(
+          (pixelShape, index) =>
+            pixelShape.operation ===
+            "add" ? (
+              <MaskOutline
+                konva={KonvaLib}
+                key={`max-${index}`}
+                shape={pixelShape}
+                stroke="rgba(0, 200, 255, 0.75)"
+                strokeWidth={
+                  pixelShape.kind ===
+                  "path"
+                    ? 2
+                    : 1.5
+                }
+                dash={[5, 5]}
+              />
+            ) : null,
+        )}
+
+        {recommendedPixelShapes?.map(
+          (pixelShape, index) =>
+            pixelShape.operation ===
+            "add" ? (
+              <MaskOutline
+                konva={KonvaLib}
+                key={`rec-${index}`}
+                shape={pixelShape}
+                stroke="rgba(255, 255, 255, 0.45)"
+                strokeWidth={1}
+                dash={[3, 6]}
+              />
+            ) : null,
         )}
       </Layer>
 

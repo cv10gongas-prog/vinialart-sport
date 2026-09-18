@@ -12,6 +12,10 @@
  *  - ProductCustomizerConfig is the single source of truth per product
  */
 
+import type { AreaMask } from "./geometry/mask";
+
+export type { AreaMask };
+
 // ---------------------------------------------------------------------------
 // Print Area & Clip Shapes
 // ---------------------------------------------------------------------------
@@ -67,12 +71,25 @@ export interface SurfaceMockup {
 export interface Surface {
   id: SurfaceId;
   label: string;
+  /** Ordem de apresentação da vista (frente, costas, lado, manga…). */
+  order?: number | undefined;
+  /** Etiqueta usada na pré-visualização final (quando difere do rótulo). */
+  previewLabel?: string | undefined;
   /** Path/URL to the product mockup image for this surface */
   mockupSrc: string;
   /** Extended mockup configuration for layered realism */
   mockup?: SurfaceMockup | undefined;
   /** Area within the mockup where design elements can be placed */
   printArea: PrintArea;
+  /**
+   * Limite REAL de personalização desta vista (máscara normalizada).
+   * Quando ausente, é derivado de `printArea` sem qualquer recalibração.
+   * É a mesma máscara usada para contorno, recorte, mover, redimensionar,
+   * rodar e validar.
+   */
+  maximumArea?: AreaMask | undefined;
+  /** Zona aconselhada (apenas indicativa; nunca limita o design). */
+  recommendedArea?: AreaMask | undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -200,10 +217,16 @@ export type AllowedTool =
   | "remove-bg-future"
   | "ai-adjust-future";
 
+export type CustomizerPreviewLayout = "pair" | "front-back" | "wide" | "single";
+
 export interface ProductCustomizerConfig {
   /** Matches product slug in sport-data.ts */
   id: string;
   name: string;
+  /** Versão do esquema de configuração (encomendas guardam esta versão). */
+  schemaVersion?: number | undefined;
+  /** Personalização ativa para este produto. */
+  enabled?: boolean | undefined;
   /** Available surfaces/views for this product */
   surfaces: Surface[];
   /** Tools available in the editor for this product */
@@ -223,6 +246,14 @@ export interface ProductCustomizerConfig {
   /** Future renderer hint; no 3D implementation or physical dimensions implied. */
   projection?: "flat" | "cylinder";
   sizeOptions?: string[];
+  /** Cor base inicial do produto (configuração, não código por produto). */
+  defaultColor?: string | undefined;
+  /** Composição da pré-visualização final (par, frente/costas, larga, única). */
+  previewLayout?: CustomizerPreviewLayout | undefined;
+  /** Título da pré-visualização final. */
+  previewTitle?: string | undefined;
+  /** Legenda da pré-visualização final. */
+  previewSubtitle?: string | undefined;
 }
 
 // ---------------------------------------------------------------------------

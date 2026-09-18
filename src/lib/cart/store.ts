@@ -52,7 +52,7 @@ export function cartId() {
 type Options = Partial<
   Pick<
     CartItem,
-    "quantity" | "variant" | "customizerDesign" | "previewDataUrl" | "serviceDetails" | "mode"
+    "quantity" | "variant" | "customizerDesign" | "previewDataUrl" | "serviceDetails" | "mode" | "configVersion" | "configSnapshot"
   >
 >;
 function addItem(productId: string, productName: string, options: Options = {}) {

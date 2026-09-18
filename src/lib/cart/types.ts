@@ -54,6 +54,17 @@ export type CartItem = {
    */
   customizerDesign?: string | undefined;
   /**
+   * Versão do esquema de configuração do personalizador usada neste item.
+   * Uma encomenda antiga nunca muda por a configuração do produto mudar depois.
+   */
+  configVersion?: number | undefined;
+  /**
+   * Fotografia (snapshot) da configuração do produto no momento da encomenda:
+   * vistas, mockups, áreas máxima e recomendada, ferramentas, cores e tamanhos.
+   * JSON serializado, independente da resolução.
+   */
+  configSnapshot?: string | undefined;
+  /**
    * Small preview thumbnail as a base64 data URL.
    * Optional — only present if a preview was generated.
    */

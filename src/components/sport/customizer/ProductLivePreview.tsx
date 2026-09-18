@@ -26,6 +26,11 @@ import { SportButton } from "@/components/sport/SportButton";
 const Product3DViewer = lazy(() =>
   import("./Product3DViewer").then((mod) => ({ default: mod.Product3DViewer }))
 );
+import {
+  getPreviewLayout,
+  resolveProductViews,
+} from "@/lib/customizer/views";
+
 import { cn } from "@/lib/utils";
 
 interface ProductLivePreviewProps {
@@ -180,9 +185,11 @@ export function ProductPresentationModal({
   if (!isOpen) return null;
   if (typeof document === "undefined") return null;
 
-  const isShinGuard = config.id === "caneleiras-personalizadas";
-  const isJersey = config.id === "equipamento-personalizado";
-  const isFlag = config.id === "bandeira-personalizada";
+  // Composição vinda da configuração do produto — sem lógica por produto.
+  const views = resolveProductViews(config);
+  const previewLayout = getPreviewLayout(config);
+  const previewTitle = config.previewTitle;
+  const previewSubtitle = config.previewSubtitle;
   // 3D toggle temporarily hidden to prioritize perfect 2D fidelity as requested
   const supports3D = false;
   const primarySurface = config.surfaces[0];
@@ -270,136 +277,76 @@ export function ProductPresentationModal({
             </div>
           ) : KonvaLib ? (
             <div>
-              {isShinGuard && (
-                <div>
-                  <div className="mb-4 flex items-center justify-between border-b border-border/40 pb-2">
-                    <span className="font-mono text-[0.65rem] uppercase tracking-widest text-cyan">
-                      Par Completo · Caneleira Esquerda & Direita
-                    </span>
-                    <span className="font-mono text-[0.58rem] text-muted-foreground">
-                      Vista em Par
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {config.surfaces.map((surface) => {
-                      const ptLabel =
-                        surface.id === "LEFT"
-                          ? "CANELEIRA ESQUERDA"
-                          : surface.id === "RIGHT"
-                            ? "CANELEIRA DIREITA"
-                            : surface.label;
-
-                      return (
-                        <div
-                          key={surface.id}
-                          className="flex flex-col items-center justify-center p-2"
-                        >
-                          <div className="mb-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
-                            {ptLabel}
-                          </div>
-                          <div className="w-full max-w-[420px]">
-                            <LiveSurfaceRenderer
-                              surface={surface}
-                              config={config}
-                              customizer={customizer}
-                              KonvaLib={KonvaLib}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+              {(previewTitle ||
+                previewSubtitle) && (
+                <div className="mb-4 flex items-center justify-between border-b border-border/40 pb-2">
+                  <span className="font-mono text-[0.65rem] uppercase tracking-widest text-cyan">
+                    {previewTitle}
+                  </span>
+                  <span className="font-mono text-[0.58rem] text-muted-foreground">
+                    {previewSubtitle}
+                  </span>
                 </div>
               )}
 
-              {isJersey && (
-                <div>
-                  <div className="mb-4 flex items-center justify-between border-b border-border/40 pb-2">
-                    <span className="font-mono text-[0.65rem] uppercase tracking-widest text-cyan">
-                      Equipamento Completo · Frente & Costas
-                    </span>
-                    <span className="font-mono text-[0.58rem] text-muted-foreground">
-                      Vista Frente e Traseira
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {config.surfaces.map((surface) => {
-                      const ptLabel =
-                        surface.id === "FRONT"
-                          ? "FRENTE"
-                          : surface.id === "BACK"
-                            ? "COSTAS"
-                            : surface.label;
-
-                      return (
-                        <div
-                          key={surface.id}
-                          className="flex flex-col items-center justify-center p-2"
-                        >
-                          <div className="mb-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
-                            {ptLabel}
-                          </div>
-                          <div className="w-full max-w-[420px]">
-                            <LiveSurfaceRenderer
-                              surface={surface}
-                              config={config}
-                              customizer={customizer}
-                              baseColor={baseColor}
-                              KonvaLib={KonvaLib}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {isFlag && primarySurface && (
+              {previewLayout ===
+              "wide" ? (
                 <div className="mx-auto max-w-2xl flex flex-col items-center">
-                  <div className="mb-4 w-full flex items-center justify-between border-b border-border/40 pb-2">
-                    <span className="font-mono text-[0.65rem] uppercase tracking-widest text-cyan">
-                      Bandeira Personalizada · Vista Total
-                    </span>
-                    <span className="font-mono text-[0.58rem] text-muted-foreground">
-                      Visualização completa
-                    </span>
-                  </div>
                   <div className="w-full max-w-[560px]">
-                    <LiveSurfaceRenderer
-                      surface={primarySurface}
-                      config={config}
-                      customizer={customizer}
-                      baseColor={baseColor}
-                      KonvaLib={KonvaLib}
-                    />
+                    {views[0] && (
+                      <LiveSurfaceRenderer
+                        surface={
+                          views[0]
+                            .surface
+                        }
+                        config={config}
+                        customizer={
+                          customizer
+                        }
+                        baseColor={
+                          baseColor
+                        }
+                        KonvaLib={
+                          KonvaLib
+                        }
+                      />
+                    )}
                   </div>
                 </div>
-              )}
-
-              {!isShinGuard && !isJersey && !isFlag && (
+              ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {config.surfaces.map((surface) => (
+                  {views.map((view) => (
                     <div
-                      key={surface.id}
+                      key={view.id}
                       className="flex flex-col items-center justify-center p-2"
                     >
                       <div className="mb-2 font-mono text-[0.62rem] uppercase tracking-widest text-muted-foreground">
-                        {surface.label}
+                        {view.surface
+                          .previewLabel ??
+                          view.label}
                       </div>
                       <div className="w-full max-w-[420px]">
                         <LiveSurfaceRenderer
-                          surface={surface}
+                          surface={
+                            view.surface
+                          }
                           config={config}
-                          customizer={customizer}
-                          baseColor={baseColor}
-                          KonvaLib={KonvaLib}
+                          customizer={
+                            customizer
+                          }
+                          baseColor={
+                            baseColor
+                          }
+                          KonvaLib={
+                            KonvaLib
+                          }
                         />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
+
             </div>
           ) : (
             <div className="flex h-64 items-center justify-center">

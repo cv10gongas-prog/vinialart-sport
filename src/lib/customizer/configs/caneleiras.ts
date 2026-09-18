@@ -49,11 +49,15 @@ const tools: AllowedTool[] = [
 export const caneleirasConfig: ProductCustomizerConfig = {
   id: "caneleiras-personalizadas",
   name: "Caneleiras Personalizadas",
+  schemaVersion: 1,
+  enabled: true,
 
   surfaces: [
     {
       id: "LEFT",
       label: "Caneleira Esquerda",
+      order: 1,
+      previewLabel: "CANELEIRA ESQUERDA",
       mockupSrc: shinGuardSingleWhite,
       mockup: {
         baseSrc: shinGuardSingleWhite,
@@ -74,6 +78,8 @@ export const caneleirasConfig: ProductCustomizerConfig = {
     {
       id: "RIGHT",
       label: "Caneleira Direita",
+      order: 2,
+      previewLabel: "CANELEIRA DIREITA",
       mockupSrc: shinGuardSingleWhite,
       mockup: {
         baseSrc: shinGuardSingleWhite,
@@ -99,6 +105,19 @@ export const caneleirasConfig: ProductCustomizerConfig = {
   canvasHeight: 480,
 
   colorSwatches: ["#ffffff"],
+
+  defaultColor: "#ffffff",
+
+  sizeOptions: [
+    "S (14cm)",
+    "M (16.5cm)",
+    "L (19cm)",
+  ],
+
+  previewLayout: "pair",
+  previewTitle:
+    "Par Completo · Caneleira Esquerda & Direita",
+  previewSubtitle: "Vista em Par",
 
   fontOptions: [
     "Archivo Black",

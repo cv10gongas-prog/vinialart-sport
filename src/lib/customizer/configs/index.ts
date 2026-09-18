@@ -119,20 +119,49 @@ const JERSEY_BACK_PRINT_CONTOUR: number[] = [
   0.0000, 0.1583,
 ];
 
+export const CLOTHING_SIZES = [
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+];
+
+export const SINGLE_SIZE = ["Tamanho Único"];
+
+/** Tamanhos por produto — configuração, nunca condições por nome. */
+const sizesByProduct: Record<string, string[]> = {
+  "equipamento-personalizado": CLOTHING_SIZES,
+  estampagem: CLOTHING_SIZES,
+  "tshirt-personalizado": CLOTHING_SIZES,
+  "calcoes-personalizado": CLOTHING_SIZES,
+};
+
 function buildConfig(
   id: string,
   name: string,
   surfaces: Surface[],
+  options: Partial<ProductCustomizerConfig> = {},
 ): ProductCustomizerConfig {
   return {
     id,
     name,
-    surfaces,
+    schemaVersion: 1,
+    enabled: true,
+    surfaces: surfaces.map((surface, index) => ({
+      ...surface,
+      order: surface.order ?? index + 1,
+    })),
     allowedTools: sharedTools,
     canvasWidth: 480,
     canvasHeight: 480,
     colorSwatches: colors,
     fontOptions: fonts,
+    sizeOptions: sizesByProduct[id] ?? SINGLE_SIZE,
+    previewLayout:
+      surfaces.length >= 2 ? "front-back" : "single",
+    ...options,
   };
 }
 
@@ -147,6 +176,7 @@ export const equipamentoConfig = buildConfig(
     {
       id: "FRONT",
       label: "Frente",
+      previewLabel: "FRENTE",
       mockupSrc: jerseyFrontWhite,
       mockup: {
         baseSrc: jerseyFrontWhite,
@@ -167,6 +197,7 @@ export const equipamentoConfig = buildConfig(
     {
       id: "BACK",
       label: "Costas",
+      previewLabel: "COSTAS",
       mockupSrc: jerseyBackWhite,
       mockup: {
         baseSrc: jerseyBackWhite,
@@ -185,6 +216,13 @@ export const equipamentoConfig = buildConfig(
       },
     },
   ],
+  {
+    previewLayout: "front-back",
+    previewTitle:
+      "Equipamento Completo · Frente & Costas",
+    previewSubtitle:
+      "Vista Frente e Traseira",
+  },
 );
 
 /* -------------------------------------------------------------------------- */
@@ -222,6 +260,13 @@ export const bandeiraConfig = buildConfig(
       },
     },
   ],
+  {
+    previewLayout: "wide",
+    previewTitle:
+      "Bandeira Personalizada · Vista Total",
+    previewSubtitle:
+      "Visualização completa",
+  },
 );
 
 /* -------------------------------------------------------------------------- */
