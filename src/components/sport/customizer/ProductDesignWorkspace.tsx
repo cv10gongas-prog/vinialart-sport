@@ -732,9 +732,7 @@ export function ProductDesignWorkspace({
                             c
                           }
                           baseColor={
-                            isCaneleiras
-                              ? "#ffffff"
-                              : selectedColor
+                            selectedColor
                           }
                         />
                       ) : konva ? (
@@ -749,9 +747,7 @@ export function ProductDesignWorkspace({
                             c
                           }
                           baseColor={
-                            isCaneleiras
-                              ? "#ffffff"
-                              : selectedColor
+                            selectedColor
                           }
                           KonvaLib={
                             konva
@@ -1316,8 +1312,7 @@ export function ProductDesignWorkspace({
               )}
             </div>
 
-            {!isCaneleiras &&
-              config.colorSwatches &&
+            {config.colorSwatches &&
               config.colorSwatches.length > 1 && (
                 <div className="pt-3 border-t border-white/5 space-y-2">
                   <div className="flex items-center justify-between">
