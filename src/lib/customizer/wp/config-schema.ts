@@ -168,7 +168,7 @@ export function parseCustomizerConfig(input: unknown): ProductCustomizerConfig {
     ...(payload.projection
       ? { projection: payload.projection as ProductCustomizerConfig["projection"] }
       : {}),
-  };
+  } as ProductCustomizerConfig;
 }
 
 function maskOuterBounds(mask: AreaMask) {
