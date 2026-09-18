@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 
-import { CmsProvider } from "@/lib/cms/store";
+import { SiteContentProvider } from "@/lib/content/store";
 
 import appCss from "../styles.css?url";
 
@@ -151,10 +151,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CmsProvider>
+      <SiteContentProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-      </CmsProvider>
+      </SiteContentProvider>
     </QueryClientProvider>
   );
 }

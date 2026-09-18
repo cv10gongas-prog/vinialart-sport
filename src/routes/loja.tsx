@@ -10,8 +10,8 @@ import {
 
 import { PageShell } from "@/components/sport/PageShell";
 import { TeamClubBanner } from "@/components/sport/TeamClubBanner";
-import { catalogExamples } from "@/lib/catalog-examples";
-import { products, type Product } from "@/lib/sport-data";
+import { useProducts, useRepositories } from "@/lib/content/store";
+import type { SiteProduct } from "@/lib/content/types";
 
 export const Route = createFileRoute("/loja")({
   component: Loja,
@@ -46,39 +46,17 @@ export const Route = createFileRoute("/loja")({
   }),
 });
 
-const PRIMARY_SLUGS = [
-  "caneleiras-personalizadas",
-  "equipamento-personalizado",
-  "bandeira-personalizada",
-  "estampagem",
-];
-
-const REAL_PHOTO_SLUGS = new Set([
-  "caneleiras-personalizadas",
-  "equipamento-personalizado",
-  "estampagem",
-  "artigos-adeptos",
-]);
-
-function getProductImage(product: Product) {
-  return product.catalogImage ?? product.image;
-}
-
-function getProductPrice(product: Product) {
-  return product.slug === "caneleiras-personalizadas"
-    ? "Desde 19,90€"
-    : "Sob orçamento";
-}
-
 function MainProductCard({
   product,
   index,
+  categoryName,
 }: {
-  product: Product;
+  product: SiteProduct;
   index: number;
+  categoryName: string;
 }) {
-  const image = getProductImage(product);
-  const isPhoto = REAL_PHOTO_SLUGS.has(product.slug);
+  const image = product.image;
+  const isPhoto = product.imageFit === "cover";
 
   return (
     <Link
@@ -110,7 +88,9 @@ function MainProductCard({
         </div>
 
         <div className="absolute right-2 top-2 z-20 max-w-[82px] rounded-full border border-white/10 bg-black/80 px-2 py-1.5 text-center font-mono text-[0.43rem] font-semibold uppercase leading-tight tracking-[0.06em] text-white backdrop-blur sm:right-3 sm:top-3 sm:max-w-none sm:px-3 sm:text-[0.59rem] sm:tracking-[0.1em]">
-          {getProductPrice(product)}
+          {product.priceMode === "price" && product.price
+            ? product.price
+            : "Sob orçamento"}
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-14 bg-gradient-to-t from-[#080c11]/85 to-transparent sm:h-24" />
@@ -119,7 +99,7 @@ function MainProductCard({
       <div className="flex flex-1 flex-col p-3 sm:p-5">
         <div className="min-w-0 flex-1">
           <span className="block truncate font-mono text-[0.48rem] font-semibold uppercase tracking-[0.11em] text-cyan-400 sm:text-[0.61rem] sm:tracking-[0.17em]">
-            {product.category}
+            {categoryName}
           </span>
 
           <h3 className="mt-1.5 line-clamp-2 min-h-[2.15rem] font-display text-[0.98rem] uppercase leading-[1.05] tracking-wide text-white transition-colors group-hover:text-cyan-200 sm:mt-2.5 sm:min-h-0 sm:text-[1.35rem] xl:text-[1.5rem]">
@@ -127,7 +107,7 @@ function MainProductCard({
           </h3>
 
           <p className="mt-3 hidden line-clamp-2 text-[0.8rem] leading-5 text-zinc-400 sm:block">
-            {product.description}
+            {product.shortDescription}
           </p>
         </div>
 
@@ -149,19 +129,13 @@ function MainProductCard({
   );
 }
 
-function CatalogCard({
-  example,
-}: {
-  example: (typeof catalogExamples)[number];
-}) {
-  const isPhoto = example.kind === "Fotografia de trabalho";
+function CatalogCard({ product }: { product: SiteProduct }) {
+  const isPhoto = product.imageFit === "cover";
 
   return (
     <Link
       to="/produto/$slug"
-      params={{
-        slug: `${example.id}-personalizado`,
-      }}
+      params={{ slug: product.slug }}
       search={{
         modo: undefined,
         cartItem: undefined,
@@ -170,8 +144,8 @@ function CatalogCard({
     >
       <div className="relative aspect-square overflow-hidden rounded-[1.1rem] border border-white/[0.07] bg-[#0c1117] transition-all duration-300 group-hover:-translate-y-1 group-hover:border-cyan-400/25 group-hover:bg-[#101720] group-hover:shadow-[0_16px_45px_rgba(0,0,0,0.28)]">
         <img
-          src={example.image}
-          alt={example.name}
+          src={product.image}
+          alt={product.name}
           loading="lazy"
           className={[
             "h-full w-full transition-transform duration-500 group-hover:scale-[1.035]",
@@ -192,7 +166,7 @@ function CatalogCard({
         </span>
 
         <h3 className="mt-1.5 font-display text-base uppercase leading-none text-white transition-colors group-hover:text-cyan-200 sm:text-lg">
-          {example.name}
+          {product.shortName}
         </h3>
 
         <span className="mt-2 block font-mono text-[0.58rem] uppercase tracking-[0.12em] text-zinc-500">
@@ -204,9 +178,19 @@ function CatalogCard({
 }
 
 function Loja() {
-  const primaryProducts = PRIMARY_SLUGS
-    .map((slug) => products.find((product) => product.slug === slug))
-    .filter((product): product is Product => Boolean(product));
+  const { categories } = useRepositories();
+
+  const primaryProducts = useProducts({
+    onlyPublished: true,
+    inShop: true,
+    shelf: "principal",
+  });
+
+  const catalogProducts = useProducts({
+    onlyPublished: true,
+    inShop: true,
+    shelf: "catalogo",
+  });
 
   return (
     <PageShell className="bg-[#080b0f] text-white">
@@ -388,9 +372,10 @@ function Loja() {
           <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4">
             {primaryProducts.map((product, index) => (
               <MainProductCard
-                key={product.slug}
+                key={product.id}
                 product={product}
                 index={index}
+                categoryName={categories.nameOf(product.categoryId)}
               />
             ))}
           </div>
@@ -430,10 +415,10 @@ function Loja() {
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4">
-            {catalogExamples.map((example) => (
+            {catalogProducts.map((product) => (
               <CatalogCard
-                key={example.id}
-                example={example}
+                key={product.id}
+                product={product}
               />
             ))}
           </div>

@@ -8,17 +8,18 @@
 
 import { products as coreProducts, type Product } from "@/lib/sport-data";
 import { supporterProducts } from "@/lib/supporter-products";
+import { catalogExamples } from "@/lib/catalog-examples";
 import { VINILART_MAIN_URL } from "@/lib/config";
 
 import {
-  CMS_SCHEMA_VERSION,
-  type CmsCategory,
-  type CmsContactChannel,
-  type CmsContent,
-  type CmsHomeSection,
-  type CmsNavLink,
-  type CmsPortfolioItem,
-  type CmsProduct,
+  CONTENT_SCHEMA_VERSION,
+  type SiteCategory,
+  type SiteContactChannel,
+  type SiteContent,
+  type SiteHomeSection,
+  type SiteNavLink,
+  type SitePortfolioItem,
+  type SiteProduct,
 } from "./types";
 
 const legacyCategories: { id: string; name: string; slug: string }[] = [
@@ -35,28 +36,58 @@ function categoryIdForName(name: string): string {
   return found ? found.id : "cat-adeptos";
 }
 
-/** Converte um produto legacy (array hardcoded) para o modelo administrável. */
+/** Preços atualmente apresentados no site — preservados tal e qual. */
+const legacyPrices: Record<string, string> = {
+  "caneleiras-personalizadas": "Desde 19,90€",
+};
+
+/** Produtos apresentados com fotografia real (imagem a preencher o cartão). */
+const legacyPhotoSlugs = new Set([
+  "caneleiras-personalizadas",
+  "equipamento-personalizado",
+  "estampagem",
+  "artigos-adeptos",
+]);
+
+/** Nomes curtos e imagens usados hoje na grelha de catálogo. */
+const catalogPresentation = new Map(
+  catalogExamples.map((example) => [
+    `${example.id}-personalizado`,
+    example,
+  ]),
+);
+
+/** Converte um produto legacy (array hardcoded) para o modelo centralizado. */
 export function normalizeLegacyProduct(
   product: Product,
   order: number,
   featured: boolean,
-): CmsProduct {
+): SiteProduct {
+  const presentation = catalogPresentation.get(product.slug);
+  const price = legacyPrices[product.slug] ?? "";
+  const isPhoto = presentation
+    ? presentation.kind === "Fotografia de trabalho"
+    : legacyPhotoSlugs.has(product.slug);
+
   return {
     id: `prod-${product.slug}`,
     slug: product.slug,
     name: product.name,
+    shortName: presentation?.name ?? product.name,
     categoryId: categoryIdForName(product.category),
     shortDescription: product.description,
     longDescription: product.description,
-    image: product.catalogImage ?? product.image,
+    image: presentation?.image ?? product.catalogImage ?? product.image,
+    imageFit: isPhoto ? "cover" : "contain",
     gallery: product.catalogGallery ?? product.gallery ?? [],
-    priceMode: "quote",
-    price: "",
+    priceMode: price ? "price" : "quote",
+    price,
     badge: product.badges[0] ?? "",
     featured,
     order,
     status: "published",
-    showInShop: true,
+    shelf: featured ? "principal" : "catalogo",
+    showInShop: featured || Boolean(presentation),
     showInHome: featured,
     customizable: product.isCustomizable,
     customizerConfigId: product.slug,
@@ -70,14 +101,14 @@ const FEATURED_SLUGS = new Set([
   "estampagem",
 ]);
 
-function defaultProducts(): CmsProduct[] {
+function defaultProducts(): SiteProduct[] {
   const all = [...coreProducts, ...supporterProducts];
   return all.map((product, index) =>
     normalizeLegacyProduct(product, index + 1, FEATURED_SLUGS.has(product.slug)),
   );
 }
 
-function defaultCategories(): CmsCategory[] {
+function defaultCategories(): SiteCategory[] {
   return legacyCategories.map((category, index) => ({
     id: category.id,
     name: category.name,
@@ -103,7 +134,7 @@ const legacyPortfolio: { title: string; categoryName: string; image: string }[] 
   { title: "Acabamento personalizado", categoryName: "Caneleiras", image: "/catalog/caneleiras-azuis.jpg" },
 ];
 
-function defaultPortfolio(): CmsPortfolioItem[] {
+function defaultPortfolio(): SitePortfolioItem[] {
   return legacyPortfolio.map((item, index) => ({
     id: `port-${index + 1}`,
     title: item.title,
@@ -117,7 +148,7 @@ function defaultPortfolio(): CmsPortfolioItem[] {
   }));
 }
 
-function defaultContacts(): CmsContactChannel[] {
+function defaultContacts(): SiteContactChannel[] {
   // Sem dados inventados: os canais ficam vazios até serem preenchidos no admin.
   return [
     { id: "ch-telefone", type: "telefone", label: "Telefone", value: "", order: 1, visible: false },
@@ -128,7 +159,7 @@ function defaultContacts(): CmsContactChannel[] {
   ];
 }
 
-function defaultHeaderLinks(): CmsNavLink[] {
+function defaultHeaderLinks(): SiteNavLink[] {
   return [
     { id: "nav-inicio", label: "Início", to: "/", order: 1, visible: true },
     { id: "nav-loja", label: "Loja", to: "/loja", order: 2, visible: true },
@@ -137,16 +168,16 @@ function defaultHeaderLinks(): CmsNavLink[] {
   ];
 }
 
-function defaultFooterLinks(): CmsNavLink[] {
+function defaultFooterLinks(): SiteNavLink[] {
   return [
     { id: "foot-loja", label: "Loja", to: "/loja", order: 1, visible: true },
-    { id: "foot-personalizar", label: "Personalizar", to: "/personalizar", order: 2, visible: true },
+    { id: "foot-personalizar", label: "Personalizar", to: "/personalizar", order: 2, visible: false },
     { id: "foot-portfolio", label: "Portfólio", to: "/portfolio", order: 3, visible: true },
     { id: "foot-contactos", label: "Contactos", to: "/contactos", order: 4, visible: true },
   ];
 }
 
-function defaultHomeSections(): CmsHomeSection[] {
+function defaultHomeSections(): SiteHomeSection[] {
   return [
     { id: "home-hero", key: "hero", label: "Destaque inicial", title: "", subtitle: "", order: 1, visible: true },
     { id: "home-areas", key: "areas", label: "O que personalizamos", title: "", subtitle: "", order: 2, visible: true },
@@ -157,9 +188,9 @@ function defaultHomeSections(): CmsHomeSection[] {
   ];
 }
 
-export function defaultContent(): CmsContent {
+export function seedContent(): SiteContent {
   return {
-    schemaVersion: CMS_SCHEMA_VERSION,
+    schemaVersion: CONTENT_SCHEMA_VERSION,
     categories: defaultCategories(),
     products: defaultProducts(),
     portfolio: defaultPortfolio(),
@@ -176,7 +207,7 @@ export function defaultContent(): CmsContent {
       mainSiteUrl: VINILART_MAIN_URL,
       mainSiteLabel: "Voltar à VinilArt",
       cartNote: "Os pedidos são confirmados pela VinilArt Sport antes da produção.",
-      footerText: "VinilArt Sport — divisão desportiva de personalização, design e impressão.",
+      footerText: "Design, personalização e impressão. A identidade do teu desporto.",
     },
   };
 }

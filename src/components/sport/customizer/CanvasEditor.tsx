@@ -561,6 +561,8 @@ function KonvaStageInner({
       );
 
       ctx.closePath();
+
+      return undefined;
     },
     [
       shape,

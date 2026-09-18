@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { downloadOrder } from "@/lib/cart/export-order";
-import { products as coreProducts } from "@/lib/sport-data";
-import { supporterProducts } from "@/lib/supporter-products";
-const products = [...coreProducts, ...supporterProducts];
+import { catalogProducts as products } from "@/lib/content/catalog-source";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Edit3 } from "lucide-react";
 import { PageHero, PageShell } from "@/components/sport/PageShell";

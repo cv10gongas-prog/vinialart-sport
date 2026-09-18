@@ -191,6 +191,15 @@ export const equipamentoConfig = buildConfig(
 /* BANDEIRA                                                                   */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Contorno normalizado (0–1) da área de impressão da bandeira.
+ * Geometria independente da resolução: serve de fonte única para recorte e limites.
+ */
+export const FLAG_CONTOUR_POINTS: number[] = [
+  0, 0, 1, 0, 1, 1, 0, 1,
+];
+
+
 export const bandeiraConfig = buildConfig(
   "bandeira-personalizada",
   "Bandeira Personalizada",

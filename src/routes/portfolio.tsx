@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
+import { usePortfolio } from "@/lib/content/store";
 
 export const Route = createFileRoute("/portfolio")({
   component: Portfolio,
@@ -34,98 +35,27 @@ export const Route = createFileRoute("/portfolio")({
   }),
 });
 
-const portfolioItems = [
-  {
-    src: "/catalog/caneleiras-clube.jpg",
-    alt: "Caneleiras personalizadas produzidas pela VinilArt Sport",
-    category: "Caneleiras",
-    title: "Caneleiras personalizadas",
-    layout: "md:col-span-7 min-h-[460px] md:min-h-[540px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/equipamento-azul.jpg",
-    alt: "Equipamento desportivo personalizado",
-    category: "Equipamentos",
-    title: "Equipamentos personalizados",
-    layout: "md:col-span-5 min-h-[460px] md:min-h-[540px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/equipamento-vermelho.jpg",
-    alt: "Equipamento desportivo personalizado em produção",
-    category: "Equipamentos",
-    title: "Personalização de equipamentos",
-    layout: "md:col-span-5 min-h-[340px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/estampagem-producao.jpg",
-    alt: "Trabalho de estampagem em equipamento desportivo",
-    category: "Estampagem",
-    title: "Estampagem desportiva",
-    layout: "md:col-span-7 min-h-[340px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/caneleiras-cores.jpg",
-    alt: "Caneleiras personalizadas com diferentes grafismos",
-    category: "Caneleiras",
-    title: "Design aplicado ao produto",
-    layout: "md:col-span-4 min-h-[380px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/bone-personalizado.jpg",
-    alt: "Boné personalizado pela VinilArt Sport",
-    category: "Acessórios",
-    title: "Bonés personalizados",
-    layout: "md:col-span-8 min-h-[380px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/bracadeira-em-uso.jpg",
-    alt: "Braçadeira desportiva personalizada em utilização",
-    category: "Acessórios",
-    title: "Braçadeiras personalizadas",
-    layout: "md:col-span-7 min-h-[400px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/bracadeira.jpg",
-    alt: "Braçadeira personalizada produzida pela VinilArt Sport",
-    category: "Acessórios",
-    title: "Personalização de braçadeiras",
-    layout: "md:col-span-5 min-h-[400px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/bracadeira-aberta.jpg",
-    alt: "Braçadeira personalizada aberta com grafismo completo",
-    category: "Acessórios",
-    title: "Grafismo integral",
-    layout: "md:col-span-12 min-h-[340px] md:min-h-[410px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/caneleiras-amarelas.jpg",
-    alt: "Caneleiras personalizadas",
-    category: "Caneleiras",
-    title: "Personalização à medida",
-    layout: "md:col-span-6 min-h-[360px]",
-    position: "object-center",
-  },
-  {
-    src: "/catalog/caneleiras-azuis.jpg",
-    alt: "Caneleiras personalizadas",
-    category: "Caneleiras",
-    title: "Acabamento personalizado",
-    layout: "md:col-span-6 min-h-[360px]",
-    position: "object-center",
-  },
+/**
+ * Composição visual do mosaico (apresentação, não conteúdo).
+ * O conteúdo — imagens, títulos, categorias e ordem — vem do repositório.
+ */
+const mosaicLayouts = [
+  "md:col-span-7 min-h-[460px] md:min-h-[540px]",
+  "md:col-span-5 min-h-[460px] md:min-h-[540px]",
+  "md:col-span-5 min-h-[340px]",
+  "md:col-span-7 min-h-[340px]",
+  "md:col-span-4 min-h-[380px]",
+  "md:col-span-8 min-h-[380px]",
+  "md:col-span-7 min-h-[400px]",
+  "md:col-span-5 min-h-[400px]",
+  "md:col-span-12 min-h-[340px] md:min-h-[410px]",
+  "md:col-span-6 min-h-[360px]",
+  "md:col-span-6 min-h-[360px]",
 ];
 
 function Portfolio() {
+  const items = usePortfolio({ onlyVisible: true });
+
   return (
     <PageShell className="bg-[#090c11] text-white">
       {/* HERO */}
@@ -189,16 +119,18 @@ function Portfolio() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-          {portfolioItems.map((item, index) => (
+          {items.map((item, index) => (
             <figure
-              key={`${item.src}-${index}`}
-              className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-[#111622] ${item.layout}`}
+              key={item.id}
+              className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-[#111622] ${
+                mosaicLayouts[index % mosaicLayouts.length]
+              }`}
             >
               <img
-                src={item.src}
-                alt={item.alt}
+                src={item.image}
+                alt={item.description || item.title}
                 loading={index < 2 ? "eager" : "lazy"}
-                className={`absolute inset-0 h-full w-full object-cover ${item.position} transition-transform duration-700 ease-out group-hover:scale-[1.035]`}
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.035]`}
               />
 
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/5 to-black/5" />
@@ -208,7 +140,7 @@ function Portfolio() {
               <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                 <figcaption>
                   <span className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-cyan-300">
-                    {item.category}
+                    {item.categoryName}
                   </span>
 
                   <h3 className="mt-1 font-display text-xl uppercase tracking-wide text-white sm:text-2xl">

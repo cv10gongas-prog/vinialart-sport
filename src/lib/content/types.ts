@@ -8,7 +8,7 @@
 export type PriceMode = "quote" | "price";
 export type PublishStatus = "published" | "draft";
 
-export type CmsCategory = {
+export type SiteCategory = {
   id: string;
   name: string;
   slug: string;
@@ -18,19 +18,23 @@ export type CmsCategory = {
   active: boolean;
 };
 
-export type CmsProductVariants = {
+export type SiteProductVariants = {
   sizes: string[];
   colors: string[];
 };
 
-export type CmsProduct = {
+export type SiteProduct = {
   id: string;
   slug: string;
   name: string;
+  /** Nome curto usado nas grelhas de catálogo. */
+  shortName: string;
   categoryId: string;
   shortDescription: string;
   longDescription: string;
   image: string;
+  /** Como a imagem preenche o cartão: fotografia real (cover) ou mockup (contain). */
+  imageFit: "cover" | "contain";
   gallery: string[];
   priceMode: PriceMode;
   price: string;
@@ -38,6 +42,8 @@ export type CmsProduct = {
   featured: boolean;
   order: number;
   status: PublishStatus;
+  /** Prateleira da loja: destaque principal ou grelha de catálogo. */
+  shelf: "principal" | "catalogo";
   showInShop: boolean;
   showInHome: boolean;
   customizable: boolean;
@@ -45,7 +51,7 @@ export type CmsProduct = {
   customizerConfigId: string;
 };
 
-export type CmsPortfolioItem = {
+export type SitePortfolioItem = {
   id: string;
   title: string;
   categoryName: string;
@@ -70,16 +76,18 @@ export type ContactChannelType =
   | "endereco"
   | "custom";
 
-export type CmsContactChannel = {
+export type SiteContactChannel = {
   id: string;
   type: ContactChannelType;
   label: string;
   value: string;
+  /** Link opcional (tel:, mailto:, url). */
+  href?: string;
   order: number;
   visible: boolean;
 };
 
-export type CmsNavLink = {
+export type SiteNavLink = {
   id: string;
   label: string;
   to: string;
@@ -87,7 +95,7 @@ export type CmsNavLink = {
   visible: boolean;
 };
 
-export type CmsHomeSection = {
+export type SiteHomeSection = {
   id: string;
   /** chave interna usada pelo código para saber que layout renderizar */
   key: string;
@@ -98,7 +106,7 @@ export type CmsHomeSection = {
   visible: boolean;
 };
 
-export type CmsSettings = {
+export type SiteSettings = {
   brandName: string;
   tagline: string;
   logo: string;
@@ -110,16 +118,16 @@ export type CmsSettings = {
   footerText: string;
 };
 
-export type CmsContent = {
+export type SiteContent = {
   schemaVersion: number;
-  categories: CmsCategory[];
-  products: CmsProduct[];
-  portfolio: CmsPortfolioItem[];
-  contacts: CmsContactChannel[];
-  headerLinks: CmsNavLink[];
-  footerLinks: CmsNavLink[];
-  homeSections: CmsHomeSection[];
-  settings: CmsSettings;
+  categories: SiteCategory[];
+  products: SiteProduct[];
+  portfolio: SitePortfolioItem[];
+  contacts: SiteContactChannel[];
+  headerLinks: SiteNavLink[];
+  footerLinks: SiteNavLink[];
+  homeSections: SiteHomeSection[];
+  settings: SiteSettings;
 };
 
-export const CMS_SCHEMA_VERSION = 1;
+export const CONTENT_SCHEMA_VERSION = 1;
