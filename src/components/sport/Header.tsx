@@ -2,17 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/lib/cart/store";
-import { VINILART_MAIN_URL } from "@/lib/config";
-
-const nav = [
-  { label: "Início", to: "/" },
-  { label: "Loja", to: "/loja" },
-  { label: "Portfólio", to: "/portfolio" },
-  { label: "Contactos", to: "/contactos" },
-];
+import { useNavLinks, useSiteSettings } from "@/lib/content/store";
 
 function Wordmark({ onClick }: { onClick?: () => void }) {
   const [logoOk, setLogoOk] = useState(true);
+  const settings = useSiteSettings();
 
   return (
     <Link
@@ -23,8 +17,8 @@ function Wordmark({ onClick }: { onClick?: () => void }) {
     >
       {logoOk ? (
         <img
-          src="/brand/vinilart-sport-logo-horizontal.png"
-          alt="VinilArt Sport"
+          src={settings.logo}
+          alt={settings.brandName}
           className="h-8 w-auto object-contain sm:h-9"
           onError={() => setLogoOk(false)}
         />
@@ -41,6 +35,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
+  const nav = useNavLinks("header");
+  const settings = useSiteSettings();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -74,7 +70,7 @@ export function Header() {
         >
           {nav.map((item) => (
             <Link
-              key={item.to}
+              key={item.id}
               to={item.to}
               activeProps={{ className: "text-foreground" }}
               inactiveProps={{
@@ -89,11 +85,11 @@ export function Header() {
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <a
-            href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+            href={settings.mainSiteUrl !== "#" ? settings.mainSiteUrl : "/"}
             className="hidden items-center gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground lg:inline-flex"
             rel="noopener noreferrer"
           >
-            <span>Voltar à VinilArt</span>
+            <span>{settings.mainSiteLabel}</span>
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
 
@@ -178,11 +174,11 @@ export function Header() {
               </Link>
 
               <a
-                href={VINILART_MAIN_URL !== "#" ? VINILART_MAIN_URL : "http://localhost:3000"}
+                href={settings.mainSiteUrl !== "#" ? settings.mainSiteUrl : "/"}
                 className="inline-flex min-h-[48px] items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors py-2"
                 rel="noopener noreferrer"
               >
-                <span>Voltar à VinilArt Principal</span>
+                <span>{settings.mainSiteLabel}</span>
                 <ArrowUpRight className="h-4 w-4 text-cyan-400" />
               </a>
             </div>
