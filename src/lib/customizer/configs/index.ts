@@ -12,6 +12,7 @@ import {
 import { caneleirasConfig } from "./caneleiras";
 
 import {
+  getAssetSource,
   resolveMockupAsset,
   resolveOverlayAsset,
 } from "@/lib/content/assets";
@@ -25,7 +26,7 @@ const jerseyFrontWhite = resolveMockupAsset("jersey-front");
 const jerseyBackWhite = resolveMockupAsset("jersey-back");
 const printSurfaceWhite = resolveMockupAsset("print-surface");
 const supporterItemWhite = resolveMockupAsset("supporter-item");
-const jerseyShadeOverlay = resolveOverlayAsset("jersey-shade");
+const jerseyShadeOverlay = getAssetSource().overlay("jersey-shade");
 
 const sharedTools: AllowedTool[] = [
   "upload-image",
