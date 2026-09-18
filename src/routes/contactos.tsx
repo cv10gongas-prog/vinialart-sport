@@ -7,6 +7,7 @@ import { CheckCircle } from "lucide-react";
 import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SportButton } from "@/components/sport/SportButton";
 import { cn } from "@/lib/utils";
+import { useContactChannels } from "@/lib/content/store";
 
 export const Route = createFileRoute("/contactos")({
   component: Contactos,
@@ -46,6 +47,43 @@ const fieldClass =
   "min-h-[48px] h-12 w-full rounded-xl border border-input bg-background/60 px-4 text-base sm:text-sm outline-none placeholder:text-muted-foreground/60 focus:border-foreground/40 transition-colors";
 
 const errorClass = "mt-1.5 text-xs sm:text-[0.65rem] text-destructive";
+
+/**
+ * Os canais de contacto vêm do repositório de conteúdos (futuramente WordPress).
+ * Enquanto não houver canais confirmados, esta lista não mostra nada — nunca
+ * inventamos telefones, emails ou endereços.
+ */
+function ContactChannels() {
+  const channels = useContactChannels({ onlyVisible: true });
+
+  if (channels.length === 0) return null;
+
+  return (
+    <div className="mt-10 border-t border-border pt-10">
+      <p className="label-eyebrow">Contactos diretos</p>
+      <ul className="mt-4 space-y-3 text-sm">
+        {channels.map((channel) => (
+          <li key={channel.id}>
+            <span className="block text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {channel.label}
+            </span>
+            {channel.href ? (
+              <a
+                href={channel.href}
+                className="text-foreground underline-offset-4 hover:underline"
+                rel="noopener noreferrer"
+              >
+                {channel.value}
+              </a>
+            ) : (
+              <span className="text-foreground">{channel.value}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function Contactos() {
   const [submitted, setSubmitted] = useState(false);
@@ -297,6 +335,8 @@ function Contactos() {
             Prepara aqui o teu pedido. Podes descarregar o resumo e partilhá-lo com a VinilArt Sport
             pelo teu canal habitual.
           </p>
+
+          <ContactChannels />
 
           <div className="mt-10 border-t border-border pt-10">
             <p className="label-eyebrow">Encomendas de equipa</p>
