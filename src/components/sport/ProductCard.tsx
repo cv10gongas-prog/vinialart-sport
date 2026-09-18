@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Printer } from "lucide-react";
 import type { Product } from "@/lib/sport-data";
 import { productPresentationImage } from "@/lib/sport-presentation";
+import { productPriceBadge } from "@/lib/content/pricing";
 
 export function ProductCard({
   product,
@@ -14,11 +15,8 @@ export function ProductCard({
   const isCustomizable = product.customizationMode === "product";
   const isCatalog = product.customizationMode === "catalog";
 
-  // Transparent starting price or badge
-  const priceDisplay =
-    product.slug === "caneleiras-personalizadas"
-      ? "Desde 19,90€"
-      : "Sob Orçamento";
+  // Etiqueta comercial vinda dos dados do produto (nunca do slug).
+  const priceDisplay = productPriceBadge(product);
 
   const imageSrc = product.catalogImage
     ? product.catalogImage

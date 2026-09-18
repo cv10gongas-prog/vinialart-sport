@@ -14,6 +14,8 @@ import {
   printSurfaceWhite,
 } from "@/lib/customizer/mockups";
 
+import type { ProductCommercial } from "@/lib/content/pricing";
+
 export type Badge = "Personalizável" | "Novo" | "Mais popular";
 
 export type CustomizationMode = "product" | "catalog" | "service";
@@ -28,6 +30,10 @@ export type Product = {
   imageKind?: "Fotografia de trabalho" | "Base de personalização" | undefined;
   gallery?: string[] | undefined;
   priceLabel: string;
+  /** Dados comerciais do produto (modo de preço, valor, moeda, etiqueta). */
+  commercial?: ProductCommercial | undefined;
+  /** Rota alternativa de edição do pedido (quando não é /produto/$slug). */
+  editPath?: string | undefined;
   badges: Badge[];
   description: string;
   isCustomizable: boolean;
@@ -60,6 +66,7 @@ export const products: Product[] = [
     gallery: [shinGuardSingleWhite, shinGuardBackWhite],
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
+    commercial: { priceMode: "from", price: 19.9, currency: "EUR" },
     description: "O teu design nas duas caneleiras, com personalização independente de cada lado.",
     isCustomizable: true,
     customizationMode: "product",
@@ -100,6 +107,7 @@ export const products: Product[] = [
     imageKind: "Fotografia de trabalho",
     priceLabel: "Preço sob consulta",
     badges: ["Personalizável"],
+    editPath: "/adeptos",
     description: "Bandeiras personalizadas e outros artigos de apoio, sob consulta.",
     isCustomizable: false,
     customizationMode: "catalog",

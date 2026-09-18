@@ -8,7 +8,7 @@ import { PageShell } from "@/components/sport/PageShell";
 import { SportLink } from "@/components/sport/SportButton";
 import { ServiceQuoteForm } from "@/components/sport/ServiceQuoteForm";
 import { productPresentationImage } from "@/lib/sport-presentation";
-import { flagWhite } from "@/lib/customizer/mockups";
+import { resolveMockupAsset } from "@/lib/content/assets";
 
 export const Route = createFileRoute("/adeptos")({
   validateSearch: (

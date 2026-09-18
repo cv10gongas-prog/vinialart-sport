@@ -10,6 +10,7 @@ import { products as coreProducts, type Product } from "@/lib/sport-data";
 import { supporterProducts } from "@/lib/supporter-products";
 import { catalogExamples } from "@/lib/catalog-examples";
 import { VINILART_MAIN_URL } from "@/lib/config";
+import { productPriceBadge, QUOTE_PRICE_LABEL } from "@/lib/content/pricing";
 
 import {
   CONTENT_SCHEMA_VERSION,
@@ -36,11 +37,6 @@ function categoryIdForName(name: string): string {
   return found ? found.id : "cat-adeptos";
 }
 
-/** Preços atualmente apresentados no site — preservados tal e qual. */
-const legacyPrices: Record<string, string> = {
-  "caneleiras-personalizadas": "Desde 19,90€",
-};
-
 /** Produtos apresentados com fotografia real (imagem a preencher o cartão). */
 const legacyPhotoSlugs = new Set([
   "caneleiras-personalizadas",
@@ -64,7 +60,8 @@ export function normalizeLegacyProduct(
   featured: boolean,
 ): SiteProduct {
   const presentation = catalogPresentation.get(product.slug);
-  const price = legacyPrices[product.slug] ?? "";
+  const badge = productPriceBadge(product);
+  const hasPrice = badge !== QUOTE_PRICE_LABEL;
   const isPhoto = presentation
     ? presentation.kind === "Fotografia de trabalho"
     : legacyPhotoSlugs.has(product.slug);
@@ -80,8 +77,8 @@ export function normalizeLegacyProduct(
     image: presentation?.image ?? product.catalogImage ?? product.image,
     imageFit: isPhoto ? "cover" : "contain",
     gallery: product.catalogGallery ?? product.gallery ?? [],
-    priceMode: price ? "price" : "quote",
-    price,
+    priceMode: hasPrice ? "price" : "quote",
+    price: hasPrice ? badge : "",
     badge: product.badges[0] ?? "",
     featured,
     order,

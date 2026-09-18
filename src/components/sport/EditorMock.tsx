@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 import { SportLink } from "./SportButton";
-import { shinGuardPairWhite } from "@/lib/customizer/mockups";
+import { resolveMockupAsset } from "@/lib/content/assets";
 import { cn } from "@/lib/utils";
 
 export function EditorMock({
@@ -41,7 +41,7 @@ export function EditorMock({
 
           <div className="relative overflow-hidden border border-border bg-black">
             <img
-              src={shinGuardPairWhite}
+              src={resolveMockupAsset("shin-guard-pair")}
               alt="Design aplicado ao produto final em tempo real"
               className="aspect-[16/10] w-full object-contain p-6"
             />
