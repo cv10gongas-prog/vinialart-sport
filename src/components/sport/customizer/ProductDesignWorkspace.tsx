@@ -60,48 +60,12 @@ const surfaceLabel = (
   return fallback;
 };
 
-function getProductSizes(
-  slug: string,
-  configSizes?: string[],
-): string[] {
-  if (
-    configSizes &&
-    configSizes.length > 0
-  ) {
-    return configSizes;
-  }
+import {
+  getDefaultColor,
+  getSizeOptions,
+} from "@/lib/customizer/views";
 
-  if (
-    slug.includes("caneleiras")
-  ) {
-    return [
-      "S (14cm)",
-      "M (16.5cm)",
-      "L (19cm)",
-    ];
-  }
-
-  if (
-    slug.includes("equipamento") ||
-    slug.includes("tshirt") ||
-    slug.includes("calcoes")
-  ) {
-    return [
-      "XS",
-      "S",
-      "M",
-      "L",
-      "XL",
-      "XXL",
-    ];
-  }
-
-  if (slug.includes("bone")) {
-    return ["Tamanho Único"];
-  }
-
-  return ["Tamanho Único"];
-}
+import { productPriceBadge } from "@/lib/content/pricing";
 
 interface ProductDesignWorkspaceProps {
   config: ProductCustomizerConfig;
@@ -126,10 +90,8 @@ export function ProductDesignWorkspace({
 
   const cart = useCart();
 
-  const sizes = getProductSizes(
-    product.slug,
-    config.sizeOptions,
-  );
+  // Tamanhos e cor base vêm da configuração do produto.
+  const sizes = getSizeOptions(config);
 
   const [
     selectedSize,
@@ -140,23 +102,18 @@ export function ProductDesignWorkspace({
       "Tamanho Único",
   );
 
-  const isCaneleiras =
-    product.slug.includes("caneleiras") ||
-    config.id === "caneleiras-personalizadas";
+  const defaultColor =
+    getDefaultColor(config);
 
   const [
     selectedColor,
     setSelectedColor,
-  ] = useState<string>(
-    isCaneleiras ? "#ffffff" : (config.colorSwatches?.[0] || "#ffffff"),
-  );
+  ] = useState<string>(defaultColor);
 
   const [
     customHex,
     setCustomHex,
-  ] = useState<string>(
-    isCaneleiras ? "#ffffff" : (config.colorSwatches?.[0] || "#00C8FF"),
-  );
+  ] = useState<string>(defaultColor);
 
   const [
     method,
@@ -1293,10 +1250,9 @@ export function ProductDesignWorkspace({
 
             <div className="flex items-center gap-3 pt-1">
               <span className="rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                {product.slug ===
-                "caneleiras-personalizadas"
-                  ? "Desde 19,90€"
-                  : "Sob Orçamento"}
+                {productPriceBadge(
+                  product.slug,
+                )}
               </span>
 
               <span className="text-xs text-zinc-400">
