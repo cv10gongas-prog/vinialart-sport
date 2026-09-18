@@ -48,3 +48,11 @@ para o WordPress fornecer o conteúdo mais tarde.
 
 Por fazer: 3D continua desativado (Product3DViewer mantém-se como está);
 fotografias reais dos trabalhos ainda por receber.
+
+## Auditoria técnica + refinamento cirúrgico (concluído, sem commit manual)
+- Preços passaram para o modelo de Produto (`commercial`: priceMode/price/currency/priceLabel); `pricing.ts` só formata.
+- Textos/imagens/CTAs/destaques/serviços da Home passaram para `SiteSettings.home` (seed.ts) — Home só renderiza dados.
+- Mockups desacoplados: componentes e configs usam `resolveMockupAsset`/`resolveOverlayAsset` (`src/lib/content/assets.ts`), ponto único de troca para a Media Library do WordPress.
+- Condicionais por produto removidos de configs, ProductCard, workspace, carrinho, adeptos, EditorMock.
+- Testes: 98 verificações de geometria/dados (0 falhas), fluxo real do editor em 6 produtos e 375/390/430 (0 falhas), QA de rotas 1440/390 (0 erros).
+- Dívida técnica: `Product3DViewer.tsx` mantém condições de caneleira/bandeira (3D desligado, isolado); sugestão automática de área recomendada pode exceder formas concavas (apenas indicativa; `maximumArea` continua o único limite).
