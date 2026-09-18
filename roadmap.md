@@ -19,3 +19,32 @@ para o WordPress fornecer o conteúdo mais tarde.
 - Modelo de encomenda com snapshot (productId, configVersion, vistas,
   transformações, ficheiros) para encomendas antigas nunca mudarem.
 - Auditoria final de conteúdos fixos + relatório.
+
+## Personalizador universal + sistema de áreas (feito)
+
+- `src/lib/customizer/geometry/mask.ts` — motor de máscaras normalizadas (0..1):
+  retângulos, elipses, polígonos, formas livres, caminhos SVG, várias zonas e
+  zonas subtraídas. Serializável em JSON, independente da resolução.
+- `src/lib/customizer/geometry/legacy.ts` — conversão fiel das áreas atuais
+  (PrintArea + ClipShape) para máscaras. Sem recalibração: Caneleiras,
+  Equipamento, Boné, Garrafa, Bandeira e restantes ficam iguais.
+- `src/lib/customizer/geometry/mask-editor.ts` — MOTOR do futuro editor visual
+  (seleção, pincel, retângulo, elipse, polígono, edição de pontos, borracha,
+  desfazer, refazer, zoom, pan, limpar, restaurar). Sem interface, sem /admin.
+- `src/lib/customizer/views.ts` — vistas por produto (id, nome, ordem, mockup,
+  área máxima, área recomendada), tamanhos, cor base e composição da
+  pré-visualização, tudo vindo da configuração.
+- `CanvasEditor` usa a MESMA máscara para o contorno visível, o recorte do
+  design e a validação de limites — fonte única de verdade.
+- `ProductLivePreview` e `ProductDesignWorkspace` deixaram de ter condições por
+  produto (caneleiras/equipamento/bandeira/tamanhos/cor/preço).
+- `src/lib/customizer/wp/config-schema.ts` — contrato JSON (zod) para leitura e
+  escrita futura pela WordPress REST API.
+- `src/lib/content/customizer-repository.ts` — repositório trocável por um
+  adaptador WordPress.
+- Encomendas guardam `configVersion` + `configSnapshot`: uma encomenda antiga
+  nunca muda por a configuração do produto mudar depois.
+- Corrigida a biblioteca de desenho (react-konva) que impedia o editor de abrir.
+
+Por fazer: 3D continua desativado (Product3DViewer mantém-se como está);
+fotografias reais dos trabalhos ainda por receber.
