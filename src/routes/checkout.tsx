@@ -20,8 +20,7 @@ import {
 } from "lucide-react";
 import { PageShell } from "@/components/sport/PageShell";
 import { useCart } from "@/lib/cart/store";
-import { products as coreProducts } from "@/lib/sport-data";
-import { supporterProducts } from "@/lib/supporter-products";
+import { catalogProducts as allProducts } from "@/lib/content/catalog-source";
 import { PAYMENT_CONFIG, type PaymentMethodId } from "@/lib/checkout/payment-config";
 import type {
   CustomerDetails,
@@ -34,7 +33,6 @@ import { saveImageBlob } from "@/lib/customizer/storage/db";
 import { downloadFullOrder } from "@/lib/cart/export-order";
 import { nanoid } from "@/lib/customizer/nanoid";
 
-const allProducts = [...coreProducts, ...supporterProducts];
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,

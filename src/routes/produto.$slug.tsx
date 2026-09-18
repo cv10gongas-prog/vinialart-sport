@@ -13,13 +13,12 @@ import { TeamClubBanner } from "@/components/sport/TeamClubBanner";
 import { ProductDesignWorkspace } from "@/components/sport/customizer/ProductDesignWorkspace";
 import { QuoteRequestForm } from "@/components/sport/QuoteRequestForm";
 import { getProductCustomizerConfig } from "@/lib/customizer/configs";
-import { products as coreProducts, type Product } from "@/lib/sport-data";
-import { supporterProducts } from "@/lib/supporter-products";
+import { type Product } from "@/lib/sport-data";
+import { catalogProducts as products } from "@/lib/content/catalog-source";
 import { useCart } from "@/lib/cart/store";
 import type { CartItem } from "@/lib/cart/types";
 import { productPresentationImage } from "@/lib/sport-presentation";
 
-const products = [...coreProducts, ...supporterProducts];
 
 export const Route = createFileRoute("/produto/$slug")({
   validateSearch: (
