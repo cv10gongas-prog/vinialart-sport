@@ -171,7 +171,7 @@ function defaultHeaderLinks(): SiteNavLink[] {
 function defaultFooterLinks(): SiteNavLink[] {
   return [
     { id: "foot-loja", label: "Loja", to: "/loja", order: 1, visible: true },
-    { id: "foot-personalizar", label: "Personalizar", to: "/personalizar", order: 2, visible: true },
+    { id: "foot-personalizar", label: "Personalizar", to: "/personalizar", order: 2, visible: false },
     { id: "foot-portfolio", label: "Portfólio", to: "/portfolio", order: 3, visible: true },
     { id: "foot-contactos", label: "Contactos", to: "/contactos", order: 4, visible: true },
   ];
@@ -207,7 +207,7 @@ export function seedContent(): SiteContent {
       mainSiteUrl: VINILART_MAIN_URL,
       mainSiteLabel: "Voltar à VinilArt",
       cartNote: "Os pedidos são confirmados pela VinilArt Sport antes da produção.",
-      footerText: "VinilArt Sport — divisão desportiva de personalização, design e impressão.",
+      footerText: "Design, personalização e impressão. A identidade do teu desporto.",
     },
   };
 }
