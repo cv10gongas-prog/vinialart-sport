@@ -63,6 +63,8 @@ function createScaledSvgPath(
 }
 
 interface MaskOutlineProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  konva: any;
   shape: PixelShape;
   stroke: string;
   strokeWidth: number;
@@ -74,11 +76,19 @@ interface MaskOutlineProps {
  * no recorte do design — o que se vê é o limite real.
  */
 function MaskOutline({
+  konva,
   shape,
   stroke,
   strokeWidth,
   dash,
 }: MaskOutlineProps) {
+  const {
+    Path: KonvaPath,
+    Line,
+    Ellipse,
+    Rect,
+  } = konva;
+
   if (shape.kind === "path") {
     return (
       <KonvaPath
@@ -901,6 +911,7 @@ function KonvaStageInner({
             pixelShape.operation ===
             "add" ? (
               <MaskOutline
+                konva={KonvaLib}
                 key={`max-${index}`}
                 shape={pixelShape}
                 stroke="rgba(0, 200, 255, 0.75)"
@@ -920,6 +931,7 @@ function KonvaStageInner({
             pixelShape.operation ===
             "add" ? (
               <MaskOutline
+                konva={KonvaLib}
                 key={`rec-${index}`}
                 shape={pixelShape}
                 stroke="rgba(255, 255, 255, 0.45)"
