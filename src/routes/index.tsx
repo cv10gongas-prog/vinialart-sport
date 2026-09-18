@@ -9,7 +9,7 @@ import {
   Printer,
 } from "lucide-react";
 import { PageShell } from "@/components/sport/PageShell";
-import { products } from "@/lib/sport-data";
+import { useRepositories } from "@/lib/content/store";
 import { productPresentationImage } from "@/lib/sport-presentation";
 
 export const Route = createFileRoute("/")({
@@ -186,9 +186,9 @@ function Home() {
 
           <div className="home-product-grid">
             {areas.map((area, i) => {
-              const product = products.find(
-                (item) => item.slug === area.slug,
-              )!;
+              const product = productsRepo.getBySlug(area.slug);
+
+              if (!product) return null;
 
               return (
                 <Link
