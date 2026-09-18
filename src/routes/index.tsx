@@ -76,6 +76,8 @@ function InkSignature() {
 }
 
 function Home() {
+  const { products: productsRepo } = useRepositories();
+
   return (
     <PageShell className="sport-home">
       <style>
