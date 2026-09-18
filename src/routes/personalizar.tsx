@@ -9,7 +9,7 @@ import { ProductAssistanceForm } from "@/components/sport/ProductAssistanceForm"
 
 import { caneleirasConfig, getProductCustomizerConfig } from "@/lib/customizer/configs";
 
-import { products } from "@/lib/sport-data";
+import { catalogProducts as products } from "@/lib/content/catalog-source";
 
 import { useCart } from "@/lib/cart/store";
 

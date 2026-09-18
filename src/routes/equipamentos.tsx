@@ -4,7 +4,7 @@ import { PageHero, PageShell } from "@/components/sport/PageShell";
 import { SectionHeading } from "@/components/sport/SectionHeading";
 import { SportLink } from "@/components/sport/SportButton";
 import { ProductCard } from "@/components/sport/ProductCard";
-import { products } from "@/lib/sport-data";
+import { catalogProducts as products } from "@/lib/content/catalog-source";
 
 export const Route = createFileRoute("/equipamentos")({
   component: Equipamentos,
