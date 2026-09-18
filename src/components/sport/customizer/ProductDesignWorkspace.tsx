@@ -1695,18 +1695,29 @@ export function ProductDesignWorkspace({
 
                   <input
                     type="file"
+                    multiple
                     accept="image/png,image/jpeg,image/webp,application/pdf"
                     className="hidden"
                     onChange={(
                       e,
                     ) => {
-                      void handleFileUpload(
-                        e.target
-                          .files?.[0],
-                        c.state
-                          .activeSurfaceId,
-                        false,
-                      );
+                      const files =
+                        Array.from(
+                          e.target
+                            .files ??
+                            [],
+                        );
+
+                      void (async () => {
+                        for (const file of files) {
+                          await handleFileUpload(
+                            file,
+                            c.state
+                              .activeSurfaceId,
+                            false,
+                          );
+                        }
+                      })();
 
                       e.target.value =
                         "";
