@@ -61,9 +61,12 @@ const surfaceLabel = (
 };
 
 import {
+  CUSTOMIZER_SCHEMA_VERSION,
   getDefaultColor,
   getSizeOptions,
 } from "@/lib/customizer/views";
+
+import { serializeCustomizerConfig } from "@/lib/customizer/wp/config-schema";
 
 import { productPriceBadge } from "@/lib/content/pricing";
 
@@ -421,6 +424,16 @@ export function ProductDesignWorkspace({
           customizerDesign,
           previewDataUrl,
           mode: "design" as const,
+          // Snapshot imutável: a encomenda guarda a configuração usada.
+          configVersion:
+            config.schemaVersion ??
+            CUSTOMIZER_SCHEMA_VERSION,
+          configSnapshot:
+            JSON.stringify(
+              serializeCustomizerConfig(
+                config,
+              ),
+            ),
           serviceDetails: designNote.trim()
             ? {
                 itemOrServiceType: product.name,
