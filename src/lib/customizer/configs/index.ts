@@ -12,19 +12,21 @@ import {
 import { caneleirasConfig } from "./caneleiras";
 
 import {
-  bottleShadeOverlay,
-  capShadeOverlay,
-  jerseyShadeOverlay,
-  jerseyBackWhite,
-  jerseyFrontWhite,
-  printSurfaceWhite,
-  sacoShadeOverlay,
-  mochilaShadeOverlay,
-  shortsShadeOverlay,
-  supporterItemWhite,
+  getAssetSource,
+  resolveMockupAsset,
+  resolveOverlayAsset,
+} from "@/lib/content/assets";
+
+import {
   JERSEY_PATH,
   JERSEY_BACK_PATH,
 } from "@/lib/customizer/mockups";
+
+const jerseyFrontWhite = resolveMockupAsset("jersey-front");
+const jerseyBackWhite = resolveMockupAsset("jersey-back");
+const printSurfaceWhite = resolveMockupAsset("print-surface");
+const supporterItemWhite = resolveMockupAsset("supporter-item");
+const jerseyShadeOverlay = getAssetSource().overlay("jersey-shade");
 
 const sharedTools: AllowedTool[] = [
   "upload-image",
@@ -373,6 +375,8 @@ export const productCustomizerConfigs: Record<
 > = {
   ...Object.fromEntries(
     supporterDefinitions.map((d) => {
+      const overlaySrc = resolveOverlayAsset(d.overlayKey);
+
       const createSurface = (
         id: "FRONT" | "BACK",
         label: string,
@@ -385,25 +389,7 @@ export const productCustomizerConfigs: Record<
         mockup: {
           baseSrc: `/catalog/editor/${d.base}.svg`,
 
-          ...(d.id === "garrafa"
-            ? { overlaySrc: bottleShadeOverlay }
-            : {}),
-
-          ...(d.id === "bone"
-            ? { overlaySrc: capShadeOverlay }
-            : {}),
-
-          ...(d.id === "saco"
-            ? { overlaySrc: sacoShadeOverlay }
-            : {}),
-
-          ...(d.id === "mochila"
-            ? { overlaySrc: mochilaShadeOverlay }
-            : {}),
-
-          ...(d.id === "calcoes"
-            ? { overlaySrc: shortsShadeOverlay }
-            : {}),
+          ...(overlaySrc ? { overlaySrc } : {}),
 
           ...(d.silhouettePath
             ? { silhouettePath: d.silhouettePath }
@@ -413,9 +399,7 @@ export const productCustomizerConfigs: Record<
         printArea: d.area,
       });
 
-      const hasBack =
-        d.id === "tshirt" ||
-        d.id === "saco";
+      const hasBack = d.hasBack === true;
 
       const surfaces: Surface[] = hasBack
         ? [
@@ -423,12 +407,7 @@ export const productCustomizerConfigs: Record<
             createSurface("BACK", "Costas"),
           ]
         : [
-            createSurface(
-              "FRONT",
-              d.id === "garrafa"
-                ? "Corpo"
-                : "Frente",
-            ),
+            createSurface("FRONT", d.frontLabel ?? "Frente"),
           ];
 
       const config = buildConfig(

@@ -1,4 +1,5 @@
 import type { Product } from "./sport-data";
+import type { OverlayAssetKey } from "@/lib/content/assets";
 import type { PrintArea } from "./customizer/types";
 
 export const CAP_CROWN_POINTS: number[] = [
@@ -389,9 +390,19 @@ export const supporterDefinitions: {
   projection?: "cylinder";
   isDirectCustomizable?: boolean;
   silhouettePath?: string;
+  /** Overlay de sombra/textura aplicado acima do design (chave de asset). */
+  overlayKey?: OverlayAssetKey;
+  /** Rótulo da vista frontal quando não é "Frente". */
+  frontLabel?: string;
+  /** Produto com vista de costas configurada. */
+  hasBack?: boolean;
+  /** Tipo de imagem de catálogo apresentada. */
+  imageKind?: "Fotografia de trabalho" | "Base de personalização";
 }[] = [
   {
     id: "garrafa",
+    overlayKey: "bottle-shade",
+    frontLabel: "Corpo",
     name: "Garrafa",
     photo: "base-garrafa.jpg",
     base: "garrafa",
@@ -412,6 +423,8 @@ export const supporterDefinitions: {
   },
   {
     id: "bone",
+    overlayKey: "cap-shade",
+    imageKind: "Fotografia de trabalho",
     name: "Boné",
     photo: "bone-personalizado.jpg",
     base: "bone",
@@ -430,6 +443,8 @@ export const supporterDefinitions: {
   },
   {
     id: "saco",
+    overlayKey: "saco-shade",
+    hasBack: true,
     name: "Saco",
     photo: "base-saco.jpg",
     base: "saco",
@@ -448,6 +463,7 @@ export const supporterDefinitions: {
   },
   {
     id: "mochila",
+    overlayKey: "mochila-shade",
     name: "Mochila",
     photo: "base-mochila.jpg",
     base: "mochila",
@@ -466,6 +482,7 @@ export const supporterDefinitions: {
   },
   {
     id: "tshirt",
+    hasBack: true,
     name: "T-shirt",
     photo: "tshirt-branca-base.jpg",
     base: "tshirt",
@@ -503,6 +520,7 @@ export const supporterDefinitions: {
   },
   {
     id: "calcoes",
+    overlayKey: "shorts-shade",
     name: "Calções",
     photo: "base-calcoes.jpg",
     base: "calcoes",
@@ -527,10 +545,7 @@ export const supporterProducts: Product[] = supporterDefinitions.map((d) => ({
   category: "Artigos para Adeptos",
   image: `/catalog/editor/${d.base}.svg`,
   catalogImage: `/catalog/${d.photo}`,
-  imageKind:
-    d.id === "bone"
-      ? "Fotografia de trabalho"
-      : "Base de personalização",
+  imageKind: d.imageKind ?? "Base de personalização",
   priceLabel: "Sob consulta",
   badges: ["Personalizável"],
   description: "Personaliza com a tua imagem ou pede ajuda à VinilArt.",

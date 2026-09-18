@@ -12,6 +12,7 @@ import type {
   SiteCategory,
   SiteContactChannel,
   SiteContent,
+  SiteHomeContent,
   SiteHomeSection,
   SiteNavLink,
   SitePortfolioItem,
@@ -88,6 +89,8 @@ export interface SiteSettingsRepository {
   contacts(options?: { onlyVisible?: boolean }): SiteContactChannel[];
   nav(area: "header" | "footer"): SiteNavLink[];
   homeSections(options?: { onlyVisible?: boolean }): SiteHomeSection[];
+  /** Conteúdo comercial da página inicial. */
+  home(): SiteHomeContent;
 }
 
 export type ContentRepositories = {
@@ -152,6 +155,7 @@ export function createRepositories(content: SiteContent): ContentRepositories {
       const list = sortByOrder(content.homeSections);
       return options?.onlyVisible ? list.filter((section) => section.visible) : list;
     },
+    home: () => content.home,
   };
 
   return { products, categories, portfolio, settings };

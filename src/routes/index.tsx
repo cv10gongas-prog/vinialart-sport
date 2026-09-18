@@ -2,15 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   ArrowRight,
-  Upload,
-  MessageSquare,
   Flag,
   Layers,
   Printer,
 } from "lucide-react";
 import { PageShell } from "@/components/sport/PageShell";
-import { useRepositories } from "@/lib/content/store";
+import { useHomeContent, useRepositories } from "@/lib/content/store";
 import { productPresentationImage } from "@/lib/sport-presentation";
+import type { SiteHomeService } from "@/lib/content/types";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -41,42 +40,72 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const areas = [
-  {
-    slug: "caneleiras-personalizadas",
-    label: "Caneleiras",
-    accent: "magenta",
-    text: "A tua identidade, em cada entrada em campo.",
-  },
-  {
-    slug: "equipamento-personalizado",
-    label: "Equipamentos",
-    accent: "cyan",
-    text: "O mesmo espírito. Uma identidade de equipa.",
-  },
-  {
-    slug: "bandeira-personalizada",
-    label: "Bandeiras",
-    accent: "yellow",
-    text: "As tuas cores, dentro e fora do campo.",
-  },
-] as const;
+/** Conjunto fixo de ícones disponíveis para os serviços (escolha por dados). */
+const serviceIcons = {
+  flag: Flag,
+  layers: Layers,
+  printer: Printer,
+} as const;
 
-const realWorks: { image: string; alt: string; label: string }[] = [];
+function ServiceCard({ service }: { service: SiteHomeService }) {
+  const Icon = serviceIcons[service.icon];
 
-function InkSignature() {
+  const body = (
+    <>
+      <Icon size={30} strokeWidth={1.5} aria-hidden="true" />
+
+      <div>
+        <h3>{service.title}</h3>
+
+        <p>{service.text}</p>
+      </div>
+
+      <span className="home-service-action">
+        {service.actionLabel} <ArrowUpRight size={22} aria-hidden="true" />
+      </span>
+    </>
+  );
+
+  const className = `home-service home-accent-${service.accent}`;
+
+  if (service.slug) {
+    return (
+      <Link
+        to="/produto/$slug"
+        params={{ slug: service.slug }}
+        className={className}
+      >
+        {body}
+      </Link>
+    );
+  }
+
   return (
-    <span className="home-ink-signature" aria-hidden="true">
-      <i />
-      <i />
-      <i />
-      <i />
-    </span>
+    <Link
+      to={service.to}
+      search={{ artigo: undefined, cartItem: undefined }}
+      className={className}
+    >
+      {body}
+    </Link>
   );
 }
 
 function Home() {
   const { products: productsRepo } = useRepositories();
+  const home = useHomeContent();
+
+  const highlights = home.products.highlights
+    .filter((item) => item.visible)
+    .sort((a, b) => a.order - b.order);
+
+  const works = home.works.items
+    .filter((item) => item.visible)
+    .sort((a, b) => a.order - b.order);
+
+  const services = home.services.items
+    .filter((item) => item.visible)
+    .sort((a, b) => a.order - b.order);
 
   return (
     <PageShell className="sport-home">
@@ -122,7 +151,7 @@ function Home() {
       >
         <img
           className="campaign-hero-image"
-          src="/brand/sport-hero-approved.jpg"
+          src={home.hero.image}
           alt=""
           aria-hidden="true"
           width="1600"
@@ -131,35 +160,41 @@ function Home() {
         />
 
         <div className="home-container campaign-hero-inner">
-          <p className="campaign-tag">VinilArt Sport</p>
+          <p className="campaign-tag">{home.hero.tag}</p>
 
           <h1 id="home-title">
-            Personalizamos
+            {home.hero.titleLine1}
             <br />
-            <span>o teu jogo.</span>
+            <span>{home.hero.titleHighlight}</span>
           </h1>
 
-          <p className="home-intro">
-            Caneleiras, equipamentos, bandeiras e soluções gráficas para
-            atletas, clubes e adeptos.
-          </p>
+          <p className="home-intro">{home.hero.intro}</p>
 
           <div className="home-actions">
-            <Link to="/loja" className="home-button home-button-cyan">
-              Ver loja <ArrowRight size={19} aria-hidden="true" />
+            <Link
+              to={home.hero.primaryCta.to}
+              className="home-button home-button-cyan"
+            >
+              {home.hero.primaryCta.label}{" "}
+              <ArrowRight size={19} aria-hidden="true" />
             </Link>
 
-            <Link to="/portfolio" className="home-button home-button-outline">
-              Ver portfólio <ArrowUpRight size={19} aria-hidden="true" />
+            <Link
+              to={home.hero.secondaryCta.to}
+              className="home-button home-button-outline"
+            >
+              {home.hero.secondaryCta.label}{" "}
+              <ArrowUpRight size={19} aria-hidden="true" />
             </Link>
           </div>
         </div>
 
         <div className="campaign-hero-baseline home-container">
-          <span>Design · Personalização · Impressão</span>
+          <span>{home.hero.baselineText}</span>
 
-          <a href="#personalizamos">
-            Descobre os produtos <ArrowRight size={17} aria-hidden="true" />
+          <a href={home.hero.baselineLinkHref}>
+            {home.hero.baselineLinkLabel}{" "}
+            <ArrowRight size={17} aria-hidden="true" />
           </a>
         </div>
       </section>
@@ -172,36 +207,38 @@ function Home() {
         <div className="home-container">
           <div className="home-section-heading">
             <div>
-              <p className="home-eyebrow">Feito à tua medida</p>
+              <p className="home-eyebrow">{home.products.eyebrow}</p>
 
               <h2 id="products-title">
-                Produtos
+                {home.products.titleLine1}
                 <br />
-                em destaque<span className="home-magenta">.</span>
+                {home.products.titleLine2}
+                <span className="home-magenta">.</span>
               </h2>
             </div>
 
             <Link to="/loja" className="home-text-link">
-              Explorar a loja <ArrowUpRight size={20} aria-hidden="true" />
+              {home.products.linkLabel}{" "}
+              <ArrowUpRight size={20} aria-hidden="true" />
             </Link>
           </div>
 
           <div className="home-product-grid">
-            {areas.map((area, i) => {
-              const product = productsRepo.getBySlug(area.slug);
+            {highlights.map((area, i) => {
+              const product = productsRepo.getBySlug(area.productSlug);
 
               if (!product) return null;
 
               return (
                 <Link
-                  key={area.slug}
+                  key={area.id}
                   to="/produto/$slug"
-                  params={{ slug: area.slug }}
+                  params={{ slug: area.productSlug }}
                   className={`home-product home-accent-${area.accent}`}
                 >
                   <div className="home-product-top">
                     <span>0{i + 1}</span>
-                    <span>Personalizável</span>
+                    <span>{home.products.itemBadge}</span>
                   </div>
 
                   <div className="home-product-stage">
@@ -222,7 +259,7 @@ function Home() {
                     <p>{area.text}</p>
 
                     <div className="home-product-bottom">
-                      <span>Personalizar</span>
+                      <span>{home.products.itemAction}</span>
 
                       <span className="home-product-arrow">
                         <ArrowUpRight size={20} aria-hidden="true" />
@@ -236,28 +273,25 @@ function Home() {
         </div>
       </section>
 
-      {realWorks.length > 0 && (
+      {works.length > 0 && (
         <section
           className="home-works home-section"
           aria-labelledby="works-title"
         >
           <div className="home-container">
             <div className="home-section-heading">
-              <h2 id="works-title">Trabalhos realizados.</h2>
+              <h2 id="works-title">{home.works.title}</h2>
 
               <Link to="/portfolio" className="home-text-link">
-                Ver portfólio <ArrowUpRight size={20} aria-hidden="true" />
+                {home.works.linkLabel}{" "}
+                <ArrowUpRight size={20} aria-hidden="true" />
               </Link>
             </div>
 
             <div className="home-work-grid">
-              {realWorks.map((work) => (
-                <figure key={work.image}>
-                  <img
-                    src={work.image}
-                    alt={work.alt}
-                    loading="lazy"
-                  />
+              {works.map((work) => (
+                <figure key={work.id}>
+                  <img src={work.image} alt={work.alt} loading="lazy" />
 
                   <figcaption>{work.label}</figcaption>
                 </figure>
@@ -274,133 +308,46 @@ function Home() {
         <div className="home-container">
           <div className="home-section-heading">
             <div>
-              <p className="home-eyebrow">Para lá do produto</p>
+              <p className="home-eyebrow">{home.services.eyebrow}</p>
 
               <h2 id="services-title">
-                Mais formas de
+                {home.services.titleLine1}
                 <br />
-                dar vida à tua ideia.
+                {home.services.titleLine2}
               </h2>
             </div>
 
-            <span className="home-service-label">
-              Serviços / Sob consulta
-            </span>
+            <span className="home-service-label">{home.services.label}</span>
           </div>
 
           <div className="home-service-grid">
-            <Link
-              to="/adeptos"
-              search={{
-                artigo: undefined,
-                cartItem: undefined,
-              }}
-              className="home-service home-accent-yellow"
-            >
-              <Flag
-                size={30}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-
-              <div>
-                <h3>Artigos para adeptos</h3>
-
-                <p>
-                  Bandeiras personalizadas e outros pedidos para apoiar o teu
-                  clube.
-                </p>
-              </div>
-
-              <span className="home-service-action">
-                Explorar <ArrowUpRight size={22} aria-hidden="true" />
-              </span>
-            </Link>
-
-            <Link
-              to="/produto/$slug"
-              params={{
-                slug: "estampagem",
-              }}
-              className="home-service home-accent-cyan"
-            >
-              <Layers
-                size={30}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-
-              <div>
-                <h3>Estampagem</h3>
-
-                <p>
-                  Nomes, números, emblemas e grafismos nas tuas peças
-                  desportivas.
-                </p>
-              </div>
-
-              <span className="home-service-action">
-                Pedir orçamento{" "}
-                <ArrowUpRight size={22} aria-hidden="true" />
-              </span>
-            </Link>
-
-            <Link
-              to="/produto/$slug"
-              params={{
-                slug: "impressao",
-              }}
-              className="home-service home-accent-magenta"
-            >
-              <Printer
-                size={30}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-
-              <div>
-                <h3>Impressão</h3>
-
-                <p>
-                  Envia o teu ficheiro e conta-nos o que precisas de imprimir.
-                </p>
-              </div>
-
-              <span className="home-service-action">
-                Pedir orçamento{" "}
-                <ArrowUpRight size={22} aria-hidden="true" />
-              </span>
-            </Link>
+            {services.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
           </div>
         </div>
       </section>
 
-      <section
-        className="home-contact"
-        aria-labelledby="contact-title"
-      >
+      <section className="home-contact" aria-labelledby="contact-title">
         <div className="home-container home-contact-inner">
           <div>
-            <p className="home-eyebrow">
-              Vamos dar o próximo passo?
-            </p>
+            <p className="home-eyebrow">{home.contact.eyebrow}</p>
 
             <h2 id="contact-title">
-              Tens a ideia.
+              {home.contact.titleLine1}
               <br />
-              Vamos pô-la <span>em jogo.</span>
+              {home.contact.titleLine2}{" "}
+              <span>{home.contact.titleHighlight}</span>
             </h2>
 
-            <p>
-              Envia o teu ficheiro ou conta-nos o que tens em mente.
-            </p>
+            <p>{home.contact.text}</p>
           </div>
 
           <Link
-            to="/contactos"
+            to={home.contact.cta.to}
             className="home-button home-button-light"
           >
-            Falar com a VinilArt{" "}
+            {home.contact.cta.label}{" "}
             <ArrowUpRight size={20} aria-hidden="true" />
           </Link>
         </div>

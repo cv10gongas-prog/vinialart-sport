@@ -10,12 +10,14 @@ import { products as coreProducts, type Product } from "@/lib/sport-data";
 import { supporterProducts } from "@/lib/supporter-products";
 import { catalogExamples } from "@/lib/catalog-examples";
 import { VINILART_MAIN_URL } from "@/lib/config";
+import { productPriceBadge, QUOTE_PRICE_LABEL } from "@/lib/content/pricing";
 
 import {
   CONTENT_SCHEMA_VERSION,
   type SiteCategory,
   type SiteContactChannel,
   type SiteContent,
+  type SiteHomeContent,
   type SiteHomeSection,
   type SiteNavLink,
   type SitePortfolioItem,
@@ -35,11 +37,6 @@ function categoryIdForName(name: string): string {
   const found = legacyCategories.find((c) => c.name === name);
   return found ? found.id : "cat-adeptos";
 }
-
-/** Preços atualmente apresentados no site — preservados tal e qual. */
-const legacyPrices: Record<string, string> = {
-  "caneleiras-personalizadas": "Desde 19,90€",
-};
 
 /** Produtos apresentados com fotografia real (imagem a preencher o cartão). */
 const legacyPhotoSlugs = new Set([
@@ -64,7 +61,8 @@ export function normalizeLegacyProduct(
   featured: boolean,
 ): SiteProduct {
   const presentation = catalogPresentation.get(product.slug);
-  const price = legacyPrices[product.slug] ?? "";
+  const badge = productPriceBadge(product);
+  const hasPrice = badge !== QUOTE_PRICE_LABEL;
   const isPhoto = presentation
     ? presentation.kind === "Fotografia de trabalho"
     : legacyPhotoSlugs.has(product.slug);
@@ -80,8 +78,8 @@ export function normalizeLegacyProduct(
     image: presentation?.image ?? product.catalogImage ?? product.image,
     imageFit: isPhoto ? "cover" : "contain",
     gallery: product.catalogGallery ?? product.gallery ?? [],
-    priceMode: price ? "price" : "quote",
-    price,
+    priceMode: hasPrice ? "price" : "quote",
+    price: hasPrice ? badge : "",
     badge: product.badges[0] ?? "",
     featured,
     order,
@@ -188,6 +186,122 @@ function defaultHomeSections(): SiteHomeSection[] {
   ];
 }
 
+/**
+ * Conteúdo comercial da página inicial — exatamente os textos atualmente
+ * publicados. Nada é reescrito: apenas deixa de estar dentro do componente.
+ */
+function defaultHome(): SiteHomeContent {
+  return {
+    hero: {
+      tag: "VinilArt Sport",
+      titleLine1: "Personalizamos",
+      titleHighlight: "o teu jogo.",
+      intro:
+        "Caneleiras, equipamentos, bandeiras e soluções gráficas para atletas, clubes e adeptos.",
+      image: "/brand/sport-hero-approved.jpg",
+      primaryCta: { label: "Ver loja", to: "/loja" },
+      secondaryCta: { label: "Ver portfólio", to: "/portfolio" },
+      baselineText: "Design · Personalização · Impressão",
+      baselineLinkLabel: "Descobre os produtos",
+      baselineLinkHref: "#personalizamos",
+    },
+    products: {
+      eyebrow: "Feito à tua medida",
+      titleLine1: "Produtos",
+      titleLine2: "em destaque",
+      linkLabel: "Explorar a loja",
+      itemBadge: "Personalizável",
+      itemAction: "Personalizar",
+      highlights: [
+        {
+          id: "home-dest-caneleiras",
+          productSlug: "caneleiras-personalizadas",
+          label: "Caneleiras",
+          text: "A tua identidade, em cada entrada em campo.",
+          accent: "magenta",
+          order: 1,
+          visible: true,
+        },
+        {
+          id: "home-dest-equipamentos",
+          productSlug: "equipamento-personalizado",
+          label: "Equipamentos",
+          text: "O mesmo espírito. Uma identidade de equipa.",
+          accent: "cyan",
+          order: 2,
+          visible: true,
+        },
+        {
+          id: "home-dest-bandeiras",
+          productSlug: "bandeira-personalizada",
+          label: "Bandeiras",
+          text: "As tuas cores, dentro e fora do campo.",
+          accent: "yellow",
+          order: 3,
+          visible: true,
+        },
+      ],
+    },
+    works: {
+      title: "Trabalhos realizados.",
+      linkLabel: "Ver portfólio",
+      // Sem fotografias reais confirmadas: a secção só aparece quando existirem.
+      items: [],
+    },
+    services: {
+      eyebrow: "Para lá do produto",
+      titleLine1: "Mais formas de",
+      titleLine2: "dar vida à tua ideia.",
+      label: "Serviços / Sob consulta",
+      items: [
+        {
+          id: "home-serv-adeptos",
+          icon: "flag",
+          title: "Artigos para adeptos",
+          text: "Bandeiras personalizadas e outros pedidos para apoiar o teu clube.",
+          actionLabel: "Explorar",
+          accent: "yellow",
+          to: "/adeptos",
+          order: 1,
+          visible: true,
+        },
+        {
+          id: "home-serv-estampagem",
+          icon: "layers",
+          title: "Estampagem",
+          text: "Nomes, números, emblemas e grafismos nas tuas peças desportivas.",
+          actionLabel: "Pedir orçamento",
+          accent: "cyan",
+          to: "/produto/$slug",
+          slug: "estampagem",
+          order: 2,
+          visible: true,
+        },
+        {
+          id: "home-serv-impressao",
+          icon: "printer",
+          title: "Impressão",
+          text: "Envia o teu ficheiro e conta-nos o que precisas de imprimir.",
+          actionLabel: "Pedir orçamento",
+          accent: "magenta",
+          to: "/produto/$slug",
+          slug: "impressao",
+          order: 3,
+          visible: true,
+        },
+      ],
+    },
+    contact: {
+      eyebrow: "Vamos dar o próximo passo?",
+      titleLine1: "Tens a ideia.",
+      titleLine2: "Vamos pô-la",
+      titleHighlight: "em jogo.",
+      text: "Envia o teu ficheiro ou conta-nos o que tens em mente.",
+      cta: { label: "Falar com a VinilArt", to: "/contactos" },
+    },
+  };
+}
+
 export function seedContent(): SiteContent {
   return {
     schemaVersion: CONTENT_SCHEMA_VERSION,
@@ -198,6 +312,7 @@ export function seedContent(): SiteContent {
     headerLinks: defaultHeaderLinks(),
     footerLinks: defaultFooterLinks(),
     homeSections: defaultHomeSections(),
+    home: defaultHome(),
     settings: {
       brandName: "VinilArt Sport",
       tagline: "Personalização desportiva",

@@ -48,7 +48,16 @@ export function viewRecommendedMask(surface: Surface): AreaMask | undefined {
   return undefined;
 }
 
-/** Sugestão de zona recomendada a partir do limite máximo (para o futuro editor). */
+/**
+ * Sugestão de zona recomendada a partir do limite máximo (apoio ao futuro
+ * editor de zonas no WordPress).
+ *
+ * Nota conhecida: numa forma concava (ex.: equipamento, com cavas e gola) a
+ * redução uniforme pode sugerir pontos ligeiramente fora do contorno real.
+ * Isto NUNCA altera o limite: `maximumArea` continua a ser a única fonte do
+ * recorte e da validação, e a zona recomendada é apenas indicativa. O editor
+ * do WordPress deve validar a zona desenhada contra a máscara máxima.
+ */
 export function suggestRecommendedMask(maximum: AreaMask, inset = 0.06): AreaMask {
   return insetMask(maximum, inset);
 }

@@ -1259,9 +1259,7 @@ export function ProductDesignWorkspace({
 
             <div className="flex items-center gap-3 pt-1">
               <span className="rounded-full border border-cyan-500/30 bg-cyan-950/40 px-3 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                {productPriceBadge(
-                  product.slug,
-                )}
+                {productPriceBadge(product)}
               </span>
 
               <span className="text-xs text-zinc-400">
