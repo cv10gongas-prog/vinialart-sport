@@ -73,6 +73,8 @@ export interface Surface {
   label: string;
   /** Ordem de apresentação da vista (frente, costas, lado, manga…). */
   order?: number | undefined;
+  /** Etiqueta usada na pré-visualização final (quando difere do rótulo). */
+  previewLabel?: string | undefined;
   /** Path/URL to the product mockup image for this surface */
   mockupSrc: string;
   /** Extended mockup configuration for layered realism */
@@ -248,6 +250,10 @@ export interface ProductCustomizerConfig {
   defaultColor?: string | undefined;
   /** Composição da pré-visualização final (par, frente/costas, larga, única). */
   previewLayout?: CustomizerPreviewLayout | undefined;
+  /** Título da pré-visualização final. */
+  previewTitle?: string | undefined;
+  /** Legenda da pré-visualização final. */
+  previewSubtitle?: string | undefined;
 }
 
 // ---------------------------------------------------------------------------
