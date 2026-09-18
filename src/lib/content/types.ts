@@ -81,6 +81,8 @@ export type SiteContactChannel = {
   type: ContactChannelType;
   label: string;
   value: string;
+  /** Link opcional (tel:, mailto:, url). */
+  href?: string;
   order: number;
   visible: boolean;
 };
